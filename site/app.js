@@ -105,13 +105,30 @@ function initMap() {
   map.on("zoomend moveend", upgradeGeometry);
 
   const url = p.url.replace("{key}", CFG.osApiKey);
-  L.tileLayer(url, Object.assign({ attribution: p.attribution }, p.options))
-   .on("tileerror", () => {
-      if (CFG.basemap !== "opentopo") {
-        console.warn("Basemap tiles failed. Check the OS key and its referrer lock.");
-      }
-   })
-   .addTo(map);
+  const base = L.tileLayer(url, Object.assign({ attribution: p.attribution }, p.options))
+    .addTo(map);
+
+  /* An OS profile can fail for several dull reasons — no key, a key not entitled to that
+     product, a referrer lock that doesn't match the Pages origin, or the Leisure WMTS
+     parameters being slightly off. None of them should leave a blank map, so after a few
+     failed tiles the basemap falls back to the keyless one and says so in the footer. A map
+     with the wrong tiles is still a map; a map with no tiles is a bug report. */
+  if (CFG.basemap !== "opentopo") {
+    let failures = 0;
+    base.on("tileerror", () => {
+      if (++failures < 4 || state.basemapFellBack) return;
+      state.basemapFellBack = true;
+      console.warn(`Basemap "${CFG.basemap}" failed; falling back to OpenTopoMap. ` +
+                   "Check the OS key, its entitlement, and the referrer lock.");
+      map.removeLayer(base);
+      const fb = BASEMAP_PROFILES.opentopo;
+      L.tileLayer(fb.url, Object.assign({ attribution: fb.attribution }, fb.options)).addTo(map);
+      document.getElementById("map").dataset.tint = "true";
+      document.getElementById("attribution").textContent =
+        `${CFG.basemap} tiles did not load — showing OpenTopoMap. ` +
+        fb.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
+    });
+  }
 
   // Only the keyless topographic basemap is tinted onto the paper; the OS sheets already
   // look the way they are meant to look, and are somebody else's cartography to leave alone.

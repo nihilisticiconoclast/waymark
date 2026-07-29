@@ -163,6 +163,33 @@ Three profiles in `site/app.js` → `BASEMAP_PROFILES`:
 | `os-outdoor` | OS Outdoor house style | EPSG:3857 | OS Data Hub, Open Data plan |
 | `os-leisure` | The 1:25 000 Explorer sheet | EPSG:27700 | OS Data Hub, **Premium** plan |
 
+### Getting a key
+
+Nothing about this is automatable — OS issues keys to an account holder, and that is you.
+
+1. Register at <https://osdatahub.os.uk> and create a **project**.
+2. Add the **OS Maps API** to it. The plan you pick decides which styles you get: the
+   **OS OpenData** plan is free and serves `Outdoor_3857` — the OS house style, not the
+   Explorer sheet. The **Premium** plan is what serves `Leisure_27700`, the actual 1:25 000
+   raster, and carries a monthly free credit allowance; confirm the current allowance and
+   whether it wants card details at <https://osdatahub.os.uk/plans> before wiring a public
+   site to it.
+3. In the project settings, **lock the key to a referrer**:
+   `https://nihilisticiconoclast.github.io/*`. The key is delivered to the browser by design
+   — that is the intended pattern for this API — but referrer-locking is what stops it being
+   useful to anyone else. Don't reuse it across projects.
+4. In this repo: *Settings → Secrets and variables → Actions*. Add a **secret** `OS_API_KEY`
+   with the key, and a **variable** `WAYMARK_BASEMAP` set to `os-outdoor` or `os-leisure`.
+5. Re-run the `pages` workflow.
+
+Start with `os-outdoor`. It needs only the free plan, it is EPSG:3857 like the default, and
+it will tell you the key and referrer lock are right before the projection changes underneath
+you as well. **The `os-leisure` URL in `site/app.js` is unverified** — the WMTS layer name and
+parameter casing are written from the API specification and have never been run against a live
+key, and that is the single line most likely to need adjusting. If tiles fail, the site falls
+back to OpenTopoMap after a few errors and says so in the footer rather than showing a blank
+map, so a wrong key degrades instead of breaking.
+
 Two things to know before you reach for `os-leisure`:
 
 1. The 1:25 000 Scale Colour Raster is **Premium** OS data, not open data. It is available

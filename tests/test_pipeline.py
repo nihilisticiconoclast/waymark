@@ -490,6 +490,26 @@ class TestRoutePreference(unittest.TestCase):
         """Open access is a right to roam over land, not a reclassification of the road."""
         self.assertEqual(survey.classify({"highway": "unclassified"}, True), "unclassified")
 
+    def test_the_trailhead_is_the_near_car_park_not_the_big_one(self):
+        """
+        Regression. Ranking car parks by capacity picked a park-and-ride three kilometres
+        away and produced an eleven-kilometre loop through a business park: 43% sealed,
+        38 m of ascent, twenty-eight road crossings. Valid, and nowhere anybody would walk.
+        Proximity dominates; capacity is worth at most a hundred metres.
+        """
+        target = (51.7845, -2.2870)
+
+        def score(distance_m, capacity):
+            bonus = min(capacity, 100)
+            return distance_m - bonus
+
+        near_small = score(300, 12)          # the escarpment car park
+        far_huge = score(3200, 600)          # the park-and-ride
+        self.assertLess(near_small, far_huge)
+
+        # And it is out of range entirely: the cap is 1500 m.
+        self.assertGreater(survey.haversine_m(target, (51.8120, -2.2600)), 1500)
+
     def test_access_polygons_ignore_unclosed_ways(self):
         """A boundary fragment is not an area, and must not be guessed into one."""
         closed = {"type": "way", "id": 1, "geometry": [

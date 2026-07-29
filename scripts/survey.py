@@ -574,20 +574,42 @@ def survey(target: dict, origin: dict) -> dict:
         return (g[0]["lat"], g[0]["lon"]) if g else None
 
     # A walk starts at the car park. The queue's `centre` is a search hint; where you can
-    # actually leave a car is a fact, and it is the thing that decides whether a route is
-    # walkable on a Saturday at all. Largest capacity wins ties, then proximity to the hint.
+    # actually leave a car is a fact, and it decides whether the route is walkable at all.
+    #
+    # Proximity to the target dominates, and it is not close. An earlier version ranked on
+    # capacity first, picked a park-and-ride on the edge of Gloucester three kilometres away,
+    # and produced an eleven-kilometre loop through a business park with 43% sealed surface,
+    # 38 m of ascent and twenty-eight major road crossings — a technically valid loop of
+    # somewhere nobody would walk. Capacity is worth at most a hundred metres of detour, as a
+    # tiebreak between car parks that are both plausibly the trailhead.
+    PARK_MAX_M = 1500
     parks = []
     for p in pois:
-        if p.get("tags", {}).get("amenity") != "parking":
+        t = p.get("tags", {})
+        if t.get("amenity") != "parking":
+            continue
+        if t.get("parking") == "park_and_ride":
+            continue                                    # a commuter facility, not a trailhead
+        if t.get("access") in ("private", "customers", "no", "permit"):
             continue
         pt = poi_point(p)
-        if pt and haversine_m(pt, (lat, lon)) <= 2500:
-            cap = p["tags"].get("capacity", "")
-            parks.append((haversine_m(pt, (lat, lon)), -(int(cap) if cap.isdigit() else 0), pt))
-    parks.sort(key=lambda x: (x[1], x[0]))
-    start_at = parks[0][2] if parks else None
+        if not pt:
+            continue
+        d = haversine_m(pt, (lat, lon))
+        if d > PARK_MAX_M:
+            continue
+        cap = t.get("capacity", "")
+        bonus = min(int(cap), 100) if cap.isdigit() else 0
+        parks.append((d - bonus, d, t.get("name"), pt))
+
+    parks.sort(key=lambda x: x[0])
+    start_at = parks[0][3] if parks else None
     if start_at:
-        print(f"  {len(parks)} car parks near the target; anchoring the loop to the best")
+        print(f"  {len(parks)} car parks within {PARK_MAX_M} m; starting at "
+              f"{parks[0][2] or 'an unnamed car park'} ({parks[0][1]:.0f} m from the target)")
+    else:
+        print(f"  no car park within {PARK_MAX_M} m of the target; "
+              "anchoring the loop to the queue centre")
 
     G = build_graph(ways, access=access)
     loop = find_loop(G, (lat, lon), tuple(target["distance_band_km"]), start_at=start_at)
@@ -657,6 +679,11 @@ def survey(target: dict, origin: dict) -> dict:
             nt = True
 
     hazards = []
+    # OSM splits a road into a way per junction, so a single crossing of one A-road matches
+    # several ways and a route beside one matches dozens. Twenty-eight identical entries
+    # saying "a primary road" is not disclosure, it is noise that buries the one that matters
+    # — so they collapse by road identity, and the caveat names the road once.
+    roads_crossed: dict[str, dict] = {}
     for h in hazards_raw:
         t = h.get("tags", {})
         if t.get("highway") in ("motorway", "trunk", "primary"):
@@ -665,11 +692,15 @@ def survey(target: dict, origin: dict) -> dict:
                 min(haversine_m((g["lat"], g["lon"]), n) for n in loop) < 15 for g in geom
             )
             if crossing and not t.get("footway") and not t.get("sidewalk"):
-                hazards.append({
+                key = t.get("ref") or t.get("name") or f"way/{h['id']}"
+                entry = roads_crossed.setdefault(key, {
                     "kind": "major_road_crossing",
-                    "detail": f"Route meets a {t['highway']} road with no mapped footway or crossing.",
+                    "detail": f"Route meets {key}, a {t['highway']} road, "
+                              "with no mapped footway or crossing.",
                     "osm_id": f"way/{h['id']}",
+                    "_n": 0,
                 })
+                entry["_n"] += 1
         elif t.get("ford") == "yes" and near(h, 30) is not None:
             hazards.append({"kind": "ford", "detail": "Ford on or adjacent to the route.",
                             "osm_id": f"{h['type']}/{h['id']}"})
@@ -683,6 +714,12 @@ def survey(target: dict, origin: dict) -> dict:
             hazards.append({"kind": "tidal",
                             "detail": "Route runs along or across a tidal section.",
                             "osm_id": f"{h['type']}/{h['id']}"})
+
+    for key, entry in roads_crossed.items():
+        n = entry.pop("_n")
+        if n > 1:
+            entry["detail"] += f" Met at {n} points along the route."
+        hazards.append(entry)
 
     # Names of nearby POIs join the allowlist — this is how a pub becomes mentionable.
     named = set(attrs["named_features"])
