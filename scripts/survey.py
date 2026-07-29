@@ -394,14 +394,21 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
             continue
         out_edges = {frozenset(e) for e in zip(out, out[1:])}
 
-        H = G.copy()
-        for u, v in zip(out, out[1:]):
-            if H.has_edge(u, v):
-                H[u][v]["cost"] *= 6.0            # penalise, don't forbid — cul-de-sacs exist
+        # Penalise the outward leg in place and put it back afterwards. Copying the graph
+        # here cost a full clone of every node and edge per candidate — three hundred clones
+        # of a twenty-thousand-node graph, which is most of the survey's runtime for no
+        # benefit. Penalise, don't forbid: cul-de-sacs exist, and sometimes the only way back
+        # from a spur is the way you came.
+        touched = [(u, v, G[u][v]["cost"]) for u, v in zip(out, out[1:]) if G.has_edge(u, v)]
+        for u, v, _ in touched:
+            G[u][v]["cost"] *= 6.0
         try:
-            back = nx.shortest_path(H, mid, start, weight="cost")
+            back = nx.shortest_path(G, mid, start, weight="cost")
         except nx.NetworkXNoPath:
             continue
+        finally:
+            for u, v, cost in touched:
+                G[u][v]["cost"] = cost
 
         loop = out + back[1:]
         total = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:]) if G.has_edge(u, v))
