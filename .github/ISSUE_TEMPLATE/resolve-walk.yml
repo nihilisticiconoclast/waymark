@@ -1,0 +1,36 @@
+name: Resolve a walk
+description: Record what actually happened, after you've been.
+title: "resolve: "
+labels: ["resolution"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This scores the generator's stated confidence against reality. Be honest about
+        `diverged` — a route you completed by ignoring the write-up did not vindicate the
+        write-up, and recording it as a success is the one way to make the calibration
+        numbers meaningless.
+  - type: input
+    id: walk
+    attributes:
+      label: Walk
+      description: The slug, e.g. haresfield-beacon
+    validations: { required: true }
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      options:
+        - walked_as_described — followed it as written, no backtracking, no access problem
+        - diverged — navigable, but the write-up was wrong somewhere material
+        - failed — blocked, unwalkable, or access was not as stated
+        - not_attempted — excluded from scoring
+    validations: { required: true }
+  - type: input
+    id: date
+    attributes: { label: Date walked, placeholder: "2026-08-03" }
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What was wrong, if anything. This is what improves the survey queries.

@@ -1,0 +1,33 @@
+## Voice specification
+
+{{ voice_md }}
+
+---
+
+## Survey payload
+
+This is everything known about the route. Nothing outside it may appear in your response.
+
+```json
+{{ survey_json }}
+```
+
+## Permitted proper nouns
+
+You may use these names and no others.
+
+{% for name in named_features %}- {{ name }}
+{% endfor %}
+{% for name in gazetteer %}- {{ name }}
+{% endfor %}
+
+## Schema
+
+```json
+{{ editorial_schema_json }}
+```
+
+---
+
+Write the record. Return one JSON object with keys `editorial`, `ratings`, and `confidence`.
+Nothing else.

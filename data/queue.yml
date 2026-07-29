@@ -1,0 +1,170 @@
+# Target areas awaiting survey.
+#
+# The weekly job takes the highest-priority unsurveyed entry. Priority is a hint, not an
+# ordering guarantee — the job will skip an entry whose Overpass query returns insufficient
+# path density and move on rather than force a bad loop.
+#
+# `centre` is a search anchor, NOT a route start. survey.py finds the start.
+# `distance_band_km` constrains loop assembly. Widen it if the assembler keeps failing.
+#
+# Deliberately spread across bearings so the dial has something to select. Roughly half the
+# queue is inside 20 km — the honest truth is that most walks that actually happen are the
+# close ones, and a corpus weighted toward Snowdonia would be aspirational furniture.
+
+origin:
+  name: Stroud
+  lat: 51.7447
+  lon: -2.2166
+  note: The Cross. Change here and in site/app.js ORIGIN together.
+
+targets:
+
+  # --- Escarpment, within half an hour -------------------------------------------------
+  - slug: haresfield-beacon
+    name: Haresfield Beacon
+    centre: [51.7845, -2.2870]
+    radius_km: 2.5
+    distance_band_km: [7, 12]
+    priority: 1
+    notes: NT escarpment, topograph, trig. Expect good PRoW density and mapped parking.
+
+  - slug: standish-wood
+    name: Standish Wood
+    centre: [51.7790, -2.2740]
+    radius_km: 2.0
+    distance_band_km: [6, 10]
+    priority: 2
+
+  - slug: rodborough-common
+    name: Rodborough Common
+    centre: [51.7290, -2.2140]
+    radius_km: 2.0
+    distance_band_km: [5, 9]
+    priority: 3
+    notes: Open access common. Watch for cattle grids and unfenced road sections.
+
+  - slug: minchinhampton-common
+    name: Minchinhampton Common
+    centre: [51.7130, -2.1900]
+    radius_km: 2.5
+    distance_band_km: [7, 12]
+    priority: 4
+
+  - slug: selsley-common
+    name: Selsley Common
+    centre: [51.7280, -2.2620]
+    radius_km: 2.0
+    distance_band_km: [5, 9]
+    priority: 5
+
+  - slug: woodchester-park
+    name: Woodchester Park
+    centre: [51.7060, -2.2860]
+    radius_km: 2.5
+    distance_band_km: [6, 11]
+    priority: 6
+
+  - slug: swifts-hill-slad
+    name: Swift's Hill and the Slad valley
+    centre: [51.7690, -2.1930]
+    radius_km: 2.0
+    distance_band_km: [6, 10]
+    priority: 7
+
+  - slug: painswick-beacon
+    name: Painswick Beacon
+    centre: [51.7920, -2.1930]
+    radius_km: 2.0
+    distance_band_km: [6, 11]
+    priority: 8
+
+  - slug: coaley-peak-nympsfield
+    name: Coaley Peak and Nympsfield
+    centre: [51.7020, -2.3200]
+    radius_km: 2.5
+    distance_band_km: [7, 12]
+    priority: 9
+
+  - slug: uley-bury
+    name: Uley Bury
+    centre: [51.6870, -2.3130]
+    radius_km: 2.0
+    distance_band_km: [6, 11]
+    priority: 10
+
+  - slug: cam-long-down
+    name: Cam Long Down
+    centre: [51.6900, -2.3540]
+    radius_km: 2.5
+    distance_band_km: [8, 13]
+    priority: 11
+
+  - slug: sapperton-daneway
+    name: Sapperton and the Golden Valley
+    centre: [51.7230, -2.0870]
+    radius_km: 2.5
+    distance_band_km: [7, 12]
+    priority: 12
+    notes: Canal and tunnel portal. Towpath surface tagging is usually good.
+
+  - slug: cranham-woods
+    name: Cranham Woods
+    centre: [51.8180, -2.1520]
+    radius_km: 2.5
+    distance_band_km: [7, 12]
+    priority: 13
+
+  # --- An hour out ---------------------------------------------------------------------
+  - slug: forest-of-dean-cannop
+    name: Forest of Dean, Cannop
+    centre: [51.8080, -2.5820]
+    radius_km: 4.0
+    distance_band_km: [9, 15]
+    priority: 20
+    notes: Forestry England access. Expect permissive rather than PRoW; classify carefully.
+
+  - slug: symonds-yat
+    name: Symonds Yat and the lower Wye
+    centre: [51.8380, -2.6430]
+    radius_km: 3.5
+    distance_band_km: [9, 15]
+    priority: 21
+
+  - slug: mendip-cheddar
+    name: Mendip above Cheddar
+    centre: [51.2830, -2.7650]
+    radius_km: 4.0
+    distance_band_km: [10, 16]
+    priority: 22
+
+  - slug: marlborough-downs-avebury
+    name: Marlborough Downs and Avebury
+    centre: [51.4290, -1.8540]
+    radius_km: 4.0
+    distance_band_km: [10, 18]
+    priority: 23
+    notes: Byways and open downland. Good test of the byway_open_to_all_traffic handling.
+
+  - slug: malvern-hills
+    name: Malvern Hills
+    centre: [52.0740, -2.3400]
+    radius_km: 4.0
+    distance_band_km: [10, 17]
+    priority: 24
+
+  # --- A proper drive ------------------------------------------------------------------
+  - slug: blorenge-blaenavon
+    name: Blorenge above Blaenavon
+    centre: [51.8050, -3.0800]
+    radius_km: 4.0
+    distance_band_km: [11, 18]
+    priority: 30
+    notes: Wales — different rights-of-way regime in detail, same designation tags.
+
+  - slug: black-mountains-hay-bluff
+    name: Hay Bluff and the Black Mountains
+    centre: [52.0120, -3.1030]
+    radius_km: 5.0
+    distance_band_km: [14, 24]
+    priority: 31
+    notes: Exposure rating matters here. Do not let the model rate this a 2.

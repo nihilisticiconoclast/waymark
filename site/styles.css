@@ -1,0 +1,252 @@
+/* ===========================================================================
+   Waymark — layout only.
+
+   Every colour, typeface, weight and radius comes from cuddly-lamp. This file may
+   declare geometry and may reference tokens. It may not declare a literal colour
+   outside the fallback fence at the bottom.
+
+   If cuddly-lamp's token names differ from the --cl-* assumed here, edit THIS file
+   to match cuddly-lamp. Never the reverse.
+   =========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--cl-font-body);
+  color: var(--cl-ink);
+  background: var(--cl-surface);
+  overscroll-behavior: none;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: minmax(300px, 24rem) 1fr;
+  height: 100dvh;
+}
+
+/* ── map ─────────────────────────────────────────────────────────────────── */
+
+#map {
+  grid-column: 2;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Route geometry is drawn twice: a wide low-opacity casing under a narrow solid core,
+   so it holds up over both the pale wash of the Explorer sheet and a darker
+   topographic basemap without needing a per-profile colour. */
+.route-casing { stroke: var(--cl-surface); stroke-width: 9; stroke-opacity: .75; fill: none; }
+.route-core   { stroke: var(--cl-accent);  stroke-width: 3; fill: none; }
+
+.walk-pin {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--cl-surface);
+  background: var(--cl-accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / .35);
+}
+.walk-pin[data-low="true"] { background: var(--cl-muted); }
+.walk-pin[data-selected="true"] { transform: scale(1.5); }
+
+.leaflet-container { font-family: var(--cl-font-ui); background: var(--cl-surface); }
+
+/* ── rail ────────────────────────────────────────────────────────────────── */
+
+#rail {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cl-space-4);
+  padding: var(--cl-space-5);
+  overflow-y: auto;
+  border-right: 1px solid var(--cl-rule);
+  background: var(--cl-surface);
+  z-index: 500;
+}
+
+#rail-grip { display: none; }
+
+.rail-head h1 { font-family: var(--cl-font-display); margin: 0; }
+.rail-sub { margin: var(--cl-space-1) 0 0; color: var(--cl-muted); }
+
+.block { display: flex; flex-direction: column; gap: var(--cl-space-2); }
+.block h2 {
+  font-family: var(--cl-font-ui);
+  font-size: var(--cl-size-eyebrow);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cl-muted);
+  margin: 0 0 var(--cl-space-1);
+  padding-bottom: var(--cl-space-1);
+  border-bottom: 1px solid var(--cl-rule);
+}
+
+.range { display: flex; flex-direction: column; gap: var(--cl-space-1); }
+.range > span { display: flex; justify-content: space-between; align-items: baseline; }
+.range output { font-family: var(--cl-font-mono); color: var(--cl-muted); }
+.range small { color: var(--cl-muted); }
+.range input[type="range"] { width: 100%; accent-color: var(--cl-accent); }
+
+.checks { display: flex; flex-direction: column; gap: var(--cl-space-1); }
+.checks label { display: flex; gap: var(--cl-space-2); align-items: center; cursor: pointer; }
+.checks input { accent-color: var(--cl-accent); }
+
+.link-btn {
+  align-self: flex-start;
+  background: none; border: 0; padding: 0;
+  font: inherit; color: var(--cl-muted);
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.calib {
+  font-family: var(--cl-font-mono);
+  font-size: var(--cl-size-small);
+  color: var(--cl-muted);
+  line-height: 1.6;
+}
+
+.rail-foot { margin-top: auto; padding-top: var(--cl-space-3); border-top: 1px solid var(--cl-rule); }
+.rail-foot p { margin: 0; font-size: var(--cl-size-small); color: var(--cl-muted); }
+
+/* ── dial ────────────────────────────────────────────────────────────────── */
+
+#dial-wrap { aspect-ratio: 1; width: 100%; max-width: 20rem; margin-inline: auto; }
+#dial { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+
+#dial-rings circle { fill: none; stroke: var(--cl-rule); stroke-width: .5; }
+#dial-ticks line   { stroke: var(--cl-rule); stroke-width: .5; }
+#dial-ticks text   {
+  fill: var(--cl-muted);
+  font-family: var(--cl-font-mono);
+  font-size: 7px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+#dial-wedge  { fill: var(--cl-accent); fill-opacity: .16; stroke: var(--cl-accent); stroke-width: .75; }
+#dial-origin { fill: var(--cl-ink); }
+#dial-dots circle { fill: var(--cl-ink); r: 2.2; }
+#dial-dots circle[data-in="false"] { fill: var(--cl-rule); }
+
+.dial-read { margin: 0; font-family: var(--cl-font-mono); font-size: var(--cl-size-small); }
+
+/* ── detail ──────────────────────────────────────────────────────────────── */
+
+#detail {
+  position: fixed;
+  top: var(--cl-space-4); right: var(--cl-space-4);
+  width: min(30rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  padding: var(--cl-space-5);
+  background: var(--cl-surface);
+  border: 1px solid var(--cl-rule);
+  border-radius: var(--cl-radius);
+  box-shadow: var(--cl-shadow);
+  z-index: 900;
+}
+#detail h2 { font-family: var(--cl-font-display); margin: 0 0 var(--cl-space-2); }
+#detail h3 {
+  font-family: var(--cl-font-ui);
+  font-size: var(--cl-size-eyebrow);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--cl-muted);
+  margin: var(--cl-space-4) 0 var(--cl-space-1);
+}
+#detail p { margin: 0 0 var(--cl-space-2); line-height: 1.65; }
+#detail-close {
+  position: absolute; top: var(--cl-space-3); right: var(--cl-space-3);
+  background: none; border: 0; font-size: 1.5rem; line-height: 1;
+  color: var(--cl-muted); cursor: pointer;
+}
+
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: var(--cl-space-2);
+  font-family: var(--cl-font-mono); font-size: var(--cl-size-small);
+}
+.stat-grid div { display: flex; flex-direction: column; }
+.stat-grid dt, .stat-grid .k { color: var(--cl-muted); font-size: var(--cl-size-tiny); }
+
+.chip {
+  display: inline-block;
+  padding: .15em .6em;
+  border: 1px solid var(--cl-rule);
+  border-radius: 999px;
+  font-family: var(--cl-font-mono); font-size: var(--cl-size-tiny);
+  color: var(--cl-muted);
+}
+.chip[data-tone="warn"] { border-color: var(--cl-accent); color: var(--cl-accent); }
+
+/* ── mobile: rail becomes a bottom sheet ─────────────────────────────────── */
+
+@media (max-width: 900px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  #map { grid-column: 1; grid-row: 1; }
+
+  #rail {
+    position: fixed; inset: auto 0 0 0;
+    grid-column: 1; grid-row: 1;
+    max-height: 88dvh;
+    border-right: 0;
+    border-top: 1px solid var(--cl-rule);
+    border-radius: var(--cl-radius) var(--cl-radius) 0 0;
+    box-shadow: var(--cl-shadow);
+    padding-bottom: calc(var(--cl-space-5) + env(safe-area-inset-bottom));
+    transform: translateY(calc(100% - 5.5rem));
+    transition: transform .28s ease;
+  }
+  #rail[data-detent="half"] { transform: translateY(45%); }
+  #rail[data-detent="full"] { transform: translateY(0); }
+
+  #rail-grip {
+    display: block;
+    width: 3rem; height: .3rem;
+    margin: 0 auto var(--cl-space-2);
+    border-radius: 999px;
+    background: var(--cl-rule);
+    cursor: grab;
+  }
+
+  #detail { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-height: 75dvh;
+            border-radius: var(--cl-radius) var(--cl-radius) 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #rail { transition: none; }
+  .walk-pin { transition: none; }
+}
+
+:focus-visible { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
+
+/* ===========================================================================
+   FALLBACK FENCE — the only place literal values are permitted.
+   Applies when cuddly-lamp fails to load, so the page is legible rather than blank.
+   Do not extend this into a second design system.
+   =========================================================================== */
+:root {
+  --cl-font-display: var(--cl-font-display, Georgia, "Times New Roman", serif);
+  --cl-font-body:    var(--cl-font-body, system-ui, sans-serif);
+  --cl-font-ui:      var(--cl-font-ui, system-ui, sans-serif);
+  --cl-font-mono:    var(--cl-font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+
+  --cl-ink:     var(--cl-ink, #1c1c1a);
+  --cl-muted:   var(--cl-muted, #6b6b64);
+  --cl-surface: var(--cl-surface, #fbfaf7);
+  --cl-rule:    var(--cl-rule, #d8d5cc);
+  --cl-accent:  var(--cl-accent, #3d5a45);
+
+  --cl-space-1: var(--cl-space-1, .25rem);
+  --cl-space-2: var(--cl-space-2, .5rem);
+  --cl-space-3: var(--cl-space-3, .75rem);
+  --cl-space-4: var(--cl-space-4, 1rem);
+  --cl-space-5: var(--cl-space-5, 1.5rem);
+
+  --cl-radius:      var(--cl-radius, 4px);
+  --cl-shadow:      var(--cl-shadow, 0 6px 24px rgb(0 0 0 / .12));
+  --cl-size-small:  var(--cl-size-small, .8125rem);
+  --cl-size-tiny:   var(--cl-size-tiny, .6875rem);
+  --cl-size-eyebrow:var(--cl-size-eyebrow, .6875rem);
+}

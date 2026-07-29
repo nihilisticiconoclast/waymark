@@ -1,0 +1,46 @@
+name: resolve walk
+
+# Beating the Bounds. An issue filed from the template becomes a ledger entry.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  append:
+    if: contains(github.event.issue.labels.*.name, 'resolution')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Append to ledger
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          python - <<'PY'
+          import json, os, re, datetime, pathlib
+          body = os.environ["BODY"]
+          def field(name):
+              m = re.search(rf"###\s*{name}\s*\n+(.+?)(?=\n###|\Z)", body, re.S | re.I)
+              return m.group(1).strip() if m else None
+
+          ledger = pathlib.Path("data/ledger.json")
+          d = json.loads(ledger.read_text())
+          d["entries"].append({
+              "slug": field("Walk"),
+              "outcome": (field("Outcome") or "").split()[0].lower().replace("-", "_"),
+              "date": field("Date walked") or datetime.date.today().isoformat(),
+              "note": field("Notes"),
+          })
+          ledger.write_text(json.dumps(d, indent=2))
+          PY
+          python scripts/brier.py --write || true
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ledger: resolve ${{ github.event.issue.title }}"
+          file_pattern: data/ledger.json site/data/calibration.json

@@ -1,0 +1,35 @@
+# Proper nouns the validator will accept in prose beyond what a survey found.
+#
+# Adding a line here is an assertion that YOU have verified the name exists and applies.
+# This is the only place in the pipeline where trust is manual. Keep it small.
+#
+# One per line. `#` comments. Case-sensitive.
+
+# --- Regional and geological ---------------------------------------------------------
+Cotswolds
+Cotswold escarpment
+Severn
+Severn Vale
+Vale of Berkeley
+Five Valleys
+Golden Valley
+Stroudwater
+Great Oolite
+Inferior Oolite
+Fuller's Earth
+Lias
+Cotswold Way
+
+# --- Administrative ------------------------------------------------------------------
+Gloucestershire
+Stroud
+National Trust
+Forestry England
+Natural England
+Gloucestershire Wildlife Trust
+
+# --- Historical / land use -----------------------------------------------------------
+# Add sparingly, and only where you can point at a source.
+Stroudwater Navigation
+Thames and Severn Canal
+Sapperton Tunnel

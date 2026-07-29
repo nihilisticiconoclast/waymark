@@ -1,0 +1,8 @@
+anthropic>=0.40
+requests>=2.32
+jsonschema>=4.23
+PyYAML>=6.0
+shapely>=2.0
+pyproj>=3.6
+networkx>=3.3
+Jinja2>=3.1

@@ -1,0 +1,5 @@
+{
+  "$comment": "Beating the Bounds. Append-only. Written by .github/workflows/resolve-walk.yml from a 'Resolve a walk' issue, or by hand. scripts/brier.py reads this and nothing else.",
+  "schema_version": 1,
+  "entries": []
+}

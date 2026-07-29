@@ -1,0 +1,79 @@
+name: new walk
+
+# One walk a week, opened as a pull request. Never pushed to main.
+#
+# Daily is tempting and wrong: you would accumulate sixty unverified records inside two
+# months and the ledger would never catch up. The rate limit on this whole system is how
+# fast you can walk.
+
+on:
+  schedule:
+    - cron: "0 6 * * 0"          # Sunday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Slug from data/queue.yml (blank = highest priority unsurveyed)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r scripts/requirements.txt
+
+      - name: Survey
+        id: survey
+        run: |
+          if [ -n "${{ inputs.target }}" ]; then
+            python scripts/survey.py --target "${{ inputs.target }}"
+          else
+            python scripts/survey.py --next
+          fi
+          echo "slug=$(ls -t data/surveys/*.json | head -1 | xargs basename | sed 's/.json//')" >> "$GITHUB_OUTPUT"
+
+      - name: Author
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WAYMARK_MODEL: claude-sonnet-5
+        run: python scripts/author.py --survey "data/surveys/${{ steps.survey.outputs.slug }}.json"
+
+      - name: Validate
+        id: validate
+        continue-on-error: true
+        run: python scripts/validate.py --strict data/walks/*.json
+
+      - name: Build
+        run: |
+          python scripts/build_index.py
+          python scripts/brier.py --write
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: "walk/${{ steps.survey.outputs.slug }}"
+          title: "walk: ${{ steps.survey.outputs.slug }}"
+          labels: ${{ steps.validate.outcome == 'success' && 'walk' || 'walk,needs-review' }}
+          commit-message: "walk: ${{ steps.survey.outputs.slug }}"
+          body: |
+            Surveyed and written up by the weekly job.
+
+            **Validation: ${{ steps.validate.outcome == 'success' && 'passed' || 'FAILED — read the log' }}**
+
+            Before merging, read the write-up against the survey payload rather than on its
+            own. The prose is designed to be plausible; that is what makes it worth checking.
+
+            - [ ] Every named feature is one you can find on the map
+            - [ ] Access classification matches `facts.access.segments`
+            - [ ] Every surveyed hazard appears in the caveats
+            - [ ] `confidence.navigable` is a judgement, not an anchor

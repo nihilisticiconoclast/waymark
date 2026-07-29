@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+site/config.js
+data/surveys/.cache/
+.DS_Store

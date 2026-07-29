@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/waymark/walk.schema.json",
+  "title": "Waymark walk record",
+  "description": "A single curated walk. Fields under `facts` and `geometry` are produced by the survey stage and must never be written by a model. Fields under `editorial` are produced by the authoring stage and must never contain a coordinate.",
+  "type": "object",
+  "required": ["id", "slug", "name", "status", "geometry", "facts", "editorial", "confidence", "provenance"],
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "integer", "minimum": 1 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "name": { "type": "string", "minLength": 3, "maxLength": 80 },
+
+    "status": {
+      "enum": ["seed", "draft", "needs-review", "published", "retired"],
+      "description": "`seed` records are hand-written examples and are refused by the publisher unless --allow-seed is passed."
+    },
+
+    "geometry": {
+      "type": "object",
+      "required": ["start", "route", "closed"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "object",
+          "required": ["lat", "lon"],
+          "additionalProperties": false,
+          "properties": {
+            "lat": { "type": "number", "minimum": 49.8, "maximum": 61.0 },
+            "lon": { "type": "number", "minimum": -8.7, "maximum": 1.8 },
+            "osgb_grid_ref": { "type": ["string", "null"] },
+            "what3words": { "type": ["string", "null"] }
+          }
+        },
+        "route": {
+          "type": "object",
+          "description": "GeoJSON LineString. Written only by survey.py.",
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": { "const": "LineString" },
+            "coordinates": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 3,
+                "items": { "type": "number" }
+              }
+            }
+          }
+        },
+        "closed": { "type": "boolean", "description": "True if start and finish are within 150 m." },
+        "bearing_from_origin_deg": { "type": ["number", "null"], "minimum": 0, "exclusiveMaximum": 360 },
+        "drive_km_from_origin": { "type": ["number", "null"], "minimum": 0 },
+        "drive_minutes_from_origin": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+
+    "facts": {
+      "type": "object",
+      "description": "Deterministic. Every value traces to OSM or a DEM.",
+      "required": ["distance_km", "ascent_m", "access", "surface_mix", "named_features"],
+      "additionalProperties": false,
+      "properties": {
+        "distance_km": { "type": "number", "exclusiveMinimum": 0 },
+        "ascent_m": { "type": "number", "minimum": 0 },
+        "descent_m": { "type": "number", "minimum": 0 },
+        "max_elevation_m": { "type": ["number", "null"] },
+        "min_elevation_m": { "type": ["number", "null"] },
+        "max_sustained_gradient_pct": {
+          "type": ["number", "null"],
+          "description": "Steepest gradient sustained over 200 m."
+        },
+        "elevation_profile": {
+          "type": "array",
+          "description": "[distance_km, elevation_m] pairs, sampled every 50 m.",
+          "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }
+        },
+
+        "access": {
+          "type": "object",
+          "required": ["by_right_pct", "segments"],
+          "additionalProperties": false,
+          "properties": {
+            "by_right_pct": {
+              "type": "number", "minimum": 0, "maximum": 100,
+              "description": "Share of route length carrying a PRoW designation or open-access status."
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["designation", "length_m"],
+                "additionalProperties": false,
+                "properties": {
+                  "designation": {
+                    "enum": ["public_footpath", "public_bridleway", "restricted_byway",
+                             "byway_open_to_all_traffic", "access_land", "permissive",
+                             "highway_with_footway", "unknown"]
+                  },
+                  "length_m": { "type": "number", "minimum": 0 },
+                  "prow_ref": { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        },
+
+        "surface_mix": {
+          "type": "object",
+          "description": "Percentages of route length. `untagged` is honest, not a defect.",
+          "additionalProperties": false,
+          "properties": {
+            "sealed_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "firm_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "soft_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "untagged_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        },
+
+        "amenities": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "car_park": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "distance_from_start_m"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": ["string", "null"] },
+                  "operator": { "type": ["string", "null"] },
+                  "fee": { "type": ["boolean", "null"] },
+                  "capacity": { "type": ["integer", "null"] },
+                  "distance_from_start_m": { "type": "number", "minimum": 0 },
+                  "osm_id": { "type": "string" }
+                }
+              }
+            },
+            "toilets": { "type": "boolean" },
+            "refreshment": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type", "vegan"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "enum": ["pub", "cafe", "restaurant", "shop", "kiosk"] },
+                  "vegan": {
+                    "enum": ["yes", "only", "no", "unknown"],
+                    "description": "From OSM diet:vegan. `unknown` is the honest default and must be surfaced as such in prose."
+                  },
+                  "distance_from_route_m": { "type": "number", "minimum": 0 },
+                  "osm_id": { "type": "string" }
+                }
+              }
+            },
+            "national_trust": { "type": "boolean" },
+            "trig_point": { "type": "boolean" },
+            "viewpoints": { "type": "integer", "minimum": 0 },
+            "public_transport": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "nearest_stop_m": { "type": ["number", "null"] },
+                "nearest_station_m": { "type": ["number", "null"] }
+              }
+            },
+            "dogs": { "enum": ["yes", "leashed", "no", "unknown"] }
+          }
+        },
+
+        "hazards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "detail"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": ["major_road_crossing", "ford", "level_crossing", "tidal",
+                         "flood_prone", "steep_drop", "livestock_likely", "barrier"]
+              },
+              "detail": { "type": "string" },
+              "osm_id": { "type": ["string", "null"] }
+            }
+          }
+        },
+
+        "named_features": {
+          "type": "array",
+          "description": "Every proper noun the authoring stage is permitted to use. Built from OSM name tags on or near the route.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "editorial": {
+      "type": "object",
+      "description": "Written by Claude. Must contain no coordinate, no proper noun outside facts.named_features + gazetteer, and no sentence-initial imperative.",
+      "required": ["summary", "character", "conditions", "practical", "caveats"],
+      "additionalProperties": false,
+      "properties": {
+        "summary":    { "type": "string", "minLength": 20, "maxLength": 200 },
+        "character":  { "type": "string", "minLength": 80, "maxLength": 900 },
+        "grain":      { "type": ["string", "null"], "maxLength": 320 },
+        "conditions": { "type": "string", "minLength": 40, "maxLength": 700 },
+        "practical":  { "type": "string", "minLength": 40, "maxLength": 700 },
+        "caveats":    { "type": "string", "minLength": 20, "maxLength": 700 },
+        "best_months": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1, "maximum": 12 },
+          "maxItems": 12
+        },
+        "runnable": {
+          "type": ["string", "null"],
+          "enum": ["throughout", "mostly", "in_parts", "no", null],
+          "description": "Trail-running assessment, derived from surface_mix and gradient."
+        }
+      }
+    },
+
+    "ratings": {
+      "type": "object",
+      "description": "1-5 ordinal, model-assigned, used only for filtering. Not facts.",
+      "additionalProperties": false,
+      "properties": {
+        "difficulty":    { "type": "integer", "minimum": 1, "maximum": 5 },
+        "technicality":  { "type": "integer", "minimum": 1, "maximum": 5 },
+        "exposure":      { "type": "integer", "minimum": 1, "maximum": 5 },
+        "solitude":      { "type": "integer", "minimum": 1, "maximum": 5 }
+      }
+    },
+
+    "confidence": {
+      "type": "object",
+      "required": ["navigable", "basis"],
+      "additionalProperties": false,
+      "properties": {
+        "navigable": {
+          "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1,
+          "description": "P(a competent walker with the map follows this as written, without backtracking or access problem)."
+        },
+        "basis": { "type": "string", "minLength": 20, "maxLength": 400 },
+        "resolved": {
+          "type": ["object", "null"],
+          "required": ["outcome", "date"],
+          "additionalProperties": false,
+          "properties": {
+            "outcome": { "enum": ["walked_as_described", "diverged", "failed", "not_attempted"] },
+            "date": { "type": "string", "format": "date" },
+            "note": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+
+    "provenance": {
+      "type": "object",
+      "required": ["method", "surveyed_at", "attribution"],
+      "additionalProperties": false,
+      "properties": {
+        "method": { "enum": ["survey+author", "hand-seeded"] },
+        "surveyed_at": { "type": "string", "format": "date-time" },
+        "authored_at": { "type": ["string", "null"], "format": "date-time" },
+        "model": { "type": ["string", "null"] },
+        "prompt_sha": { "type": ["string", "null"] },
+        "overpass_query_sha": { "type": ["string", "null"] },
+        "attribution": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "passed": { "type": "boolean" },
+            "checks": { "type": "object", "additionalProperties": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

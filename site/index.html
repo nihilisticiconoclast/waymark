@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waymark — walks from Stroud</title>
+<meta name="description" content="Curated walks around Stroud, surveyed from open data and written up by hand.">
+
+<!-- Styling is owned by cuddly-lamp. Confirm the actual file names and token prefix before
+     the first build; the paths below are the assumed contract, not a verified one. -->
+<link rel="stylesheet" href="https://USER.github.io/cuddly-lamp/tokens.css">
+<link rel="stylesheet" href="https://USER.github.io/cuddly-lamp/base.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ── rail ─────────────────────────────────────────────────────────────────────── -->
+  <aside id="rail" aria-label="Filters">
+    <div id="rail-grip" role="button" tabindex="0" aria-label="Expand filters"></div>
+
+    <header class="rail-head">
+      <h1>Waymark</h1>
+      <p class="rail-sub"><span id="count">0</span> of <span id="total">0</span> walks</p>
+    </header>
+
+    <!-- The dial. Every walk is a dot in polar coordinates about Stroud. Drag across it to
+         select a sector; the selection is a bearing range and a distance range at once. -->
+    <section class="block" aria-labelledby="dial-h">
+      <h2 id="dial-h">Where from Stroud</h2>
+      <div id="dial-wrap">
+        <svg id="dial" viewBox="-110 -110 220 220" role="application"
+             aria-label="Bearing and distance selector. Drag to select a sector.">
+          <g id="dial-rings"></g>
+          <g id="dial-ticks"></g>
+          <path id="dial-wedge" d=""></path>
+          <g id="dial-dots"></g>
+          <circle id="dial-origin" r="2.5" cx="0" cy="0"></circle>
+        </svg>
+      </div>
+      <p class="dial-read" id="dial-read">All directions, any distance</p>
+      <button type="button" class="link-btn" id="dial-clear">Clear the sector</button>
+    </section>
+
+    <section class="block" aria-labelledby="range-h">
+      <h2 id="range-h">The walk itself</h2>
+
+      <label class="range">
+        <span>Distance <output id="out-dist">any</output></span>
+        <input type="range" id="f-dist" min="0" max="30" step="1" value="30">
+      </label>
+
+      <label class="range">
+        <span>Total ascent <output id="out-asc">any</output></span>
+        <input type="range" id="f-asc" min="0" max="900" step="25" value="900">
+      </label>
+
+      <label class="range">
+        <span>Steepest sustained <output id="out-grad">any</output></span>
+        <input type="range" id="f-grad" min="0" max="30" step="1" value="30">
+      </label>
+
+      <label class="range">
+        <span>Underfoot <output id="out-surf">any</output></span>
+        <input type="range" id="f-surf" min="0" max="100" step="10" value="0">
+        <small>Minimum share of the route that is unsealed.</small>
+      </label>
+
+      <label class="range">
+        <span>Technicality at most <output id="out-tech">any</output></span>
+        <input type="range" id="f-tech" min="1" max="5" step="1" value="5">
+      </label>
+    </section>
+
+    <section class="block" aria-labelledby="need-h">
+      <h2 id="need-h">Must have</h2>
+      <div class="checks">
+        <label><input type="checkbox" data-flag="nt"> National Trust land</label>
+        <label><input type="checkbox" data-flag="car_park"> Car park at the start</label>
+        <label><input type="checkbox" data-flag="car_park_free"> …and free</label>
+        <label><input type="checkbox" data-flag="toilets"> Toilets</label>
+        <label><input type="checkbox" data-flag="refreshment"> Somewhere to eat</label>
+        <label><input type="checkbox" data-flag="vegan"> …with a vegan option</label>
+        <label><input type="checkbox" data-flag="closed"> Circular</label>
+        <label><input type="checkbox" data-flag="trig"> Trig point on route</label>
+        <label><input type="checkbox" data-flag="transit"> Reachable by bus or train</label>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="run-h">
+      <h2 id="run-h">Running</h2>
+      <div class="checks">
+        <label><input type="radio" name="run" value="" checked> Doesn't matter</label>
+        <label><input type="radio" name="run" value="mostly"> Runnable for the most part</label>
+        <label><input type="radio" name="run" value="throughout"> Runnable throughout</label>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="trust-h">
+      <h2 id="trust-h">Trust</h2>
+      <label class="range">
+        <span>Confidence at least <output id="out-conf">any</output></span>
+        <input type="range" id="f-conf" min="0" max="95" step="5" value="0">
+      </label>
+      <div id="calibration" class="calib" aria-live="polite"></div>
+    </section>
+
+    <footer class="rail-foot">
+      <p id="attribution"></p>
+    </footer>
+  </aside>
+
+  <!-- ── map ──────────────────────────────────────────────────────────────────────── -->
+  <main id="map" aria-label="Map of walks"></main>
+
+  <!-- ── detail ───────────────────────────────────────────────────────────────────── -->
+  <article id="detail" hidden aria-live="polite">
+    <button type="button" id="detail-close" aria-label="Close">×</button>
+    <div id="detail-body"></div>
+  </article>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script>
+<script src="./config.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
