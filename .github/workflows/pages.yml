@@ -26,21 +26,35 @@ jobs:
       - run: |
           python scripts/build_index.py
           python scripts/brier.py --write
-      # Values arrive as environment variables rather than being interpolated into the
-      # script text: a repository variable is settable by anyone with write access, and
-      # `${{ }}` inside a run block is substituted before the shell ever sees it.
-      # There is no cuddly-lamp setting — the stylesheet URL is fixed in index.html.
+      # One setting, not two. Adding an OS_API_KEY secret is the whole configuration: the
+      # basemap follows from whether a key exists, because a key with no basemap setting and
+      # a basemap setting with no key are both useless states and there is no reason to make
+      # somebody hold them in their head. WAYMARK_BASEMAP stays as an optional override for
+      # the one real choice — os-outdoor (free plan) versus os-leisure (Premium, and the
+      # Explorer sheet) — and can be ignored entirely.
+      #
+      # Values arrive as environment variables rather than being interpolated into the script
+      # text: a repository variable is settable by anyone with write access, and `${{ }}`
+      # inside a run block is substituted before the shell ever sees it.
       - name: Write config.js
         env:
-          BASEMAP: ${{ vars.WAYMARK_BASEMAP || 'opentopo' }}
+          BASEMAP_OVERRIDE: ${{ vars.WAYMARK_BASEMAP }}
           OS_API_KEY: ${{ secrets.OS_API_KEY }}
         run: |
           python - <<'PY' > site/config.js
           import json, os
-          print("window.WAYMARK_CONFIG = %s;" % json.dumps({
-              "basemap": os.environ.get("BASEMAP") or "opentopo",
-              "osApiKey": os.environ.get("OS_API_KEY", ""),
-          }))
+          key = os.environ.get("OS_API_KEY", "").strip()
+          basemap = os.environ.get("BASEMAP_OVERRIDE", "").strip()
+          if not basemap:
+              basemap = "os-outdoor" if key else "opentopo"
+          if basemap.startswith("os-") and not key:
+              print("::warning::WAYMARK_BASEMAP asks for %s but OS_API_KEY is empty; "
+                    "using OpenTopoMap." % basemap)
+              basemap = "opentopo"
+          print("::notice::basemap=%s (OS key %s)"
+                % (basemap, "present" if key else "absent"))
+          print("window.WAYMARK_CONFIG = %s;" % json.dumps(
+              {"basemap": basemap, "osApiKey": key}))
           PY
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }

@@ -178,9 +178,25 @@ Nothing about this is automatable — OS issues keys to an account holder, and t
    `https://nihilisticiconoclast.github.io/*`. The key is delivered to the browser by design
    — that is the intended pattern for this API — but referrer-locking is what stops it being
    useful to anyone else. Don't reuse it across projects.
-4. In this repo: *Settings → Secrets and variables → Actions*. Add a **secret** `OS_API_KEY`
-   with the key, and a **variable** `WAYMARK_BASEMAP` set to `os-outdoor` or `os-leisure`.
-5. Re-run the `pages` workflow.
+4. In this repo, add **one secret and nothing else**:
+
+   *Settings → Secrets and variables → Actions →* the **Secrets** tab *→ New repository secret*
+
+   | Field | Value |
+   |---|---|
+   | Name | `OS_API_KEY` |
+   | Secret | the key from the Data Hub |
+
+   That is the entire configuration. The basemap follows from whether the key exists — with
+   it, the site uses `os-outdoor`; without it, OpenTopoMap. There is no second entry to add.
+
+5. *Actions → pages → Run workflow* to redeploy.
+
+If you want the 1:25 000 Explorer sheet instead of the OS house style, that is the one
+optional extra, and it is a **variable**, not a secret — same page, the **Variables** tab
+next to Secrets: name `WAYMARK_BASEMAP`, value `os-leisure`. It needs the Premium plan. The
+`pages` run logs a notice saying which basemap it wrote and whether it saw a key, so you can
+confirm from the run summary rather than by squinting at the map.
 
 Start with `os-outdoor`. It needs only the free plan, it is EPSG:3857 like the default, and
 it will tell you the key and referrer lock are right before the projection changes underneath
