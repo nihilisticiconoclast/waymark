@@ -3,7 +3,16 @@ name: pages
 on:
   push:
     branches: [main]
-    paths: ["site/**", "data/walks/**", "data/ledger.json", "scripts/build_index.py"]
+    # Includes this file: changing how the site is built or configured is a reason to
+    # rebuild it. Without that, editing the deploy workflow does nothing until something
+    # else happens to change, which is a confusing way to discover your settings are live.
+    paths:
+      - "site/**"
+      - "data/walks/**"
+      - "data/ledger.json"
+      - "scripts/build_index.py"
+      - "scripts/brier.py"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
