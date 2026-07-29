@@ -32,11 +32,28 @@ jobs:
 
       - run: pip install -r scripts/requirements.txt
 
+      # Checked before the survey rather than after it. Without this the job spends its
+      # Overpass budget, assembles a loop, and only then dies on a missing secret — once a
+      # week, with a stack trace, until someone reads the log. A weekly red cross nobody
+      # reads is worse than no scheduled job at all.
+      - name: Check the authoring key is present
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY is not set. The survey stage needs no key, but" \
+                 "the authoring stage does. Add it under Settings → Secrets and variables →" \
+                 "Actions, or disable this workflow until you want it running."
+            exit 1
+          fi
+
       - name: Survey
         id: survey
+        env:
+          TARGET: ${{ inputs.target }}
         run: |
-          if [ -n "${{ inputs.target }}" ]; then
-            python scripts/survey.py --target "${{ inputs.target }}"
+          if [ -n "$TARGET" ]; then
+            python scripts/survey.py --target "$TARGET"
           else
             python scripts/survey.py --next
           fi
@@ -46,7 +63,8 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WAYMARK_MODEL: claude-sonnet-5
-        run: python scripts/author.py --survey "data/surveys/${{ steps.survey.outputs.slug }}.json"
+          SLUG: ${{ steps.survey.outputs.slug }}
+        run: python scripts/author.py --survey "data/surveys/$SLUG.json"
 
       - name: Validate
         id: validate
