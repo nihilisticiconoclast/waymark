@@ -386,6 +386,31 @@ class TestLoopAssembly(unittest.TestCase):
     def test_out_of_band_request_finds_nothing_rather_than_forcing_it(self):
         self.assertIsNone(survey.find_loop(self.graph, self.CENTRE, (20.0, 30.0)))
 
+    def test_an_orphan_fragment_at_the_anchor_does_not_capture_the_search(self):
+        """
+        Regression, and the one that actually stopped the first real survey.
+
+        An Overpass extract is mostly fragments: driveway stubs, paths that leave the bbox
+        and come back, footways drawn as their own islands. The start used to be the node
+        geometrically nearest the anchor, which on a real extract of 4,145 ways was a
+        two-node stub — so the search explored a graph 100 m across and reported that no
+        loop existed. That is true of the stub and false of the place.
+        """
+        lat, lon = self.CENTRE
+        ways = square_ways((lat + 0.01, lon + 0.01), side_km=1.0)      # the real network
+        ways.append({                                                   # a stub on the anchor
+            "type": "way", "id": 9999, "tags": {"highway": "service"},
+            "geometry": [{"lat": lat, "lon": lon},
+                         {"lat": lat + 0.0005, "lon": lon}],
+        })
+        graph = survey.build_graph(ways)
+        self.assertGreater(__import__("networkx").number_connected_components(graph), 1)
+
+        loop = survey.find_loop(graph, self.CENTRE, (3.5, 4.5))
+        self.assertIsNotNone(loop, "the orphan stub captured the search")
+        total = sum(graph[u][v]["length"] for u, v in zip(loop, loop[1:]))
+        self.assertGreaterEqual(total, 3500)
+
     def test_the_band_is_reachable_at_every_scale(self):
         """
         Regression. The turning point used to be sought at 0.20–0.35 of the target, which

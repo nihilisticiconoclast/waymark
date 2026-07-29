@@ -72,6 +72,11 @@ So the pipeline splits hard along a provenance line:
 `scripts/validate.py` enforces the line mechanically: any proper noun in the prose that does
 not appear in the survey payload or the gazetteer fails the build.
 
+Claude does the writing in a session or a Routine, reading the survey and committing the
+editorial block — **no API key, no billing**. The gate is what enforces the constraints, and
+it cannot tell which mode produced the words, so there is nothing to buy. `author.py --api`
+exists only for the unattended weekly job, where no session is present to do the writing.
+
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
@@ -114,10 +119,11 @@ git clone <this repo> && cd waymark
 python -m venv .venv && source .venv/bin/activate
 pip install -r scripts/requirements.txt
 
-# 1. Survey a target area (no LLM, no API key needed)
+# 1. Survey a target area (no LLM, no API key — but it does need Overpass)
 python scripts/survey.py --target haresfield-beacon
 
-# 2. Write it up (needs ANTHROPIC_API_KEY)
+# 2. Write it up. Claude reads the survey and writes data/editorial/<slug>.json;
+#    this merges it with the surveyed facts. No key, no API call.
 python scripts/author.py --survey data/surveys/haresfield-beacon.json
 
 # 3. Gate it

@@ -215,8 +215,25 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
 
     if not G.nodes:
         return None
-    start = min(G.nodes, key=lambda n: haversine_m(n, anchor))
 
+    # Start from the largest connected component, not from whatever node happens to lie
+    # nearest the anchor. An Overpass extract is full of fragments — a driveway stub, a
+    # path that leaves the bbox and comes back, a footway drawn as its own island — and the
+    # nearest node to a search anchor is quite often one of them. Searching from there
+    # explores a graph a hundred metres across and reports that no loop exists, which is
+    # true of that fragment and false of the place.
+    component = max(nx.connected_components(G), key=len)
+    reachable = G.subgraph(component)
+    print(f"  graph: {G.number_of_nodes()} nodes in "
+          f"{nx.number_connected_components(G)} components, "
+          f"largest has {reachable.number_of_nodes()}")
+
+    start = min(reachable.nodes, key=lambda n: haversine_m(n, anchor))
+    if haversine_m(start, anchor) > 2000:
+        print(f"  nearest node on the main network is "
+              f"{haversine_m(start, anchor) / 1000:.1f} km from the anchor")
+
+    G = reachable
     lengths = nx.single_source_dijkstra_path_length(G, start, cutoff=target * 0.8, weight="length")
     far = [n for n, d in lengths.items() if target * 0.32 < d < target * 0.62]
     if not far:
