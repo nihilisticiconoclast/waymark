@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import brier                                                          # noqa: E402
+import build_index                                                    # noqa: E402
 import survey                                                         # noqa: E402
 import validate                                                       # noqa: E402
 
@@ -476,6 +477,47 @@ class TestIndexBuild(unittest.TestCase):
         rec = a_record()
         mix = rec["facts"]["surface_mix"]
         self.assertEqual(100 - mix["sealed_pct"], mix["firm_pct"] + mix["soft_pct"])
+
+
+class TestQueuePayload(unittest.TestCase):
+    """
+    The queue is shown on the map so an empty corpus reads as empty rather than broken.
+    That only stays honest if a queued area can never be confused with a surveyed one.
+    """
+
+    def test_a_queued_area_carries_no_surveyed_facts(self):
+        forbidden = {"distance_km", "ascent_m", "descent_m", "route", "geometry",
+                     "confidence", "surface_mix", "by_right_pct", "hazards", "editorial",
+                     "gradient_pct", "max_sustained_gradient_pct"}
+        for t in build_index.build_queue(set())["targets"]:
+            with self.subTest(slug=t["slug"]):
+                self.assertEqual(forbidden & set(t), set(),
+                                 "a queued area is advertising facts no survey has produced")
+
+    def test_published_slugs_leave_the_queue(self):
+        """Otherwise a walk would appear twice: once real, once as a pending marker."""
+        all_slugs = {t["slug"] for t in build_index.build_queue(set())["targets"]}
+        self.assertIn("haresfield-beacon", all_slugs)
+        remaining = {t["slug"] for t in build_index.build_queue({"haresfield-beacon"})["targets"]}
+        self.assertNotIn("haresfield-beacon", remaining)
+        self.assertEqual(len(remaining), len(all_slugs) - 1)
+
+    def test_queue_is_ordered_by_priority(self):
+        priorities = [t["priority"] for t in build_index.build_queue(set())["targets"]]
+        self.assertEqual(priorities, sorted(priorities))
+
+    def test_bearings_and_distances_are_computed_not_copied(self):
+        """The dial places these; a wrong bearing puts an area in the wrong quadrant."""
+        for t in build_index.build_queue(set())["targets"]:
+            with self.subTest(slug=t["slug"]):
+                self.assertEqual(t["crow_km"],
+                                 round(build_index.haversine_km(build_index.ORIGIN,
+                                                                (t["lat"], t["lon"])), 1))
+                self.assertEqual(t["bearing"],
+                                 round(build_index.bearing(build_index.ORIGIN,
+                                                           (t["lat"], t["lon"]))))
+                self.assertGreaterEqual(t["bearing"], 0)
+                self.assertLess(t["bearing"], 360)
 
 
 if __name__ == "__main__":

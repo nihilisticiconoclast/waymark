@@ -13,17 +13,42 @@ probability is scored against reality when you walk it.
 
 ## Status
 
-Wired up, nothing published. The pipeline, the gate and the site all run;
-`data/queue.yml` holds twenty-one target areas and none has been surveyed yet, because a
-survey needs the Overpass API and the first one is a deliberate act rather than a build step.
+Wired up and deploying; **no walks published**. The site is live and the pipeline, the gate
+and the calibration all run. What is missing is data, and only one thing produces it.
+
+The map therefore shows the **survey queue** — the twenty areas in `data/queue.yml`, drawn as
+hollow markers, filterable by the dial and by nothing else, because a queued area has no
+distance, no ascent and no surface for the other filters to read. They are search anchors, not
+routes. Each becomes a walk the first time it is surveyed, written up and passed by the
+validator, and it leaves the queue layer at that point.
 
 `data/walks/0001-haresfield-beacon.json` is a **seed** record that demonstrates the schema.
 Its geometry is seven hand-placed points that follow nothing on the ground, and the validator
 refuses to publish it — it reports `SEED` rather than `FAIL`, so it does not redden every
-pull request while it sits there. `scripts/validate.py --strict` and the invariant tests in
-`tests/` both run on every pull request.
+pull request while it sits there.
 
-The first real walk is `python scripts/survey.py --next`.
+### Next
+
+1. **Survey the first area.** `python scripts/survey.py --next` takes Haresfield Beacon, the
+   highest-priority entry. It needs no key. It does need `overpass-api.de`, and it is the
+   only step in the whole system that cannot run from a locked-down environment. Expect to
+   spend the first attempt or two widening `distance_band_km` — the loop assembler is the
+   part most likely to come back empty, and the honest failure is a `SystemExit` telling you
+   so rather than a forced bad loop.
+2. **Write it up.** `ANTHROPIC_API_KEY=… python scripts/author.py --survey
+   data/surveys/haresfield-beacon.json`.
+3. **Read the write-up against the survey payload**, not on its own. The prose is designed to
+   be plausible; that is exactly what makes it worth checking. Then
+   `python scripts/validate.py data/walks/*.json`.
+4. **Turn the weekly job on.** `.github/workflows/new-walk.yml` needs `ANTHROPIC_API_KEY` in
+   repository secrets; until then it will fail every Sunday at 06:00 UTC. Nothing else is
+   required — `ci.yml` and `pages.yml` are already running.
+5. **Walk one, then resolve it.** The calibration panel stays empty until the ledger has
+   entries, and the Brier decomposition means nothing below about n=10. This is the slow
+   part of the system and it is supposed to be: the rate limit is how fast you can walk.
+
+Optional, and only when you want the real 1:25 000 Explorer sheet rather than OpenTopoMap:
+set `OS_API_KEY` in secrets and `WAYMARK_BASEMAP` in repository variables. See *Basemap*.
 
 ---
 

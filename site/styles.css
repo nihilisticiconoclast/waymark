@@ -67,6 +67,15 @@ body { overscroll-behavior: none; }
    element, and the selected pin sits at the end of it. */
 .walk-pin[data-selected="true"] { background: var(--ink); transform: scale(1.5); }
 
+/* Queued areas: hollow, thin, unfilled. The difference from a walk pin is deliberately
+   categorical rather than a shade — an area that has not been surveyed must not read as a
+   quieter walk, it must read as a different kind of thing. */
+.queue-pin {
+  width: 12px; height: 12px;
+  border: 1.5px dashed var(--contour);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
 /* Leaflet ships its own chrome: white cards and 4px corners. Bring it into the system. */
 .leaflet-container { font-family: var(--font-body); background: var(--paper); }
 .leaflet-bar,
@@ -121,7 +130,18 @@ body { overscroll-behavior: none; }
 .rail-title h1 { font-size: var(--step-2); margin: 0; }
 .rail-sub { margin: var(--wm-space-1) 0 0; color: var(--contour); font-size: var(--step--1); }
 
+.state-note {
+  margin: 0; max-width: none;
+  padding: var(--wm-space-3);
+  border-left: 2px solid var(--index);
+  background: color-mix(in srgb, var(--contour) 8%, transparent);
+  font-size: var(--step--1);
+  line-height: 1.55;
+}
+.state-note strong { font-family: var(--font-data); font-weight: 500; }
+
 .block { display: flex; flex-direction: column; gap: var(--wm-space-2); }
+.block > small { color: var(--contour); font-size: var(--step--1); line-height: 1.5; }
 .block h2 {
   font-family: var(--font-body);
   font-size: var(--step--1);
@@ -188,6 +208,11 @@ body { overscroll-behavior: none; }
 #dial-origin { fill: var(--index); }
 #dial-dots circle { fill: var(--ink); r: 2.2; cursor: pointer; }
 #dial-dots circle[data-in="false"] { fill: var(--contour); fill-opacity: .35; }
+#dial-dots circle.queue-dot {
+  fill: none; r: 2;
+  stroke: var(--contour); stroke-width: .8; stroke-dasharray: 1.5 1.2;
+}
+#dial-dots circle.queue-dot[data-in="false"] { stroke-opacity: .3; }
 
 .dial-read { margin: 0; max-width: none; font-family: var(--font-data); font-size: var(--step--1); }
 

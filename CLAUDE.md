@@ -65,7 +65,7 @@ schema/walk.schema.json  the contract between authoring and the site
 scripts/survey.py      Overpass + DEM → data/surveys/{id}.json   (no LLM)
 scripts/author.py      survey → data/walks/{id}.json             (LLM, constrained)
 scripts/validate.py    the gate
-scripts/build_index.py data/walks/*.json → site/data/walks.json
+scripts/build_index.py data/walks/*.json → site/data/walks.json + queue.json
 scripts/brier.py       ledger → calibration statistics
 tests/test_pipeline.py the invariants above, as executable checks
 site/                  the map
@@ -122,5 +122,8 @@ Prose in docs, not bullets, where the content is argument rather than enumeratio
   `site/config.example.js` across.
 - **The seed record fails validation on purpose.** It reports `SEED`, not `FAIL`, and does
   not trip `--strict`. Publishing it is not the fix; surveying something is.
+- **Queued areas on the map are not walks.** They come from `data/queue.yml` via
+  `site/data/queue.json`, carry no surveyed facts, and answer to the dial only. Giving one a
+  distance or a confidence to make the map look fuller breaks the line the repo is built on.
 - **The CSS fallback fence is a cascade layer.** `--ink: var(--ink, #4A3823)` looks like a
   neat shim and is a self-reference: the property goes invalid and takes the palette with it.

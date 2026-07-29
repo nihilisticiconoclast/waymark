@@ -73,7 +73,7 @@ data/queue.yml
       │
       ▼
   build_index.py ─→ site/data/walks.json ─→ GitHub Pages
-      ▲
+      ▲         └─→ site/data/queue.json   (unsurveyed targets, drawn hollow)
       │
   data/ledger.json ──→ brier.py ──→ site/data/calibration.json
       ▲
@@ -188,6 +188,18 @@ with a vegan option, dog-friendly, public transport reachable, circular, trig po
 (sealed ↔ soft), technicality, exposure.
 
 *Dial* — bearing sector and radius from the Stroud origin. Replaces the usual radius slider.
+
+**The empty state.** A corpus of zero is this site's starting condition and will recur any
+time the queue outruns the walking, so the map shows `site/data/queue.json` — the target areas
+from `data/queue.yml`, drawn hollow and dashed. This is a deliberate concession and it has one
+rule: a queued area must never be mistakable for a walk. It carries no route, no distance, no
+ascent and no confidence, because none of those exist until a survey has run; its marker is a
+different shape rather than a paler shade; and it answers to the dial alone, since every other
+filter reads an attribute a survey produces. A queued area leaves the layer the moment a walk
+with its slug is published. `tests/` asserts the first of those rules against the real queue.
+
+The alternative was a blank map, which is indistinguishable from a broken one, and the failure
+mode of a broken-looking map is that somebody starts loosening things to make walks appear.
 
 Filtering is pure client-side over `site/data/walks.json`. At the scale this will reach —
 low hundreds of walks — that's the right call and keeps the whole site a static artefact.

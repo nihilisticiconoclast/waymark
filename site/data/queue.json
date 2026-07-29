@@ -1,0 +1,306 @@
+{
+ "count": 20,
+ "surveyed": 0,
+ "targets": [
+  {
+   "slug": "haresfield-beacon",
+   "name": "Haresfield Beacon",
+   "lat": 51.7845,
+   "lon": -2.287,
+   "crow_km": 6.6,
+   "bearing": 312,
+   "band_km": [
+    7,
+    12
+   ],
+   "priority": 1,
+   "surveyed": false,
+   "notes": "NT escarpment, topograph, trig. Expect good PRoW density and mapped parking."
+  },
+  {
+   "slug": "standish-wood",
+   "name": "Standish Wood",
+   "lat": 51.779,
+   "lon": -2.274,
+   "crow_km": 5.5,
+   "bearing": 314,
+   "band_km": [
+    6,
+    10
+   ],
+   "priority": 2,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "rodborough-common",
+   "name": "Rodborough Common",
+   "lat": 51.729,
+   "lon": -2.214,
+   "crow_km": 1.8,
+   "bearing": 174,
+   "band_km": [
+    5,
+    9
+   ],
+   "priority": 3,
+   "surveyed": false,
+   "notes": "Open access common. Watch for cattle grids and unfenced road sections."
+  },
+  {
+   "slug": "minchinhampton-common",
+   "name": "Minchinhampton Common",
+   "lat": 51.713,
+   "lon": -2.19,
+   "crow_km": 4.0,
+   "bearing": 153,
+   "band_km": [
+    7,
+    12
+   ],
+   "priority": 4,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "selsley-common",
+   "name": "Selsley Common",
+   "lat": 51.728,
+   "lon": -2.262,
+   "crow_km": 3.6,
+   "bearing": 239,
+   "band_km": [
+    5,
+    9
+   ],
+   "priority": 5,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "woodchester-park",
+   "name": "Woodchester Park",
+   "lat": 51.706,
+   "lon": -2.286,
+   "crow_km": 6.4,
+   "bearing": 228,
+   "band_km": [
+    6,
+    11
+   ],
+   "priority": 6,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "swifts-hill-slad",
+   "name": "Swift's Hill and the Slad valley",
+   "lat": 51.769,
+   "lon": -2.193,
+   "crow_km": 3.2,
+   "bearing": 31,
+   "band_km": [
+    6,
+    10
+   ],
+   "priority": 7,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "painswick-beacon",
+   "name": "Painswick Beacon",
+   "lat": 51.792,
+   "lon": -2.193,
+   "crow_km": 5.5,
+   "bearing": 17,
+   "band_km": [
+    6,
+    11
+   ],
+   "priority": 8,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "coaley-peak-nympsfield",
+   "name": "Coaley Peak and Nympsfield",
+   "lat": 51.702,
+   "lon": -2.32,
+   "crow_km": 8.6,
+   "bearing": 236,
+   "band_km": [
+    7,
+    12
+   ],
+   "priority": 9,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "uley-bury",
+   "name": "Uley Bury",
+   "lat": 51.687,
+   "lon": -2.313,
+   "crow_km": 9.2,
+   "bearing": 226,
+   "band_km": [
+    6,
+    11
+   ],
+   "priority": 10,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "cam-long-down",
+   "name": "Cam Long Down",
+   "lat": 51.69,
+   "lon": -2.354,
+   "crow_km": 11.3,
+   "bearing": 237,
+   "band_km": [
+    8,
+    13
+   ],
+   "priority": 11,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "sapperton-daneway",
+   "name": "Sapperton and the Golden Valley",
+   "lat": 51.723,
+   "lon": -2.087,
+   "crow_km": 9.2,
+   "bearing": 105,
+   "band_km": [
+    7,
+    12
+   ],
+   "priority": 12,
+   "surveyed": false,
+   "notes": "Canal and tunnel portal. Towpath surface tagging is usually good."
+  },
+  {
+   "slug": "cranham-woods",
+   "name": "Cranham Woods",
+   "lat": 51.818,
+   "lon": -2.152,
+   "crow_km": 9.3,
+   "bearing": 29,
+   "band_km": [
+    7,
+    12
+   ],
+   "priority": 13,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "forest-of-dean-cannop",
+   "name": "Forest of Dean, Cannop",
+   "lat": 51.808,
+   "lon": -2.582,
+   "crow_km": 26.1,
+   "bearing": 286,
+   "band_km": [
+    9,
+    15
+   ],
+   "priority": 20,
+   "surveyed": false,
+   "notes": "Forestry England access. Expect permissive rather than PRoW; classify carefully."
+  },
+  {
+   "slug": "symonds-yat",
+   "name": "Symonds Yat and the lower Wye",
+   "lat": 51.838,
+   "lon": -2.643,
+   "crow_km": 31.1,
+   "bearing": 290,
+   "band_km": [
+    9,
+    15
+   ],
+   "priority": 21,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "mendip-cheddar",
+   "name": "Mendip above Cheddar",
+   "lat": 51.283,
+   "lon": -2.765,
+   "crow_km": 63.8,
+   "bearing": 217,
+   "band_km": [
+    10,
+    16
+   ],
+   "priority": 22,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "marlborough-downs-avebury",
+   "name": "Marlborough Downs and Avebury",
+   "lat": 51.429,
+   "lon": -1.854,
+   "crow_km": 43.1,
+   "bearing": 144,
+   "band_km": [
+    10,
+    18
+   ],
+   "priority": 23,
+   "surveyed": false,
+   "notes": "Byways and open downland. Good test of the byway_open_to_all_traffic handling."
+  },
+  {
+   "slug": "malvern-hills",
+   "name": "Malvern Hills",
+   "lat": 52.074,
+   "lon": -2.34,
+   "crow_km": 37.6,
+   "bearing": 347,
+   "band_km": [
+    10,
+    17
+   ],
+   "priority": 24,
+   "surveyed": false,
+   "notes": null
+  },
+  {
+   "slug": "blorenge-blaenavon",
+   "name": "Blorenge above Blaenavon",
+   "lat": 51.805,
+   "lon": -3.08,
+   "crow_km": 59.8,
+   "bearing": 277,
+   "band_km": [
+    11,
+    18
+   ],
+   "priority": 30,
+   "surveyed": false,
+   "notes": "Wales — different rights-of-way regime in detail, same designation tags."
+  },
+  {
+   "slug": "black-mountains-hay-bluff",
+   "name": "Hay Bluff and the Black Mountains",
+   "lat": 52.012,
+   "lon": -3.103,
+   "crow_km": 67.7,
+   "bearing": 296,
+   "band_km": [
+    14,
+    24
+   ],
+   "priority": 31,
+   "surveyed": false,
+   "notes": "Exposure rating matters here. Do not let the model rate this a 2."
+  }
+ ]
+}

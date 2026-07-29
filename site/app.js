@@ -62,6 +62,9 @@ const BASEMAP_PROFILES = {
 const state = {
   walks: [],
   markers: new Map(),
+  queue: [],                         // areas awaiting survey — never walks
+  queueMarkers: new Map(),
+  showQueue: true,
   routeLayer: L.layerGroup(),
   selected: null,
   sector: null,                      // { b0, b1, r0, r1 } — set by the dial
@@ -140,6 +143,22 @@ function paintSelection() {
   });
 }
 
+/* Queued areas are drawn hollow and never share the walk pin's shape. A queued entry is a
+   search anchor from data/queue.yml — not a route, not a start, and not checked against
+   anything on the ground. The visual distinction is doing real work: the whole repo is
+   arranged so that an unsurveyed area cannot be mistaken for a surveyed one. */
+function renderQueue() {
+  state.queue.forEach(t => {
+    const m = L.marker([t.lat, t.lon], {
+      icon: L.divIcon({ className: "", html: `<div class="queue-pin"></div>`,
+                        iconSize: [12, 12], iconAnchor: [6, 6] }),
+      title: `${t.name} — awaiting survey`,
+      keyboard: false,
+    }).on("click", () => showQueued(t.slug));
+    state.queueMarkers.set(t.slug, m);
+  });
+}
+
 /* ── filtering ─────────────────────────────────────────────────────────────── */
 
 const unsealedPct = w => Math.max(0, 100 - (w.sealed_pct ?? 0));
@@ -176,7 +195,22 @@ function apply() {
     if (ok) { if (!map.hasLayer(m)) m.addTo(map); shown++; }
     else if (map.hasLayer(m)) map.removeLayer(m);
   });
+
+  // Queued areas answer only to the dial. The other filters read attributes a survey
+  // produces — distance, ascent, surface — and a queued area has none of them, so
+  // filtering on those would silently hide things for reasons that aren't true of them.
+  let queued = 0;
+  state.queue.forEach(t => {
+    const ok = state.showQueue && inSector(t);
+    const m = state.queueMarkers.get(t.slug);
+    if (!m) return;
+    if (ok) { if (!map.hasLayer(m)) m.addTo(map); queued++; }
+    else if (map.hasLayer(m)) map.removeLayer(m);
+  });
+
   document.getElementById("count").textContent = shown;
+  const qc = document.getElementById("queue-count");
+  if (qc) qc.textContent = queued;
   drawDots();
 }
 
@@ -227,6 +261,22 @@ function drawChrome() {
 function drawDots() {
   const g = svg("dial-dots");
   g.innerHTML = "";
+
+  if (state.showQueue) {
+    state.queue.forEach(t => {
+      const [x, y] = polar(t.bearing, t.crow_km);
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", x); c.setAttribute("cy", y);
+      c.setAttribute("class", "queue-dot");
+      c.setAttribute("data-in", inSector(t));
+      c.setAttribute("role", "img");
+      c.setAttribute("aria-label",
+        `${t.name}, awaiting survey, ${t.crow_km} km ${compass(t.bearing)}`);
+      c.addEventListener("click", e => { e.stopPropagation(); showQueued(t.slug); });
+      g.appendChild(c);
+    });
+  }
+
   state.walks.forEach(w => {
     const [x, y] = polar(w.bearing, w.crow_km);
     const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -371,6 +421,41 @@ async function select(slug) {
   paintSelection();
 }
 
+/* A queued area's panel says what is known and stops. There is no route to draw, no
+   distance to state and no confidence to quote, so none of those appear — the point of
+   showing the queue is to make the site's emptiness legible, not to dress it up. */
+function showQueued(slug) {
+  const t = state.queue.find(q => q.slug === slug);
+  if (!t) return;
+
+  state.routeLayer.clearLayers();
+  state.selected = null;
+  paintSelection();
+
+  document.getElementById("detail-body").innerHTML = `
+    <h2>${esc(t.name)}</h2>
+    <p><span class="chip" data-tone="warn">awaiting survey</span></p>
+    <p>An area in the survey queue, not a walk. Nothing here has been checked against
+       OpenStreetMap yet, so there is no route, no distance and no ascent to report — the
+       marker sits on a search anchor, and the survey chooses the actual start.</p>
+
+    <div class="stat-grid">
+      <div><span class="k">From Stroud</span><span>${esc(t.crow_km)} km ${esc(compass(t.bearing))}</span></div>
+      <div><span class="k">Target length</span><span>${esc(t.band_km[0])}–${esc(t.band_km[1])} km</span></div>
+      <div><span class="k">Queue position</span><span>${esc(t.priority)}</span></div>
+      <div><span class="k">Surveyed</span><span>${t.surveyed ? "yes, not yet written up" : "no"}</span></div>
+    </div>
+
+    ${t.notes ? `<h3>Note in the queue</h3><p>${esc(t.notes)}</p>` : ""}
+
+    <h3>What happens next</h3>
+    <p>A survey of this area assembles a loop from rights of way and samples its elevation.
+       The write-up follows from that survey and nothing else, and reaches the map only after
+       it has passed the validator.</p>
+  `;
+  document.getElementById("detail").hidden = false;
+}
+
 /* ── wiring ────────────────────────────────────────────────────────────────── */
 
 function initControls() {
@@ -404,6 +489,14 @@ function initControls() {
   document.querySelectorAll("input[name=run]").forEach(r => {
     r.addEventListener("change", () => { state.filters.run = r.value; apply(); });
   });
+
+  const queueToggle = document.getElementById("f-queue");
+  if (queueToggle) {
+    queueToggle.addEventListener("change", () => {
+      state.showQueue = queueToggle.checked;
+      apply();
+    });
+  }
 
   document.getElementById("detail-close").addEventListener("click", () => {
     document.getElementById("detail").hidden = true;
@@ -440,12 +533,39 @@ async function loadCalibration() {
   }
 }
 
+/* Says what the map is showing and, when it is showing nothing, why. A corpus of zero is
+   the expected state of this site until the first survey runs, and a blank map with no
+   explanation is indistinguishable from a broken one. */
+function describeState() {
+  const note = document.getElementById("state-note");
+  if (!note) return;
+  if (state.walks.length) { note.hidden = true; return; }
+  note.hidden = false;
+  note.innerHTML = state.queue.length
+    ? `No walks published yet. The hollow markers are the
+       <strong id="queue-count">${state.queue.length}</strong> areas in the survey queue;
+       each becomes a walk once it has been surveyed, written up and passed the validator.`
+    : `No walks published yet, and the survey queue is empty.`;
+}
+
+async function loadQueue() {
+  try {
+    const q = await (await fetch("./data/queue.json")).json();
+    state.queue = q.targets || [];
+  } catch {
+    state.queue = [];            // an older build without a queue payload; not an error
+  }
+}
+
 async function main() {
   initMap();
   const data = await (await fetch("./data/walks.json")).json();
   state.walks = data.walks;
+  await loadQueue();
   document.getElementById("total").textContent = state.walks.length;
   renderMarkers();
+  renderQueue();
+  describeState();
   initDial();
   initControls();
   apply();

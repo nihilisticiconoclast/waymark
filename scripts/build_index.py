@@ -5,6 +5,12 @@ Stage 4: BUILD. data/walks/*.json → site/data/walks.json
 Drops the elevation profile and full route geometry into a per-walk file so the index stays
 small enough to fetch on a phone on a hill with one bar. The index carries only what the
 filters need; detail loads on selection.
+
+Also emits site/data/queue.json from data/queue.yml. Until the first survey runs there are
+no walks, and a map with nothing on it and no explanation reads as a broken site rather than
+an empty one. The queue is real, hand-authored data about what is coming, so showing it is
+honest — provided the site never lets a queued area be mistaken for a walk. It carries no
+route, no distance, no ascent and no confidence, because none of those exist yet.
 """
 
 from __future__ import annotations
@@ -13,8 +19,12 @@ import json
 import math
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parent.parent
 WALKS = ROOT / "data" / "walks"
+SURVEYS = ROOT / "data" / "surveys"
+QUEUE = ROOT / "data" / "queue.yml"
 OUT = ROOT / "site" / "data"
 
 ORIGIN = (51.7447, -2.2166)          # Stroud, the Cross. Keep in step with site/app.js.
@@ -34,6 +44,36 @@ def bearing(a, b):
     y = math.sin(dl) * math.cos(p2)
     x = math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl)
     return (math.degrees(math.atan2(y, x)) + 360) % 360
+
+
+def build_queue(published: set[str]) -> dict:
+    """
+    The survey queue, as the site sees it. `centre` is a search anchor and not a route start
+    — survey.py finds the start — so the site labels these as areas, never as walks.
+    """
+    q = yaml.safe_load(QUEUE.read_text())
+    surveyed = {p.stem for p in SURVEYS.glob("*.json")}
+
+    targets = []
+    for t in q["targets"]:
+        if t["slug"] in published:
+            continue                       # it is a walk now; the walk index carries it
+        centre = (t["centre"][0], t["centre"][1])
+        targets.append({
+            "slug": t["slug"], "name": t["name"],
+            "lat": centre[0], "lon": centre[1],
+            "crow_km": round(haversine_km(ORIGIN, centre), 1),
+            "bearing": round(bearing(ORIGIN, centre)),
+            "band_km": t["distance_band_km"],
+            "priority": t["priority"],
+            "surveyed": t["slug"] in surveyed,
+            "notes": t.get("notes"),
+        })
+
+    targets.sort(key=lambda t: t["priority"])
+    return {"count": len(targets),
+            "surveyed": sum(1 for t in targets if t["surveyed"]),
+            "targets": targets}
 
 
 def main() -> None:
@@ -93,6 +133,11 @@ def main() -> None:
         "walks": index,
     }, ensure_ascii=False, indent=1))
     print(f"→ site/data/walks.json  ({len(index)} published)")
+
+    queue = build_queue({w["slug"] for w in index})
+    (OUT / "queue.json").write_text(json.dumps(queue, ensure_ascii=False, indent=1))
+    print(f"→ site/data/queue.json  ({queue['count']} awaiting, "
+          f"{queue['surveyed']} already surveyed)")
 
 
 if __name__ == "__main__":

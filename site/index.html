@@ -41,6 +41,10 @@
       </div>
     </header>
 
+    <!-- Shown only while the corpus is empty, which is this site's expected state until the
+         first survey runs. A blank map with no explanation reads as a broken one. -->
+    <p class="state-note" id="state-note" hidden></p>
+
     <!-- The dial. Every walk is a dot in polar coordinates about Stroud. Drag across it to
          select a sector; the selection is a bearing range and a distance range at once. -->
     <section class="block" aria-labelledby="dial-h">
@@ -102,6 +106,15 @@
         <label><input type="checkbox" data-flag="trig"> Trig point on route</label>
         <label><input type="checkbox" data-flag="transit"> Reachable by bus or train</label>
       </div>
+    </section>
+
+    <section class="block" aria-labelledby="queue-h">
+      <h2 id="queue-h">The queue</h2>
+      <div class="checks">
+        <label><input type="checkbox" id="f-queue" checked> Show areas awaiting survey</label>
+      </div>
+      <small>Hollow markers. Not walks — nothing about them has been checked against the map
+        yet, so they answer to the dial and to none of the filters above.</small>
     </section>
 
     <section class="block" aria-labelledby="run-h">
