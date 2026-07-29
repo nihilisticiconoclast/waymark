@@ -391,6 +391,25 @@ class TestLoopAssembly(unittest.TestCase):
         self.assertLess(len(edges) - len(set(edges)), 0.1 * len(edges),
                         "more than a tenth of the loop is walked twice")
 
+    def test_the_loop_must_visit_the_named_target(self):
+        """
+        Regression, and the subtlest of the three. Anchoring the start to the right car park
+        left the assembler free to walk the other way: Haresfield Beacon produced an 11 km
+        circuit of the vale floor, 18–44 m throughout, that never went near the Beacon. Every
+        constraint was satisfied and the walk was not the walk.
+
+        The queue's `centre` names the feature. A loop that does not reach it is rejected.
+        """
+        lat, lon = self.CENTRE
+        # A circuit 3 km north of the target: reachable, in band, and the wrong walk.
+        away = survey.build_graph(square_ways((lat + 0.027, lon), side_km=1.0))
+        self.assertIsNone(survey.find_loop(away, self.CENTRE, (3.5, 4.5)),
+                          "a loop that never reaches the target was accepted")
+
+        # The same circuit centred on the target is fine.
+        here = survey.build_graph(square_ways((lat, lon), side_km=1.0))
+        self.assertIsNotNone(survey.find_loop(here, self.CENTRE, (3.5, 4.5)))
+
     def test_out_of_band_request_finds_nothing_rather_than_forcing_it(self):
         self.assertIsNone(survey.find_loop(self.graph, self.CENTRE, (20.0, 30.0)))
 
@@ -405,8 +424,10 @@ class TestLoopAssembly(unittest.TestCase):
         loop existed. That is true of the stub and false of the place.
         """
         lat, lon = self.CENTRE
-        ways = square_ways((lat + 0.01, lon + 0.01), side_km=1.0)      # the real network
-        ways.append({                                                   # a stub on the anchor
+        # The real network, starting a couple of hundred metres from the anchor so the loop
+        # still reaches the target, and an orphan stub sitting exactly on it.
+        ways = square_ways((lat + 0.002, lon + 0.002), side_km=1.0)
+        ways.append({
             "type": "way", "id": 9999, "tags": {"highway": "service"},
             "geometry": [{"lat": lat, "lon": lon},
                          {"lat": lat + 0.0005, "lon": lon}],

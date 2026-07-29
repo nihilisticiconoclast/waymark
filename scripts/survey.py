@@ -319,7 +319,8 @@ def build_graph(ways: list[dict], access=None) -> nx.Graph:
 
 
 def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float],
-              start_at: tuple[float, float] | None = None):
+              start_at: tuple[float, float] | None = None,
+              must_pass_m: float = 500.0):
     """
     Loop assembly heuristic.
 
@@ -384,6 +385,7 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     far.sort(key=lambda n: abs(lengths[n] - target / 2))
 
     attempts = []
+    missed_target = 0
     best, best_score = None, -1.0
     for mid in far[:300]:
         try:
@@ -407,6 +409,16 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         if not (lo_m <= total <= hi_m):
             continue
 
+        # The loop has to visit the thing the target is named after. Without this the
+        # assembler is free to start at the right car park and then walk the other way:
+        # Haresfield Beacon produced an 11 km circuit of the vale floor, 18-44 m throughout,
+        # that never went near the Beacon. Every constraint was satisfied and the walk was
+        # not the walk. The queue's `centre` names the feature; the car park only says where
+        # to leave the car, and the two are different jobs.
+        if min(haversine_m(n, anchor) for n in loop) > must_pass_m:
+            missed_target += 1
+            continue
+
         back_edges = {frozenset(e) for e in zip(back, back[1:])}
         overlap = len(out_edges & back_edges) / max(len(out_edges), 1)
 
@@ -424,6 +436,9 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         if score > best_score:
             best, best_score = loop, score
 
+    if best is None and missed_target:
+        print(f"  {missed_target} loops were in band but none came within "
+              f"{must_pass_m:.0f} m of the target")
     if best is None and attempts:
         # Say what was actually reachable. "No loop found" on its own leaves the operator
         # guessing at a band, and guessing costs another Overpass call every time.
