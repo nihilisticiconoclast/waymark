@@ -213,32 +213,47 @@ def overpass(query: str, cache_key: str) -> dict:
 
 def access_polygons(elements: list[dict]):
     """
-    Closed rings from the open-access query, as one prepared geometry.
+    Areas from the open-access query, as one prepared geometry.
 
-    Relations come back from `out geom` with their members' geometry attached, so both ways
-    and relation members are read the same way. Anything that isn't a closed ring of at least
-    four points is skipped rather than guessed at.
+    A closed way is a polygon on its own. A relation is not: an estate boundary is a
+    multipolygon whose member ways are open segments that only close when stitched together,
+    and an earlier version of this function skipped anything that wasn't already a closed
+    ring. That silently discarded every National Trust boundary in the extract — which is why
+    a survey of a National Trust escarpment reported nothing as open-access land, priced its
+    paths as if their status were unknown, and routed the walk onto lanes instead.
+
+    So: closed ways become polygons directly, and everything else is merged and polygonised
+    per element, which is what turns a bag of boundary segments back into the estate.
     """
-    from shapely.geometry import Polygon
-    from shapely.ops import unary_union
+    from shapely.geometry import LineString, Polygon
+    from shapely.ops import linemerge, polygonize, unary_union
     from shapely.prepared import prep
+
+    def rings_from(geoms: list[list[dict]]) -> list:
+        polys, open_lines = [], []
+        for g in geoms:
+            if not g or len(g) < 2:
+                continue
+            pts = [(p["lon"], p["lat"]) for p in g]
+            if len(pts) >= 4 and pts[0] == pts[-1]:
+                poly = Polygon(pts)
+                if poly.is_valid and poly.area > 0:
+                    polys.append(poly)
+            else:
+                open_lines.append(LineString(pts))
+        if open_lines:
+            merged = linemerge(open_lines)
+            polys.extend(p for p in polygonize(merged) if p.is_valid and p.area > 0)
+        return polys
 
     rings = []
     for el in elements:
-        geoms = [el.get("geometry")] if el.get("geometry") else \
-                [m.get("geometry") for m in el.get("members", [])]
-        for g in geoms:
-            if not g or len(g) < 4:
-                continue
-            pts = [(p["lon"], p["lat"]) for p in g]
-            if pts[0] != pts[-1]:
-                continue                      # an open way is a boundary fragment, not an area
-            try:
-                poly = Polygon(pts)
-                if poly.is_valid and poly.area > 0:
-                    rings.append(poly)
-            except Exception:
-                continue
+        if el.get("geometry"):
+            rings.extend(rings_from([el["geometry"]]))
+        elif el.get("members"):
+            members = [m.get("geometry") for m in el["members"]
+                       if m.get("type") == "way" and m.get("role") in (None, "", "outer")]
+            rings.extend(rings_from([m for m in members if m]))
 
     if not rings:
         return None
@@ -320,7 +335,7 @@ def build_graph(ways: list[dict], access=None) -> nx.Graph:
 
 def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float],
               start_at: tuple[float, float] | None = None,
-              must_pass_m: float = 500.0):
+              must_pass_m: float = 500.0, max_road_pct: float = 25.0):
     """
     Loop assembly heuristic.
 
@@ -384,8 +399,10 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     # likely to close into a loop of about the target length.
     far.sort(key=lambda n: abs(lengths[n] - target / 2))
 
+    ROAD_CLASSES = ("residential", "unclassified", "service", "other")
     attempts = []
     missed_target = 0
+    too_much_road = 0
     best, best_score = None, -1.0
     for mid in far[:300]:
         try:
@@ -434,8 +451,16 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         by_right = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:])
                        if G.has_edge(u, v) and G[u][v]["kind"] in BY_RIGHT_CLASSES)
         road = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:])
-                   if G.has_edge(u, v)
-                   and G[u][v]["kind"] in ("residential", "unclassified", "service"))
+                   if G.has_edge(u, v) and G[u][v]["kind"] in ROAD_CLASSES)
+
+        # A ceiling, not a preference. Weighting road segments expensively biases the search
+        # and can still be outvoted by length and by-right terms; a quarter of a walk spent
+        # on tarmac is not a good walk that scored slightly low, it is the wrong answer. If
+        # nothing satisfies this the survey says so and the target gets rethought, which is
+        # more useful than quietly publishing a road walk.
+        if 100 * road / total > max_road_pct:
+            too_much_road += 1
+            continue
         score = ((1 - overlap)
                  - abs(total - target) / target
                  + 1.5 * by_right / total
@@ -443,6 +468,8 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         if score > best_score:
             best, best_score = loop, score
 
+    if best is None and too_much_road:
+        print(f"  {too_much_road} loops were in band but more than {max_road_pct:.0f}% road")
     if best is None and missed_target:
         print(f"  {missed_target} loops were in band but none came within "
               f"{must_pass_m:.0f} m of the target")
@@ -586,6 +613,8 @@ def survey(target: dict, origin: dict) -> dict:
     print(f"  {len(ways)} ways, {len(pois)} pois, {len(access_raw)} access areas")
 
     access = access_polygons(access_raw)
+    if access is None:
+        print("  no open-access areas resolved — every path will be priced on its own tags")
 
     def poi_point(p):
         if p.get("lat") is not None:

@@ -531,6 +531,47 @@ class TestRoutePreference(unittest.TestCase):
         # And it is out of range entirely: the cap is 1500 m.
         self.assertGreater(survey.haversine_m(target, (51.8120, -2.2600)), 1500)
 
+    def test_a_multipolygon_estate_boundary_is_stitched_into_an_area(self):
+        """
+        Regression, and the reason a National Trust escarpment routed onto lanes.
+
+        An estate boundary is a relation whose member ways are open segments that only close
+        when stitched together. Skipping anything not already a closed ring discarded every
+        National Trust boundary in the extract, so no path was ever priced as open-access
+        land and the router had no reason to prefer the common over the road.
+        """
+        from shapely.geometry import Point
+        relation = {
+            "type": "relation", "id": 7, "tags": {"operator": "National Trust"},
+            "members": [
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 51.780, "lon": -2.295}, {"lat": 51.790, "lon": -2.295}]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 51.790, "lon": -2.295}, {"lat": 51.790, "lon": -2.280}]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 51.790, "lon": -2.280}, {"lat": 51.780, "lon": -2.280}]},
+                {"type": "way", "role": "outer", "geometry": [
+                    {"lat": 51.780, "lon": -2.280}, {"lat": 51.780, "lon": -2.295}]},
+            ],
+        }
+        area = survey.access_polygons([relation])
+        self.assertIsNotNone(area, "the estate boundary was discarded")
+        self.assertTrue(area.contains(Point(-2.287, 51.785)), "inside the estate")
+        self.assertFalse(area.contains(Point(-2.250, 51.785)), "outside the estate")
+
+    def test_a_loop_more_than_a_quarter_road_is_rejected_outright(self):
+        """
+        A ceiling, not a preference. Pricing roads expensively biases the search but can be
+        outvoted by the length and by-right terms, and a quarter of a walk spent on tarmac is
+        not a good walk that scored slightly low — it is the wrong answer.
+        """
+        import inspect
+        src = inspect.getsource(survey.find_loop)
+        self.assertIn("max_road_pct", src)
+        self.assertIn("too_much_road", src)
+        self.assertEqual(
+            inspect.signature(survey.find_loop).parameters["max_road_pct"].default, 25.0)
+
     def test_access_polygons_ignore_unclosed_ways(self):
         """A boundary fragment is not an area, and must not be guessed into one."""
         closed = {"type": "way", "id": 1, "geometry": [

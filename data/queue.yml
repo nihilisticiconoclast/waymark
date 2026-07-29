@@ -23,9 +23,10 @@ targets:
   - slug: haresfield-beacon
     name: Haresfield Beacon
     centre: [51.7845, -2.2870]
-    radius_km: 4.0          # 2.5 was too tight: the assembler could not reach a turning
-                            # point at half the target without a wider extract.
-    distance_band_km: [7, 12]
+    radius_km: 2.5          # Tight on purpose. At 4.0 the extract reaches the edge of
+                            # Gloucester and the assembler kept finding valid, flat,
+                            # road-heavy loops out in the vale.
+    distance_band_km: [5, 9]  # The escarpment circuit is a short walk, not a long one.
     priority: 1
     notes: NT escarpment, topograph, trig. Surveyed — 9.52 km, 252 m, 36% by right.
 
