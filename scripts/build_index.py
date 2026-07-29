@@ -38,16 +38,17 @@ def haversine_km(a, b):
     return 2 * R * math.asin(math.sqrt(h))
 
 
-def simplify(coords: list[list[float]], tolerance_m: float = 12.0) -> list[list[float]]:
+def simplify(coords: list[list[float]], tolerance_m: float = 4.0) -> list[list[float]]:
     """
     Ramer–Douglas–Peucker, so the index can carry every route's line rather than only its
     start. A survey emits a vertex every few metres; at map scale most of them are invisible,
     and the whole point of the index is that it loads on a hill with one bar.
 
-    Tolerance is in metres of perpendicular deviation. 12 m is below what a route line's own
-    stroke width covers at the zooms this map uses, so the simplified line is not visibly
-    different from the full one — which is on the detail payload and replaces this on
-    selection.
+    Tolerance is in metres of perpendicular deviation. It has to be small: these are footpath
+    routes, and a footpath's shape *is* the information — 12 m thinned a 318-point loop to 63
+    and turned a path that hugs a contour into a polygon. At 4 m the overview line still
+    tracks the path, and the site swaps in the full-resolution geometry from the detail
+    payload as soon as anyone zooms in far enough to tell the difference.
     """
     if len(coords) < 3:
         return coords

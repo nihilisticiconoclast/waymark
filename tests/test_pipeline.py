@@ -437,6 +437,75 @@ class TestLoopAssembly(unittest.TestCase):
                 self.assertLessEqual(total, band[1])
 
 
+class TestRoutePreference(unittest.TestCase):
+    """
+    These are walking directions. The assembler minimises a weighted cost, not raw length,
+    so a right of way beats a lane even when the lane is shorter — which is the whole point
+    and the opposite of what a driving router would do.
+    """
+
+    def test_a_right_of_way_beats_a_shorter_lane(self):
+        cheap = survey.classify({"highway": "footway", "designation": "public_footpath"}, False)
+        lane = survey.classify({"highway": "unclassified"}, False)
+        self.assertEqual(cheap, "prow")
+        self.assertEqual(lane, "unclassified")
+        # A kilometre of lane must cost more than five kilometres of footpath.
+        self.assertGreater(survey.COST_MULTIPLIER[lane],
+                           5 * survey.COST_MULTIPLIER[cheap])
+
+    def test_the_assembler_takes_the_longer_path_over_the_road(self):
+        """A road shortcut and a longer footpath between the same two points."""
+        lat, lon = 51.7845, -2.2870
+        d = 0.009
+        def leg(pts, tags, wid):
+            return {"type": "way", "id": wid, "tags": tags,
+                    "geometry": [{"lat": p[0], "lon": p[1]} for p in pts]}
+        a, b = (lat, lon), (lat + d, lon)
+        road = [a, (lat + d / 2, lon), b]                          # straight, short
+        path = [a, (lat + d / 3, lon + d), (lat + 2 * d / 3, lon + d), b]   # dog-leg, long
+        graph = survey.build_graph([
+            leg(road, {"highway": "unclassified"}, 1),
+            leg(path, {"highway": "footway", "designation": "public_footpath"}, 2),
+        ])
+        import networkx as nx
+        chosen = nx.shortest_path(graph, min(graph.nodes, key=lambda n: survey.haversine_m(n, a)),
+                                  min(graph.nodes, key=lambda n: survey.haversine_m(n, b)),
+                                  weight="cost")
+        kinds = {graph[u][v]["kind"] for u, v in zip(chosen, chosen[1:])}
+        self.assertIn("prow", kinds)
+        self.assertNotIn("unclassified", kinds, "the router took the road")
+
+    def test_open_access_land_confers_a_right_the_way_does_not_carry(self):
+        """
+        A path with no designation, inside National Trust open land, is walkable by right.
+        Reading the way alone reports an escarpment common as 'unknown'.
+        """
+        tags = {"highway": "path"}
+        self.assertEqual(survey.classify(tags, False), "path")
+        self.assertEqual(survey.classify(tags, True), "access_land")
+        self.assertIn("access_land", survey.BY_RIGHT_CLASSES)
+        self.assertNotIn("path", survey.BY_RIGHT_CLASSES)
+
+    def test_a_lane_inside_access_land_is_still_a_lane(self):
+        """Open access is a right to roam over land, not a reclassification of the road."""
+        self.assertEqual(survey.classify({"highway": "unclassified"}, True), "unclassified")
+
+    def test_access_polygons_ignore_unclosed_ways(self):
+        """A boundary fragment is not an area, and must not be guessed into one."""
+        closed = {"type": "way", "id": 1, "geometry": [
+            {"lat": 51.78, "lon": -2.29}, {"lat": 51.79, "lon": -2.29},
+            {"lat": 51.79, "lon": -2.28}, {"lat": 51.78, "lon": -2.29}]}
+        open_way = {"type": "way", "id": 2, "geometry": [
+            {"lat": 51.70, "lon": -2.20}, {"lat": 51.71, "lon": -2.20},
+            {"lat": 51.71, "lon": -2.19}, {"lat": 51.72, "lon": -2.18}]}
+        from shapely.geometry import Point
+        area = survey.access_polygons([closed, open_way])
+        self.assertIsNotNone(area)
+        self.assertTrue(area.contains(Point(-2.2887, 51.7867)))
+        self.assertFalse(area.contains(Point(-2.195, 51.710)))
+        self.assertIsNone(survey.access_polygons([open_way]))
+
+
 class TestRouteRollUp(unittest.TestCase):
     def test_designation_and_surface_are_apportioned_by_length(self):
         graph = survey.build_graph(square_ways((51.7845, -2.2870), side_km=1.0))

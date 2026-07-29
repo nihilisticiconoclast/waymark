@@ -93,6 +93,46 @@ HAZARD_QL = """
 out geom tags;
 """
 
+# Open-access land, with geometry rather than a centre point. A path inside CRoW access land
+# or on National Trust open land is walkable by right even when the way itself carries no
+# `designation` tag — which is the usual case, because the right comes from the land and not
+# from the line. Without these polygons the survey reports an escarpment common as "unknown"
+# and the write-up has to hedge a right that actually exists.
+ACCESS_QL = """
+[out:json][timeout:120];
+(
+  way["designation"="access_land"]({bbox});
+  relation["designation"="access_land"]({bbox});
+  way["access"="yes"]["natural"]({bbox});
+  way["operator"="National Trust"]({bbox});
+  relation["operator"="National Trust"]({bbox});
+  way["operator:wikidata"="Q333515"]({bbox});
+  relation["operator:wikidata"="Q333515"]({bbox});
+);
+out geom tags;
+"""
+
+# What the assembler minimises. Length is the physical truth and is what gets reported; cost
+# is preference, and the two are deliberately different numbers.
+#
+# These are walking directions, so a right of way is the cheapest thing on the map and a
+# carriageway is expensive out of all proportion to its length. At 7x, the router will take
+# seven kilometres of footpath over one of lane, which is the right trade for a walk and
+# completely wrong for a car. Roads are not forbidden — a lane is often the only link between
+# two path networks, and forbidding them returns no loop at all.
+COST_MULTIPLIER = {
+    "prow": 1.0,           # public footpath, bridleway, restricted byway, BOAT
+    "access_land": 1.1,    # inside CRoW or National Trust open land
+    "path": 1.4,           # mapped path or track, access unknown
+    "permissive": 1.6,
+    "track": 1.8,
+    "byway_motor": 3.0,    # open to all traffic: legal, but you share it
+    "service": 6.0,
+    "residential": 7.0,
+    "unclassified": 9.0,   # the rural lane with no pavement and a 60 limit
+    "other": 5.0,
+}
+
 SURFACE_CLASS = {
     "asphalt": "sealed", "concrete": "sealed", "paved": "sealed", "paving_stones": "sealed",
     "chipseal": "sealed", "sett": "sealed",
@@ -171,12 +211,93 @@ def overpass(query: str, cache_key: str) -> dict:
 
 # --------------------------------------------------------------------------- assembly
 
-def build_graph(ways: list[dict]) -> nx.Graph:
+def access_polygons(elements: list[dict]):
+    """
+    Closed rings from the open-access query, as one prepared geometry.
+
+    Relations come back from `out geom` with their members' geometry attached, so both ways
+    and relation members are read the same way. Anything that isn't a closed ring of at least
+    four points is skipped rather than guessed at.
+    """
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+    from shapely.prepared import prep
+
+    rings = []
+    for el in elements:
+        geoms = [el.get("geometry")] if el.get("geometry") else \
+                [m.get("geometry") for m in el.get("members", [])]
+        for g in geoms:
+            if not g or len(g) < 4:
+                continue
+            pts = [(p["lon"], p["lat"]) for p in g]
+            if pts[0] != pts[-1]:
+                continue                      # an open way is a boundary fragment, not an area
+            try:
+                poly = Polygon(pts)
+                if poly.is_valid and poly.area > 0:
+                    rings.append(poly)
+            except Exception:
+                continue
+
+    if not rings:
+        return None
+    return prep(unary_union(rings))
+
+
+def classify(tags: dict, in_access_land: bool) -> str:
+    """One vocabulary for both the cost model and the access roll-up, so they cannot drift."""
+    des = tags.get("designation")
+    hw = tags.get("highway")
+
+    if des in ("public_footpath", "public_bridleway", "restricted_byway"):
+        return "prow"
+    if des == "byway_open_to_all_traffic":
+        return "byway_motor"
+    if in_access_land and hw not in ("residential", "unclassified", "service", "living_street"):
+        return "access_land"
+    if tags.get("foot") == "permissive" or tags.get("access") == "permissive":
+        return "permissive"
+    if hw in ("footway", "path", "steps", "cycleway", "bridleway"):
+        return "path"
+    if hw == "track":
+        return "track"
+    if hw in ("residential", "living_street"):
+        return "residential"
+    if hw == "service":
+        return "service"
+    if hw == "unclassified":
+        return "unclassified"
+    return "other"
+
+
+# How a class maps onto the schema's designation vocabulary and onto the by-right share.
+DESIGNATION_OF = {
+    "prow": None,                      # replaced by the way's actual designation tag
+    "byway_motor": "byway_open_to_all_traffic",
+    "access_land": "access_land",
+    "permissive": "permissive",
+    "path": "unknown",
+    "track": "unknown",
+    "service": "unknown",
+    "residential": "unknown",
+    "unclassified": "unknown",
+    "other": "unknown",
+}
+BY_RIGHT_CLASSES = {"prow", "byway_motor", "access_land"}
+
+
+def build_graph(ways: list[dict], access=None) -> nx.Graph:
     """
     Node key is a rounded (lat, lon) tuple — ~1 m precision. Rounding is how ways that share
     an endpoint get joined; loosen it and you connect things that aren't connected on the
     ground, which is the worst possible bug in this file.
+
+    Each edge carries both a `length` (metres, the physical truth, what gets reported) and a
+    `cost` (length weighted by how much a walker wants to be on it, what gets minimised).
     """
+    from shapely.geometry import Point
+
     G = nx.Graph()
     for w in ways:
         geom = w.get("geometry") or []
@@ -186,11 +307,19 @@ def build_graph(ways: list[dict]) -> nx.Graph:
             nb = (round(b["lat"], 5), round(b["lon"], 5))
             if na == nb:
                 continue
-            G.add_edge(na, nb, length=haversine_m(na, nb), tags=tags, osm_id=f"way/{w['id']}")
+            length = haversine_m(na, nb)
+            in_access = False
+            if access is not None:
+                mid = Point((na[1] + nb[1]) / 2, (na[0] + nb[0]) / 2)
+                in_access = access.contains(mid)
+            kind = classify(tags, in_access)
+            G.add_edge(na, nb, length=length, cost=length * COST_MULTIPLIER[kind],
+                       kind=kind, tags=tags, osm_id=f"way/{w['id']}")
     return G
 
 
-def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float]):
+def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float],
+              start_at: tuple[float, float] | None = None):
     """
     Loop assembly heuristic.
 
@@ -228,13 +357,20 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
           f"{nx.number_connected_components(G)} components, "
           f"largest has {reachable.number_of_nodes()}")
 
-    start = min(reachable.nodes, key=lambda n: haversine_m(n, anchor))
+    # A walk starts where you leave the car. When the survey found a car park near the
+    # target, the loop is anchored to it rather than to the queue's search centre, which is
+    # only ever a hint at roughly where to look.
+    origin_point = start_at or anchor
+    start = min(reachable.nodes, key=lambda n: haversine_m(n, origin_point))
+    if start_at:
+        print(f"  starting {haversine_m(start, start_at):.0f} m from the car park")
     if haversine_m(start, anchor) > 2000:
         print(f"  nearest node on the main network is "
               f"{haversine_m(start, anchor) / 1000:.1f} km from the anchor")
 
     G = reachable
     lengths = nx.single_source_dijkstra_path_length(G, start, cutoff=target * 0.8, weight="length")
+    costs = nx.single_source_dijkstra_path_length(G, start, weight="cost")
     far = [n for n, d in lengths.items() if target * 0.32 < d < target * 0.62]
     if not far:
         reach = max(lengths.values(), default=0.0)
@@ -251,7 +387,7 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     best, best_score = None, -1.0
     for mid in far[:300]:
         try:
-            out = nx.shortest_path(G, start, mid, weight="length")
+            out = nx.shortest_path(G, start, mid, weight="cost")
         except nx.NetworkXNoPath:
             continue
         out_edges = {frozenset(e) for e in zip(out, out[1:])}
@@ -259,9 +395,9 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         H = G.copy()
         for u, v in zip(out, out[1:]):
             if H.has_edge(u, v):
-                H[u][v]["length"] *= 6.0          # penalise, don't forbid — cul-de-sacs exist
+                H[u][v]["cost"] *= 6.0            # penalise, don't forbid — cul-de-sacs exist
         try:
-            back = nx.shortest_path(H, mid, start, weight="length")
+            back = nx.shortest_path(H, mid, start, weight="cost")
         except nx.NetworkXNoPath:
             continue
 
@@ -273,7 +409,18 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
 
         back_edges = {frozenset(e) for e in zip(back, back[1:])}
         overlap = len(out_edges & back_edges) / max(len(out_edges), 1)
-        score = (1 - overlap) - abs(total - target) / target
+
+        # Two loops of the same length are not equally good. Prefer the one that spends more
+        # of itself on ways a walker is entitled to be on, and less on carriageway.
+        by_right = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:])
+                       if G.has_edge(u, v) and G[u][v]["kind"] in BY_RIGHT_CLASSES)
+        road = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:])
+                   if G.has_edge(u, v)
+                   and G[u][v]["kind"] in ("residential", "unclassified", "service"))
+        score = ((1 - overlap)
+                 - abs(total - target) / target
+                 + 1.5 * by_right / total
+                 - 2.0 * road / total)
         if score > best_score:
             best, best_score = loop, score
 
@@ -296,6 +443,7 @@ def summarise_route(G: nx.Graph, loop: list) -> dict:
     surface: dict[str, float] = {"sealed": 0.0, "firm": 0.0, "soft": 0.0, "untagged": 0.0}
     names: set[str] = set()
     total = 0.0
+    by_right_m = 0.0
 
     for u, v in zip(loop, loop[1:]):
         if not G.has_edge(u, v):
@@ -304,28 +452,21 @@ def summarise_route(G: nx.Graph, loop: list) -> dict:
         tags, ln = e["tags"], e["length"]
         total += ln
 
-        des = tags.get("designation")
-        if des in PROW.split("|"):
-            key = des
-        elif tags.get("designation") == "access_land" or tags.get("access") == "yes":
-            key = "access_land"
-        elif tags.get("foot") == "permissive" or tags.get("access") == "permissive":
-            key = "permissive"
-        elif tags.get("highway") in ("residential", "unclassified", "service", "living_street"):
-            key = "highway_with_footway" if tags.get("sidewalk") else "unknown"
-        else:
-            key = "unknown"
+        # The same classification the router used, so the reported access can never
+        # disagree with what the assembler thought it was choosing.
+        kind = e["kind"]
+        key = DESIGNATION_OF[kind] or tags.get("designation", "unknown")
+        if kind in ("residential", "unclassified", "service") and tags.get("sidewalk"):
+            key = "highway_with_footway"
         segments[key] = segments.get(key, 0.0) + ln
+        by_right_m = by_right_m + ln if kind in BY_RIGHT_CLASSES else by_right_m
 
         surface[SURFACE_CLASS.get(tags.get("surface", ""), "untagged")] += ln
 
         if tags.get("name"):
             names.add(tags["name"])
 
-    by_right = sum(
-        v for k, v in segments.items()
-        if k in PROW.split("|") + ["access_land"]
-    )
+    by_right = by_right_m
     return {
         "total_m": total,
         "segments": [{"designation": k, "length_m": round(v, 1), "prow_ref": None}
@@ -419,10 +560,37 @@ def survey(target: dict, origin: dict) -> dict:
     ways = overpass(WAYS_QL.format(prow=PROW, bbox=bbox), f"{slug}-ways")["elements"]
     pois = overpass(POI_QL.format(bbox=bbox), f"{slug}-pois")["elements"]
     hazards_raw = overpass(HAZARD_QL.format(bbox=bbox), f"{slug}-hazards")["elements"]
-    print(f"  {len(ways)} ways, {len(pois)} pois")
+    access_raw = overpass(ACCESS_QL.format(bbox=bbox), f"{slug}-access")["elements"]
+    print(f"  {len(ways)} ways, {len(pois)} pois, {len(access_raw)} access areas")
 
-    G = build_graph(ways)
-    loop = find_loop(G, (lat, lon), tuple(target["distance_band_km"]))
+    access = access_polygons(access_raw)
+
+    def poi_point(p):
+        if p.get("lat") is not None:
+            return (p["lat"], p["lon"])
+        if p.get("center"):
+            return (p["center"]["lat"], p["center"]["lon"])
+        g = p.get("geometry") or []
+        return (g[0]["lat"], g[0]["lon"]) if g else None
+
+    # A walk starts at the car park. The queue's `centre` is a search hint; where you can
+    # actually leave a car is a fact, and it is the thing that decides whether a route is
+    # walkable on a Saturday at all. Largest capacity wins ties, then proximity to the hint.
+    parks = []
+    for p in pois:
+        if p.get("tags", {}).get("amenity") != "parking":
+            continue
+        pt = poi_point(p)
+        if pt and haversine_m(pt, (lat, lon)) <= 2500:
+            cap = p["tags"].get("capacity", "")
+            parks.append((haversine_m(pt, (lat, lon)), -(int(cap) if cap.isdigit() else 0), pt))
+    parks.sort(key=lambda x: (x[1], x[0]))
+    start_at = parks[0][2] if parks else None
+    if start_at:
+        print(f"  {len(parks)} car parks near the target; anchoring the loop to the best")
+
+    G = build_graph(ways, access=access)
+    loop = find_loop(G, (lat, lon), tuple(target["distance_band_km"]), start_at=start_at)
     if loop is None:
         raise SystemExit(
             f"No loop found for {slug} in {target['distance_band_km']} km. "

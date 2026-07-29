@@ -102,6 +102,7 @@ function initMap() {
         .setView([ORIGIN.lat, ORIGIN.lon], p.zoom);
 
   L.control.zoom({ position: "bottomright" }).addTo(map);
+  map.on("zoomend moveend", upgradeGeometry);
 
   const url = p.url.replace("{key}", CFG.osApiKey);
   L.tileLayer(url, Object.assign({ attribution: p.attribution }, p.options))
@@ -159,6 +160,38 @@ function paintSelection() {
   });
 }
 
+/* Zoom past this and the index's simplified line is no longer good enough: the difference
+   between a path that hugs a contour and a polygon that approximates it becomes visible, and
+   on a walking map that difference is the information. */
+const FULL_GEOMETRY_ZOOM = 14;
+
+/* Fetch full-resolution geometry for every walk currently on screen, once. The index line is
+   for the overview — cheap enough to load on a hill with one bar — and this is what replaces
+   it when someone actually looks. */
+async function upgradeGeometry() {
+  if (!map || map.getZoom() < FULL_GEOMETRY_ZOOM) return;
+  const bounds = map.getBounds();
+  const pending = state.walks.filter(w =>
+    !w.fullLine && !w.fetching && passes(w) && w.line &&
+    w.line.some(([lat, lon]) => bounds.contains([lat, lon])));
+  if (!pending.length) return;
+
+  await Promise.all(pending.map(async w => {
+    w.fetching = true;
+    try {
+      const res = await fetch(`./data/walks/${w.slug}.json`);
+      if (!res.ok) return;
+      const d = await res.json();
+      w.fullLine = d.geometry.route.coordinates.map(([lon, lat]) => [lat, lon]);
+    } catch {
+      /* offline or missing: the simplified line stays, which is degraded but not broken */
+    } finally {
+      w.fetching = false;
+    }
+  }));
+  drawRoutes();
+}
+
 /* Every visible walk draws its route, always — the route is the walk, and a map of start
    pins tells you nothing about where a walk actually goes. Selecting one thickens it and
    opens the panel; it does not conjure the line out of nowhere. */
@@ -166,7 +199,7 @@ function drawRoutes() {
   state.routeLayer.clearLayers();
   state.walks.forEach(w => {
     if (!w.line || !passes(w)) return;
-    const latlngs = w.line;
+    const latlngs = w.fullLine || w.line;
     const selected = w.slug === state.selected;
     L.polyline(latlngs, { className: "route-casing", interactive: false })
       .addTo(state.routeLayer);
@@ -246,6 +279,7 @@ function apply() {
   if (qc) qc.textContent = queued;
   drawRoutes();
   drawDots();
+  upgradeGeometry();
 }
 
 /* ── the dial ──────────────────────────────────────────────────────────────
@@ -413,7 +447,7 @@ async function select(slug) {
   // and swaps the index's simplified geometry for the full-resolution one.
   const latlngs = w.geometry.route.coordinates.map(([lon, lat]) => [lat, lon]);
   const indexed = state.walks.find(x => x.slug === slug);
-  if (indexed) indexed.line = latlngs;
+  if (indexed) indexed.fullLine = latlngs;
   state.selected = slug;
   drawRoutes();
   map.fitBounds(L.latLngBounds(latlngs).pad(0.15));
