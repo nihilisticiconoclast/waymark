@@ -26,15 +26,22 @@ jobs:
       - run: |
           python scripts/build_index.py
           python scripts/brier.py --write
-      - name: Write config.js from secrets
+      # Values arrive as environment variables rather than being interpolated into the
+      # script text: a repository variable is settable by anyone with write access, and
+      # `${{ }}` inside a run block is substituted before the shell ever sees it.
+      # There is no cuddly-lamp setting — the stylesheet URL is fixed in index.html.
+      - name: Write config.js
+        env:
+          BASEMAP: ${{ vars.WAYMARK_BASEMAP || 'opentopo' }}
+          OS_API_KEY: ${{ secrets.OS_API_KEY }}
         run: |
-          cat > site/config.js <<EOF
-          window.WAYMARK_CONFIG = {
-            basemap: "${{ vars.WAYMARK_BASEMAP || 'opentopo' }}",
-            osApiKey: "${{ secrets.OS_API_KEY }}",
-            cuddlyLampBase: "${{ vars.CUDDLY_LAMP_BASE }}"
-          };
-          EOF
+          python - <<'PY' > site/config.js
+          import json, os
+          print("window.WAYMARK_CONFIG = %s;" % json.dumps({
+              "basemap": os.environ.get("BASEMAP") or "opentopo",
+              "osApiKey": os.environ.get("OS_API_KEY", ""),
+          }))
+          PY
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
 

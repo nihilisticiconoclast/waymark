@@ -2,8 +2,10 @@
    Waymark
    =========================================================================== */
 
+/* Styling comes from cuddly-lamp's CDN copy, linked in index.html — there is no base URL
+   to configure here. Config carries the basemap choice and the OS key, nothing else. */
 const CFG = Object.assign(
-  { basemap: "opentopo", osApiKey: "", cuddlyLampBase: "" },
+  { basemap: "opentopo", osApiKey: "" },
   window.WAYMARK_CONFIG || {}
 );
 
@@ -129,7 +131,18 @@ function renderMarkers() {
   });
 }
 
+/* The pin carries the selection, so it has to be redrawn when the selection moves.
+   divIcon markup is baked at creation; setIcon is the only way to change it. */
+function paintSelection() {
+  state.walks.forEach(w => {
+    const m = state.markers.get(w.slug);
+    if (m) m.setIcon(pinIcon(w, w.slug === state.selected));
+  });
+}
+
 /* ── filtering ─────────────────────────────────────────────────────────────── */
+
+const unsealedPct = w => Math.max(0, 100 - (w.sealed_pct ?? 0));
 
 function inSector(w) {
   const s = state.sector;
@@ -144,7 +157,9 @@ function passes(w) {
   if (w.distance_km > f.dist) return false;
   if (w.ascent_m > f.asc) return false;
   if (f.grad < 30 && (w.gradient_pct ?? 0) > f.grad) return false;
-  if ((w.soft_pct + (100 - w.sealed_pct - w.soft_pct) * 0) < f.surf) return false;
+  // "Unsealed" is everything that is not sealed — firm and untagged count, not just soft.
+  // Filtering on soft_pct alone hid every walk on a well-tagged firm track.
+  if (unsealedPct(w) < f.surf) return false;
   if ((w.ratings?.technicality ?? 1) > f.tech) return false;
   if (w.confidence * 100 < f.conf) return false;
   if (f.run === "throughout" && w.runnable !== "throughout") return false;
@@ -298,6 +313,13 @@ function initDial() {
 
 /* ── detail ────────────────────────────────────────────────────────────────── */
 
+/* Editorial prose is model-written and passes through a validator that checks meaning,
+   not markup. It is interpolated into innerHTML below, so it is escaped here: a stray
+   angle bracket in a write-up should render as an angle bracket, not as an element. */
+const esc = v => String(v ?? "").replace(/[&<>"']/g, ch => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[ch]));
+
 async function select(slug) {
   const res = await fetch(`./data/walks/${slug}.json`);
   if (!res.ok) return;
@@ -310,38 +332,43 @@ async function select(slug) {
   map.fitBounds(L.latLngBounds(latlngs).pad(0.15));
 
   const f = w.facts, e = w.editorial, c = w.confidence;
-  const veg = f.amenities.refreshment.find(r => ["yes", "only"].includes(r.vegan));
+  const amen = f.amenities || {};
+  const refreshment = amen.refreshment || [];
+  const veg = refreshment.find(r => ["yes", "only"].includes(r.vegan));
+  const unsealed = Math.max(0, 100 - (f.surface_mix.sealed_pct ?? 0));
 
   document.getElementById("detail-body").innerHTML = `
-    <h2>${w.name}</h2>
-    <p>${e.summary}</p>
+    <h2>${esc(w.name)}</h2>
+    <p>${esc(e.summary)}</p>
 
     <div class="stat-grid">
-      <div><span class="k">Distance</span><span>${f.distance_km} km</span></div>
-      <div><span class="k">Ascent</span><span>${f.ascent_m} m</span></div>
-      <div><span class="k">Steepest</span><span>${f.max_sustained_gradient_pct ?? "—"}%</span></div>
-      <div><span class="k">By right</span><span>${f.access.by_right_pct}%</span></div>
-      <div><span class="k">Unsealed</span><span>${(f.surface_mix.soft_pct ?? 0) + (f.surface_mix.firm_pct ?? 0)}%</span></div>
-      <div><span class="k">Confidence</span><span>${c.navigable}</span></div>
+      <div><span class="k">Distance</span><span>${esc(f.distance_km)} km</span></div>
+      <div><span class="k">Ascent</span><span>${esc(f.ascent_m)} m</span></div>
+      <div><span class="k">Steepest</span><span>${esc(f.max_sustained_gradient_pct ?? "—")}%</span></div>
+      <div><span class="k">By right</span><span>${esc(f.access.by_right_pct)}%</span></div>
+      <div><span class="k">Unsealed</span><span>${esc(unsealed)}%</span></div>
+      <div><span class="k">Confidence</span><span>${esc(c.navigable)}</span></div>
     </div>
 
-    <h3>Character</h3><p>${e.character}</p>
-    ${e.grain ? `<h3>Grain</h3><p>${e.grain}</p>` : ""}
-    <h3>Conditions</h3><p>${e.conditions}</p>
-    <h3>Practical</h3><p>${e.practical}</p>
-    ${veg ? "" : `<p><span class="chip">no vegan option recorded</span></p>`}
-    <h3>Caveats</h3><p>${e.caveats}</p>
+    <h3>Character</h3><p>${esc(e.character)}</p>
+    ${e.grain ? `<h3>Grain</h3><p>${esc(e.grain)}</p>` : ""}
+    <h3>Conditions</h3><p>${esc(e.conditions)}</p>
+    <h3>Practical</h3><p>${esc(e.practical)}</p>
+    ${refreshment.length && !veg
+        ? `<p><span class="chip">no vegan option recorded</span></p>` : ""}
+    <h3>Caveats</h3><p>${esc(e.caveats)}</p>
 
     <h3>Confidence</h3>
-    <p>${c.basis}</p>
+    <p>${esc(c.basis)}</p>
     <p>${c.resolved
-        ? `<span class="chip">resolved ${c.resolved.date}: ${c.resolved.outcome.replace(/_/g, " ")}</span>`
+        ? `<span class="chip">resolved ${esc(c.resolved.date)}: ${esc(c.resolved.outcome.replace(/_/g, " "))}</span>`
         : `<span class="chip" data-tone="warn">unresolved — not yet walked</span>`}</p>
 
-    <p><small>${w.provenance.attribution.join(" · ")}</small></p>
+    <p><small>${esc(w.provenance.attribution.join(" · "))}</small></p>
   `;
   document.getElementById("detail").hidden = false;
   state.selected = slug;
+  paintSelection();
 }
 
 /* ── wiring ────────────────────────────────────────────────────────────────── */
@@ -382,6 +409,7 @@ function initControls() {
     document.getElementById("detail").hidden = true;
     state.routeLayer.clearLayers();
     state.selected = null;
+    paintSelection();
   });
 
   // Bottom sheet detents on small screens.

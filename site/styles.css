@@ -1,24 +1,38 @@
 /* ===========================================================================
    Waymark — layout only.
 
-   Every colour, typeface, weight and radius comes from cuddly-lamp. This file may
-   declare geometry and may reference tokens. It may not declare a literal colour
-   outside the fallback fence at the bottom.
+   Every colour, typeface, weight and radius comes from cuddly-lamp's Tunnel system.
+   This file declares geometry and references tokens. It may not declare a literal
+   colour, font stack or radius outside the fallback fence at the bottom.
 
-   If cuddly-lamp's token names differ from the --cl-* assumed here, edit THIS file
-   to match cuddly-lamp. Never the reverse.
+   TOKEN VOCABULARY — verified against cuddly-lamp/assets/tokens.css, not assumed:
+
+     colour   --paper --ink --contour --index --incident --amber --route
+     type     --font-display --font-body --font-data
+     scale    --step--1 --step-0 --step-1 --step-2 --step-3 --step-4
+     form     --radius (0 — hard edges)  --rule (hairline shorthand)  --measure
+
+   Three house rules the layout below obeys, from cuddly-lamp SKILL.md §1:
+     · exactly one --route red element per view — here, the drawn route line
+     · --amber is reserved for the figure; it appears nowhere in this file
+     · square corners and no drop shadows; separation is hairline rules, not elevation
+
+   cuddly-lamp has no spacing scale, so layout spacing is defined here under a --wm-
+   prefix. Spacing is geometry and geometry is this file's job; colour, type and radius
+   are not, and are never redeclared.
    =========================================================================== */
 
-*, *::before, *::after { box-sizing: border-box; }
-
-html, body { height: 100%; margin: 0; }
-
-body {
-  font-family: var(--cl-font-body);
-  color: var(--cl-ink);
-  background: var(--cl-surface);
-  overscroll-behavior: none;
+:root {
+  --wm-space-1: .25rem;
+  --wm-space-2: .5rem;
+  --wm-space-3: .75rem;
+  --wm-space-4: 1rem;
+  --wm-space-5: 1.5rem;
 }
+
+html, body { height: 100%; }
+
+body { overscroll-behavior: none; }
 
 #app {
   display: grid;
@@ -32,153 +46,204 @@ body {
   grid-column: 2;
   height: 100%;
   z-index: 0;
+  background: var(--paper);
 }
 
-/* Route geometry is drawn twice: a wide low-opacity casing under a narrow solid core,
-   so it holds up over both the pale wash of the Explorer sheet and a darker
-   topographic basemap without needing a per-profile colour. */
-.route-casing { stroke: var(--cl-surface); stroke-width: 9; stroke-opacity: .75; fill: none; }
-.route-core   { stroke: var(--cl-accent);  stroke-width: 3; fill: none; }
+/* Route geometry is drawn twice: a wide low-opacity casing under a narrow solid core, so
+   it holds up over both the pale wash of the Explorer sheet and a darker topographic
+   basemap without needing a per-profile colour. The core is this view's single --route
+   element — the one red line on the page, and it is literally a route. */
+.route-casing { stroke: var(--paper); stroke-width: 9; stroke-opacity: .8; fill: none; }
+.route-core   { stroke: var(--route); stroke-width: 3; fill: none; }
 
 .walk-pin {
   width: 14px; height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--cl-surface);
-  background: var(--cl-accent);
-  box-shadow: 0 1px 3px rgb(0 0 0 / .35);
+  border: 2px solid var(--paper);
+  background: var(--incident);
+  transition: transform .12s ease;
 }
-.walk-pin[data-low="true"] { background: var(--cl-muted); }
-.walk-pin[data-selected="true"] { transform: scale(1.5); }
+.walk-pin[data-low="true"] { background: var(--contour); }
+/* Selection reads as ink and scale, not as a second red: the drawn route is the one red
+   element, and the selected pin sits at the end of it. */
+.walk-pin[data-selected="true"] { background: var(--ink); transform: scale(1.5); }
 
-.leaflet-container { font-family: var(--cl-font-ui); background: var(--cl-surface); }
+/* Leaflet ships its own chrome: white cards and 4px corners. Bring it into the system. */
+.leaflet-container { font-family: var(--font-body); background: var(--paper); }
+.leaflet-bar,
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--contour) 38%, transparent);
+}
+.leaflet-bar a:hover { color: var(--route); }
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  color: var(--contour);
+  font-family: var(--font-data);
+  font-size: var(--step--1);
+}
+.leaflet-control-attribution a { color: var(--incident); }
 
 /* ── rail ────────────────────────────────────────────────────────────────── */
 
 #rail {
   grid-column: 1;
+  position: relative;          /* offset parent for the doodle */
+  isolation: isolate;          /* keep the doodle above the rail's own ground */
   display: flex;
   flex-direction: column;
-  gap: var(--cl-space-4);
-  padding: var(--cl-space-5);
+  gap: var(--wm-space-4);
+  padding: var(--wm-space-5);
   overflow-y: auto;
-  border-right: 1px solid var(--cl-rule);
-  background: var(--cl-surface);
+  overflow-x: hidden;          /* the doodle bleeds past the edge; clip it there */
+  border-right: var(--rule);
+  background: var(--paper);
   z-index: 500;
 }
 
+/* tokens.css parks the doodle at z-index:-1 so it sits behind page content. Inside an
+   opaque rail that would bury it under the rail's own background, so it is lifted one
+   level and the rail's blocks are lifted above it.
+
+   It is also drawn smaller and fainter than the token default. That default assumes a
+   document gutter — a wide empty margin beside a reading column. A filter rail has no such
+   margin, so at full strength the scribble sits under live controls rather than beside
+   them. Same figure, same slot logic, dialled to the space it actually has. */
+#rail > .doodle { z-index: 0; width: clamp(120px, 14vw, 180px); opacity: .3; }
+#rail > :not(.doodle) { position: relative; z-index: 1; }
+
 #rail-grip { display: none; }
 
-.rail-head h1 { font-family: var(--cl-font-display); margin: 0; }
-.rail-sub { margin: var(--cl-space-1) 0 0; color: var(--cl-muted); }
+.rail-head { display: flex; align-items: center; gap: var(--wm-space-3); }
+.rail-head .sig { flex: none; width: clamp(56px, 6vw, 68px); }
+.rail-title h1 { font-size: var(--step-2); margin: 0; }
+.rail-sub { margin: var(--wm-space-1) 0 0; color: var(--contour); font-size: var(--step--1); }
 
-.block { display: flex; flex-direction: column; gap: var(--cl-space-2); }
+.block { display: flex; flex-direction: column; gap: var(--wm-space-2); }
 .block h2 {
-  font-family: var(--cl-font-ui);
-  font-size: var(--cl-size-eyebrow);
-  letter-spacing: .08em;
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: .18em;
   text-transform: uppercase;
-  color: var(--cl-muted);
-  margin: 0 0 var(--cl-space-1);
-  padding-bottom: var(--cl-space-1);
-  border-bottom: 1px solid var(--cl-rule);
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+  margin: 0 0 var(--wm-space-1);
+  padding-bottom: var(--wm-space-1);
+  border-bottom: var(--rule);
 }
 
-.range { display: flex; flex-direction: column; gap: var(--cl-space-1); }
+.range { display: flex; flex-direction: column; gap: var(--wm-space-1); }
 .range > span { display: flex; justify-content: space-between; align-items: baseline; }
-.range output { font-family: var(--cl-font-mono); color: var(--cl-muted); }
-.range small { color: var(--cl-muted); }
-.range input[type="range"] { width: 100%; accent-color: var(--cl-accent); }
+.range output { font-family: var(--font-data); color: var(--contour); }
+.range small { color: var(--contour); font-size: var(--step--1); }
+.range input[type="range"] { width: 100%; accent-color: var(--incident); }
 
-.checks { display: flex; flex-direction: column; gap: var(--cl-space-1); }
-.checks label { display: flex; gap: var(--cl-space-2); align-items: center; cursor: pointer; }
-.checks input { accent-color: var(--cl-accent); }
+.checks { display: flex; flex-direction: column; gap: var(--wm-space-1); }
+.checks label { display: flex; gap: var(--wm-space-2); align-items: center; cursor: pointer; }
+.checks input { accent-color: var(--incident); }
 
 .link-btn {
   align-self: flex-start;
   background: none; border: 0; padding: 0;
-  font: inherit; color: var(--cl-muted);
-  text-decoration: underline; text-underline-offset: 3px;
+  font: inherit; font-size: var(--step--1);
+  color: var(--incident);
+  text-decoration: underline; text-underline-offset: 2px;
   cursor: pointer;
 }
+.link-btn:hover { color: var(--route); }
 
 .calib {
-  font-family: var(--cl-font-mono);
-  font-size: var(--cl-size-small);
-  color: var(--cl-muted);
+  font-family: var(--font-data);
+  font-size: var(--step--1);
+  color: var(--contour);
   line-height: 1.6;
 }
 
-.rail-foot { margin-top: auto; padding-top: var(--cl-space-3); border-top: 1px solid var(--cl-rule); }
-.rail-foot p { margin: 0; font-size: var(--cl-size-small); color: var(--cl-muted); }
+.rail-foot { margin-top: auto; padding-top: var(--wm-space-3); border-top: var(--rule); }
+.rail-foot p {
+  margin: 0; max-width: none;
+  font-family: var(--font-data);
+  font-size: var(--step--1);
+  color: var(--contour);
+}
 
 /* ── dial ────────────────────────────────────────────────────────────────── */
 
 #dial-wrap { aspect-ratio: 1; width: 100%; max-width: 20rem; margin-inline: auto; }
 #dial { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 
-#dial-rings circle { fill: none; stroke: var(--cl-rule); stroke-width: .5; }
-#dial-ticks line   { stroke: var(--cl-rule); stroke-width: .5; }
+/* Hairlines that read as isolines rather than as UI strokes. */
+#dial-rings circle { fill: none; stroke: var(--contour); stroke-opacity: .38; stroke-width: .5; }
+#dial-ticks line   { stroke: var(--contour); stroke-opacity: .38; stroke-width: .5; }
 #dial-ticks text   {
-  fill: var(--cl-muted);
-  font-family: var(--cl-font-mono);
+  fill: var(--contour);
+  font-family: var(--font-data);
   font-size: 7px;
   text-anchor: middle;
   dominant-baseline: middle;
 }
-#dial-wedge  { fill: var(--cl-accent); fill-opacity: .16; stroke: var(--cl-accent); stroke-width: .75; }
-#dial-origin { fill: var(--cl-ink); }
-#dial-dots circle { fill: var(--cl-ink); r: 2.2; }
-#dial-dots circle[data-in="false"] { fill: var(--cl-rule); }
+#dial-wedge  { fill: var(--incident); fill-opacity: .16; stroke: var(--incident); stroke-width: .75; }
+#dial-origin { fill: var(--index); }
+#dial-dots circle { fill: var(--ink); r: 2.2; cursor: pointer; }
+#dial-dots circle[data-in="false"] { fill: var(--contour); fill-opacity: .35; }
 
-.dial-read { margin: 0; font-family: var(--cl-font-mono); font-size: var(--cl-size-small); }
+.dial-read { margin: 0; max-width: none; font-family: var(--font-data); font-size: var(--step--1); }
 
 /* ── detail ──────────────────────────────────────────────────────────────── */
 
 #detail {
   position: fixed;
-  top: var(--cl-space-4); right: var(--cl-space-4);
+  top: var(--wm-space-4); right: var(--wm-space-4);
   width: min(30rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
   overflow-y: auto;
-  padding: var(--cl-space-5);
-  background: var(--cl-surface);
-  border: 1px solid var(--cl-rule);
-  border-radius: var(--cl-radius);
-  box-shadow: var(--cl-shadow);
+  padding: var(--wm-space-5);
+  background: var(--paper);
+  border: var(--rule);
+  border-radius: var(--radius);
   z-index: 900;
 }
-#detail h2 { font-family: var(--cl-font-display); margin: 0 0 var(--cl-space-2); }
+#detail h2 { font-size: var(--step-2); margin: 0 var(--wm-space-5) var(--wm-space-2) 0; }
 #detail h3 {
-  font-family: var(--cl-font-ui);
-  font-size: var(--cl-size-eyebrow);
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--cl-muted);
-  margin: var(--cl-space-4) 0 var(--cl-space-1);
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+  margin: var(--wm-space-4) 0 var(--wm-space-1);
 }
-#detail p { margin: 0 0 var(--cl-space-2); line-height: 1.65; }
+#detail p { margin: 0 0 var(--wm-space-2); max-width: none; line-height: 1.65; }
 #detail-close {
-  position: absolute; top: var(--cl-space-3); right: var(--cl-space-3);
-  background: none; border: 0; font-size: 1.5rem; line-height: 1;
-  color: var(--cl-muted); cursor: pointer;
+  position: absolute; top: var(--wm-space-3); right: var(--wm-space-3);
+  background: none; border: 0; padding: 0;
+  font-family: var(--font-body); font-size: var(--step-1); line-height: 1;
+  color: var(--contour); cursor: pointer;
 }
+#detail-close:hover { color: var(--route); }
 
 .stat-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
-  gap: var(--cl-space-2);
-  font-family: var(--cl-font-mono); font-size: var(--cl-size-small);
+  gap: var(--wm-space-2);
+  padding: var(--wm-space-3) 0;
+  border-top: var(--rule); border-bottom: var(--rule);
+  font-family: var(--font-data); font-size: var(--step--1);
 }
 .stat-grid div { display: flex; flex-direction: column; }
-.stat-grid dt, .stat-grid .k { color: var(--cl-muted); font-size: var(--cl-size-tiny); }
+.stat-grid .k { color: var(--contour); }
 
 .chip {
   display: inline-block;
   padding: .15em .6em;
-  border: 1px solid var(--cl-rule);
-  border-radius: 999px;
-  font-family: var(--cl-font-mono); font-size: var(--cl-size-tiny);
-  color: var(--cl-muted);
+  border: var(--rule);
+  border-radius: var(--radius);
+  font-family: var(--font-data); font-size: var(--step--1);
+  color: var(--contour);
 }
-.chip[data-tone="warn"] { border-color: var(--cl-accent); color: var(--cl-accent); }
+/* Emphasis by weight and ink, not by a second red — the route line is the one red. */
+.chip[data-tone="warn"] { border-color: var(--index); color: var(--ink); font-weight: 500; }
 
 /* ── mobile: rail becomes a bottom sheet ─────────────────────────────────── */
 
@@ -191,10 +256,9 @@ body {
     grid-column: 1; grid-row: 1;
     max-height: 88dvh;
     border-right: 0;
-    border-top: 1px solid var(--cl-rule);
-    border-radius: var(--cl-radius) var(--cl-radius) 0 0;
-    box-shadow: var(--cl-shadow);
-    padding-bottom: calc(var(--cl-space-5) + env(safe-area-inset-bottom));
+    border-top: var(--rule);
+    border-radius: var(--radius);
+    padding-bottom: calc(var(--wm-space-5) + env(safe-area-inset-bottom));
     transform: translateY(calc(100% - 5.5rem));
     transition: transform .28s ease;
   }
@@ -203,50 +267,73 @@ body {
 
   #rail-grip {
     display: block;
-    width: 3rem; height: .3rem;
-    margin: 0 auto var(--cl-space-2);
-    border-radius: 999px;
-    background: var(--cl-rule);
+    width: 3rem; height: .2rem;
+    margin: 0 auto var(--wm-space-2);
+    background: var(--contour);
     cursor: grab;
   }
 
-  #detail { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-height: 75dvh;
-            border-radius: var(--cl-radius) var(--cl-radius) 0 0; }
+  #detail { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-height: 75dvh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #rail { transition: none; }
-  .walk-pin { transition: none; }
+  #rail, .walk-pin { transition: none; }
 }
 
-:focus-visible { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--incident); outline-offset: 2px; }
 
 /* ===========================================================================
    FALLBACK FENCE — the only place literal values are permitted.
-   Applies when cuddly-lamp fails to load, so the page is legible rather than blank.
-   Do not extend this into a second design system.
+
+   It lives in a cascade layer. Unlayered styles beat layered ones regardless of order,
+   so cuddly-lamp's tokens.css overrides every line below the moment it loads, and these
+   apply only when the CDN is blocked or 404s. (The previous shim tried to do this with
+   `--x: var(--x, fallback)`, which is a self-reference: the custom property is invalid
+   at computed-value time and the whole page loses its tokens. Don't reintroduce it.)
+
+   Values mirror cuddly-lamp/assets/tokens.css. They are a copy of somebody else's source
+   of truth, so they go stale by design: do not tune them here, and do not extend this
+   fence into a second design system.
    =========================================================================== */
-:root {
-  --cl-font-display: var(--cl-font-display, Georgia, "Times New Roman", serif);
-  --cl-font-body:    var(--cl-font-body, system-ui, sans-serif);
-  --cl-font-ui:      var(--cl-font-ui, system-ui, sans-serif);
-  --cl-font-mono:    var(--cl-font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+@layer waymark-fallback {
+  :root {
+    --paper: #EDE7D3;
+    --ink: #4A3823;
+    --contour: #7A5C3E;
+    --index: #5A4225;
+    --incident: #3E7C8C;
+    --amber: #E0922B;
+    --route: #C0432B;
 
-  --cl-ink:     var(--cl-ink, #1c1c1a);
-  --cl-muted:   var(--cl-muted, #6b6b64);
-  --cl-surface: var(--cl-surface, #fbfaf7);
-  --cl-rule:    var(--cl-rule, #d8d5cc);
-  --cl-accent:  var(--cl-accent, #3d5a45);
+    --font-display: Georgia, "Times New Roman", serif;
+    --font-body: system-ui, -apple-system, sans-serif;
+    --font-data: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --cl-space-1: var(--cl-space-1, .25rem);
-  --cl-space-2: var(--cl-space-2, .5rem);
-  --cl-space-3: var(--cl-space-3, .75rem);
-  --cl-space-4: var(--cl-space-4, 1rem);
-  --cl-space-5: var(--cl-space-5, 1.5rem);
+    --radius: 0;
+    --rule: 1px solid color-mix(in srgb, var(--contour) 38%, transparent);
+    --measure: 64ch;
 
-  --cl-radius:      var(--cl-radius, 4px);
-  --cl-shadow:      var(--cl-shadow, 0 6px 24px rgb(0 0 0 / .12));
-  --cl-size-small:  var(--cl-size-small, .8125rem);
-  --cl-size-tiny:   var(--cl-size-tiny, .6875rem);
-  --cl-size-eyebrow:var(--cl-size-eyebrow, .6875rem);
+    --step--1: .84rem;
+    --step-0: 1rem;
+    --step-1: 1.25rem;
+    --step-2: 1.6rem;
+    --step-3: 2.4rem;
+    --step-4: clamp(2.6rem, 1.6rem + 4vw, 4.6rem);
+  }
+
+  /* tokens.css also carries the page ground and the reset; without it the page would be
+     white-on-default-serif. Kept to the minimum that makes the layout above legible. */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    position: relative;
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: 1.6;
+  }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 560; line-height: 1.05; }
+  .doodle { position: absolute; pointer-events: none; width: clamp(150px, 22vw, 280px); opacity: .6; }
+  .doodle svg, .sig svg { width: 100%; height: auto; display: block; }
 }

@@ -1,0 +1,43 @@
+name: ci
+
+# The gate, run where it can actually stop something: on every pull request, before the
+# weekly walk PR can be merged. CLAUDE.md says validate.py runs `--strict` in CI; until
+# this workflow existed, it didn't.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r scripts/requirements.txt
+
+      - name: Invariants
+        run: python -m unittest discover -s tests -v
+
+      - name: Gate
+        run: python scripts/validate.py --strict data/walks/*.json
+
+      # Both are pure functions of the records, so a diff here means someone edited a
+      # generated file by hand or forgot to regenerate one. Either way the site would ship
+      # something that does not follow from data/walks/.
+      - name: Site payload is in step with the records
+        run: |
+          python scripts/build_index.py
+          python scripts/brier.py --write
+          git diff --exit-code -- site/data \
+            || { echo "::error::site/data is stale — run build_index.py and brier.py --write"; exit 1; }

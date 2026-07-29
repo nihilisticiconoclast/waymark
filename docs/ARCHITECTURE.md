@@ -106,6 +106,19 @@ session — don't.
 gate") signal that the model has slipped from describing to navigating. Waymark is not a
 navigation aid and should never read like one.
 
+The gate is itself gated. `tests/test_pipeline.py` breaks a known-good record one field at a
+time and asserts that each check catches it: an invented pub, an unqualified right-of-way
+claim over an undesignated route, an undisclosed road crossing, "about two miles" against an
+eight-kilometre loop. A check that has stopped firing still prints `ok`, which is the most
+comfortable way for this system to fail, and the only defence against it is a test that fails
+instead. The same file exercises the loop assembler against a synthetic graph, because the
+alternative is discovering its behaviour one Overpass call at a time.
+
+A seed record is reported as `SEED` rather than `FAIL` and does not trip `--strict`. It is an
+example of the schema and is refused on purpose; letting it redden every pull request would
+put steady pressure on the gate itself, which is the outcome this whole design is arranged to
+avoid.
+
 ---
 
 ## Calibration: Beating the Bounds
@@ -185,27 +198,56 @@ low hundreds of walks — that's the right call and keeps the whole site a stati
 
 cuddly-lamp owns everything visual. Waymark declares structure and consumes tokens.
 
-`site/index.html` imports, in order:
+The contract was a guess in the first draft — a `tokens.css` plus a `base.css` on GitHub
+Pages, exporting `--cl-*` properties — and confirming it against cuddly-lamp was the first
+build's first job. None of the three assumptions held. What is actually there is a single
+stylesheet, served from jsDelivr because that is what cuddly-lamp's own distribution notes
+ask consumers to use, exporting unprefixed names:
 
 ```html
-<link rel="stylesheet" href="https://<user>.github.io/cuddly-lamp/tokens.css">
-<link rel="stylesheet" href="https://<user>.github.io/cuddly-lamp/base.css">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tokens.css">
 <link rel="stylesheet" href="./styles.css">
 ```
 
+| Group | Tokens |
+|---|---|
+| Colour | `--paper` `--ink` `--contour` `--index` `--incident` `--amber` `--route` |
+| Type | `--font-display` `--font-body` `--font-data` |
+| Scale | `--step--1` `--step-0` `--step-1` `--step-2` `--step-3` `--step-4` |
+| Form | `--radius` (0 — hard edges) `--rule` (a hairline border shorthand) `--measure` |
+
 `site/styles.css` may only:
 
-- define layout (grid, flex, positioning, z-index)
+- define layout (grid, flex, positioning, z-index) and layout spacing
 - reference cuddly-lamp custom properties
-- carry a `@supports not (--x: 1)`-style fallback block, clearly fenced, so the page is
-  legible if the import 404s
+- carry a clearly fenced fallback block so the page is legible if the CDN 404s
 
 It may not declare a literal colour, font stack, or radius outside the fallback fence.
 
-If cuddly-lamp exposes a token vocabulary other than what the stub assumes, edit
-`site/styles.css` to match cuddly-lamp — never the reverse. **Confirm the actual token names
-and file paths before the first build**; the stub assumes a `tokens.css` exporting
-`--cl-*` custom properties, which is a guess.
+Two consequences worth stating, because both are places the boundary could quietly erode.
+
+**Spacing.** cuddly-lamp has no spacing scale — it is a document system, and a document's
+rhythm comes from its type scale. An application rail needs one, so `site/styles.css` defines
+`--wm-space-1` … `--wm-space-5`. Spacing is geometry and geometry is that file's job; the
+prefix is there so that if cuddly-lamp ever grows a spacing vocabulary, every line to delete
+is greppable.
+
+**The fence is a cascade layer, not `@supports`.** Unlayered styles beat layered ones
+regardless of source order, so tokens.css overrides the fence the moment it loads, and the
+fence applies only when it doesn't. The obvious-looking alternative — `--ink: var(--ink,
+#4A3823)` — is a self-reference, which makes the property invalid at computed-value time and
+takes the whole palette down with it. It looked like it worked because the page still
+rendered, in the browser's defaults.
+
+If cuddly-lamp changes its vocabulary again, edit `site/styles.css` to match cuddly-lamp —
+never the reverse.
+
+The house signature is part of the contract, not decoration: the fixed `mark` logo sits in the
+rail head, and one per-page `doodle`, seeded from the page and positioned by
+`TunnelFigure.placeDoodle`, sits behind the rail's blocks. The rail is the only gutter the
+page has — the map is opaque and full-bleed — so that is where it goes. Both mounts are
+guarded, because the site has to stay usable when the CDN is unreachable.
 
 Map tiles are raster and cannot be restyled. The palette therefore has to work *against* a
 fixed OS sheet rather than with it, which is a real constraint on cuddly-lamp's side: route
@@ -225,6 +267,12 @@ Actions gives a durable audit trail, deterministic re-runs from a commit SHA, sc
 validation in CI, and — most importantly — a pull request you review before anything reaches
 the site. The generator is on probation permanently; it should not have write access to
 `main`.
+
+Three workflows, and they do different jobs. `new-walk.yml` is the weekly generator and opens
+the pull request. `ci.yml` is the gate: invariant tests, `validate.py --strict`, and a check
+that `site/data` is what `build_index.py` and `brier.py` would produce from the records — a
+hand-edited index would otherwise put something on the map that does not follow from
+`data/walks/`. `pages.yml` deploys what survived.
 
 Claude Routines are the better tool for the other half of the loop: a Sunday-evening nudge
 that reads `data/ledger.json`, finds published walks you haven't resolved, and asks you

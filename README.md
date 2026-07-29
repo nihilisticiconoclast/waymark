@@ -13,9 +13,17 @@ probability is scored against reality when you walk it.
 
 ## Status
 
-Scaffold. Nothing is published yet. `data/walks/0001-standish-wood.json` is a **seed**
-record that demonstrates the schema; its geometry is a placeholder and it is deliberately
-blocked from publication by the validator until a real survey replaces it.
+Wired up, nothing published. The pipeline, the gate and the site all run;
+`data/queue.yml` holds twenty-one target areas and none has been surveyed yet, because a
+survey needs the Overpass API and the first one is a deliberate act rather than a build step.
+
+`data/walks/0001-haresfield-beacon.json` is a **seed** record that demonstrates the schema.
+Its geometry is seven hand-placed points that follow nothing on the ground, and the validator
+refuses to publish it — it reports `SEED` rather than `FAIL`, so it does not redden every
+pull request while it sits there. `scripts/validate.py --strict` and the invariant tests in
+`tests/` both run on every pull request.
+
+The first real walk is `python scripts/survey.py --next`.
 
 ---
 
@@ -95,6 +103,13 @@ python scripts/build_index.py
 python -m http.server 8000 --directory site
 ```
 
+The invariants the gate exists to enforce are executable, and they need no key, no network
+and no survey:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
 The site runs with **no API key at all** on an OpenTopoMap basemap. To get the real 1:25 000
 Explorer look, see *Basemap* below.
 
@@ -139,16 +154,27 @@ route geometry, so the attribution is load-bearing.
 
 ## Repository name
 
-`waymark` is a placeholder that fits the existing naming (Tunnel, Transit, Cairn, Traverse,
-Dead Reckoning, Mast). Alternatives if you want a different register: `trigpoint`,
-`perambulation`, `beating-the-bounds`. Change it before the first push; it's in
-`site/index.html`, `README.md`, and the Pages URL.
+`waymark`, kept — it fits the existing naming (Tunnel, Transit, Cairn, Traverse, Dead
+Reckoning, Mast) and it is the word for the thing this site is about. The alternatives
+considered and not taken were `trigpoint`, `perambulation` and `beating-the-bounds`; the last
+of those survives as the name of the calibration feature, which is where it belongs.
 
 ---
 
 ## Aesthetic
 
-Styling is delegated to **cuddly-lamp**, consumed as a stylesheet + token set. Waymark ships
-only structure and a small fallback shim so the site renders standalone if the import fails.
-Wiring is documented in `docs/ARCHITECTURE.md` → *Styling contract*. Nothing in this repo
-should redefine a colour, a typeface, or a radius.
+Styling is delegated to **cuddly-lamp**'s Tunnel system, linked from its jsDelivr copy rather
+than vendored, so an update there reaches this page without a commit here. Waymark ships
+structure, layout and a fallback shim that keeps the site legible if the CDN is unreachable.
+
+The token vocabulary is confirmed, not assumed: one stylesheet (`assets/tokens.css` — there is
+no `base.css`) exporting unprefixed names — `--paper`, `--ink`, `--contour`, `--index`,
+`--incident`, `--amber`, `--route`, `--font-display/body/data`, `--radius`, `--rule`,
+`--measure`, `--step--1` … `--step-4`. Nothing in this repo redefines a colour, a typeface or
+a radius. Layout spacing is the one thing cuddly-lamp does not provide, and it lives in
+`site/styles.css` under a `--wm-` prefix so the boundary stays visible.
+
+The house signature is mounted as cuddly-lamp asks: the fixed `mark` logo in the rail head,
+and one seeded `doodle` placed by `placeDoodle` into a random edge slot of the rail — the map
+is opaque and full-bleed, so the rail is the only gutter this page has. Wiring is documented
+in `docs/ARCHITECTURE.md` → *Styling contract*.

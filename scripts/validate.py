@@ -206,6 +206,18 @@ def check_banned(rec: dict) -> list[str]:
     return [f"voice: banned phrase '{b}'" for b in BANNED if b in text]
 
 
+def check_status(rec: dict) -> list[str]:
+    """
+    Seed records are hand-written examples of the schema. They are refused here rather than
+    in the publisher so the refusal has a reason attached: a bare FAIL with no failing check
+    reads like a bug in the validator, and the temptation is then to go and 'fix' it.
+    """
+    if rec.get("status") == "seed":
+        return ["status: 'seed' is an example record and never publishes — replace it with "
+                "the output of survey.py and author.py"]
+    return []
+
+
 def check_confidence(rec: dict) -> list[str]:
     """Not a pass/fail — a nudge. Flat confidence across a corpus is a real defect."""
     c = rec["confidence"]["navigable"]
@@ -219,7 +231,7 @@ def check_confidence(rec: dict) -> list[str]:
 
 # --------------------------------------------------------------------------------- main
 
-def validate(path: Path, gazetteer: set[str]) -> tuple[bool, dict[str, list[str]]]:
+def validate(path: Path, gazetteer: set[str]) -> tuple[bool, dict[str, list[str]], dict]:
     rec = json.loads(path.read_text())
     results = {
         "schema": check_schema(rec),
@@ -229,10 +241,11 @@ def validate(path: Path, gazetteer: set[str]) -> tuple[bool, dict[str, list[str]
         "access": check_access(rec),
         "imperatives": check_imperatives(rec),
         "banned": check_banned(rec),
+        "status": check_status(rec),
         "confidence": check_confidence(rec),
     }
     hard = {k: v for k, v in results.items() if v and k != "confidence"}
-    passed = not hard and rec.get("status") != "seed"
+    passed = not hard
 
     rec.setdefault("provenance", {})["validation"] = {
         "passed": passed,
@@ -241,7 +254,7 @@ def validate(path: Path, gazetteer: set[str]) -> tuple[bool, dict[str, list[str]
     if rec.get("status") in ("draft", "needs-review", "published"):
         rec["status"] = "published" if passed else "needs-review"
     path.write_text(json.dumps(rec, indent=2, ensure_ascii=False))
-    return passed, results
+    return passed, results, rec
 
 
 def main() -> None:
@@ -254,13 +267,18 @@ def main() -> None:
     any_failed = False
 
     for p in args.paths:
-        passed, results = validate(p, gazetteer)
-        mark = "PASS" if passed else "FAIL"
+        passed, results, rec = validate(p, gazetteer)
+        # A seed record failing is the system working, not the build breaking: it is an
+        # example of the schema and is refused on purpose. Everything else that fails is a
+        # failure, and --strict says so. Without this distinction the seed would redden
+        # every pull request until someone deleted it or, worse, weakened the gate.
+        seed = rec.get("status") == "seed"
+        mark = "SEED" if seed else ("PASS" if passed else "FAIL")
         print(f"\n{mark}  {p.name}")
         for check, errs in results.items():
             for e in errs:
                 print(f"       {e}")
-        if not passed:
+        if not passed and not seed:
             any_failed = True
 
     if any_failed:

@@ -268,13 +268,22 @@ def summarise_route(G: nx.Graph, loop: list) -> dict:
     }
 
 
-def sample_elevation(coords: list[tuple[float, float]]) -> list[list[float]]:
+def sample_elevation(coords: list[tuple[float, float]], cache_key: str) -> list[list[float]]:
     """
     Elevation profile, batched 100 points per request per the public opentopodata limit.
 
+    Cached on disk like the Overpass calls. The public instance allows one call a second
+    and a thousand a day; a re-run of a survey that only changed the loop heuristic should
+    not spend that budget again, and CI should not depend on the endpoint being up.
+
     For anything beyond casual use, download OS Terrain 50 (OGL) once and sample locally —
-    it is better data over GB and it removes a network dependency from the survey.
+    it is better data over GB and it removes the network dependency altogether.
     """
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached = CACHE_DIR / f"{cache_key}-elevation.json"
+    if cached.exists():
+        return json.loads(cached.read_text())
+
     profile, cum = [], 0.0
     step = max(1, len(coords) // 300)
     pts = coords[::step]
@@ -289,7 +298,10 @@ def sample_elevation(coords: list[tuple[float, float]]) -> list[list[float]]:
                 cum += haversine_m(pts[idx - 1], pts[idx])
             profile.append([round(cum / 1000, 3), res.get("elevation")])
         time.sleep(1.1)                                    # public instance: 1 call/sec
-    return [p for p in profile if p[1] is not None]
+
+    profile = [p for p in profile if p[1] is not None]
+    cached.write_text(json.dumps(profile))
+    return profile
 
 
 def ascent_descent(profile: list[list[float]], threshold: float = 3.0) -> tuple[float, float]:
@@ -340,17 +352,29 @@ def survey(target: dict, origin: dict) -> dict:
         )
 
     attrs = summarise_route(G, loop)
-    profile = sample_elevation(loop)
+    profile = sample_elevation(loop, slug)
     up, down = ascent_descent(profile)
     start = loop[0]
 
     # POIs are attached only if genuinely near the route. Distance is computed, never guessed.
+    #
+    # Overpass returns nodes with lat/lon, ways and relations with `center` under `out center`
+    # and a `geometry` array under `out geom`. All three have to be understood here: the
+    # hazard query uses `out geom`, so an earlier lat/lon-only version silently dropped every
+    # ford and tidal section that happened to be mapped as a way rather than a node — a hazard
+    # check that misses hazards is worse than no check.
+    def points_of(p) -> list[tuple[float, float]]:
+        if p.get("lat") is not None:
+            return [(p["lat"], p["lon"])]
+        if p.get("center"):
+            return [(p["center"]["lat"], p["center"]["lon"])]
+        return [(g["lat"], g["lon"]) for g in p.get("geometry") or []]
+
     def near(p, limit_m):
-        plat = p.get("lat") or p.get("center", {}).get("lat")
-        plon = p.get("lon") or p.get("center", {}).get("lon")
-        if plat is None:
+        pts = points_of(p)
+        if not pts:
             return None
-        d = min(haversine_m((plat, plon), n) for n in loop)
+        d = min(haversine_m(pt, n) for pt in pts for n in loop)
         return round(d) if d <= limit_m else None
 
     car_parks, refreshment = [], []
@@ -364,9 +388,8 @@ def survey(target: dict, origin: dict) -> dict:
                     "name": t.get("name"), "operator": t.get("operator"),
                     "fee": {"yes": True, "no": False}.get(t.get("fee")),
                     "capacity": int(t["capacity"]) if t.get("capacity", "").isdigit() else None,
-                    "distance_from_start_m": round(haversine_m(
-                        (p.get("lat") or p["center"]["lat"], p.get("lon") or p["center"]["lon"]),
-                        start)),
+                    "distance_from_start_m": round(
+                        min(haversine_m(pt, start) for pt in points_of(p))),
                     "osm_id": f"{p['type']}/{p['id']}",
                 })
         elif t.get("amenity") in ("pub", "cafe", "restaurant") and t.get("name"):
@@ -406,6 +429,13 @@ def survey(target: dict, origin: dict) -> dict:
         elif t.get("railway") == "level_crossing" and near(h, 30) is not None:
             hazards.append({"kind": "level_crossing", "detail": "Level crossing on the route.",
                             "osm_id": f"node/{h['id']}"})
+        # The query asks for tidal ways and the schema has a `tidal` kind, so the result has
+        # to be read back out. Left unhandled, the survey collected the evidence and threw it
+        # away, and the disclosure check downstream had nothing to enforce.
+        elif t.get("tidal") == "yes" and near(h, 30) is not None:
+            hazards.append({"kind": "tidal",
+                            "detail": "Route runs along or across a tidal section.",
+                            "osm_id": f"{h['type']}/{h['id']}"})
 
     # Names of nearby POIs join the allowlist — this is how a pub becomes mentionable.
     named = set(attrs["named_features"])

@@ -46,8 +46,11 @@ These are not preferences. Breaking any of them is a defect, not a style choice.
    look good, and do not flatten everything to 0.8 to be safe. It feeds a Brier score with a
    Murphy decomposition; a well-behaved generator should show resolution, not just reliability.
 
-7. **No styling lives here.** All colour, type, spacing, and radius come from cuddly-lamp.
-   `site/styles.css` contains layout and a clearly-marked fallback shim only.
+7. **No styling lives here.** All colour, type and radius come from cuddly-lamp, whose
+   vocabulary is `--paper`, `--ink`, `--contour`, `--index`, `--incident`, `--amber`,
+   `--route`, `--font-display/body/data`, `--radius`, `--rule`, `--step--1` … `--step-4`.
+   `site/styles.css` contains layout, layout spacing under a `--wm-` prefix — cuddly-lamp
+   has no spacing scale — and a clearly-marked fallback shim. Nothing else.
 
 ---
 
@@ -64,6 +67,7 @@ scripts/author.py      survey → data/walks/{id}.json             (LLM, constra
 scripts/validate.py    the gate
 scripts/build_index.py data/walks/*.json → site/data/walks.json
 scripts/brier.py       ledger → calibration statistics
+tests/test_pipeline.py the invariants above, as executable checks
 site/                  the map
 data/queue.yml         target areas awaiting survey
 data/ledger.json       Beating the Bounds resolutions
@@ -79,6 +83,7 @@ python scripts/author.py --survey data/surveys/<slug>.json
 python scripts/validate.py data/walks/*.json      # --strict in CI
 python scripts/build_index.py
 python scripts/brier.py                           # calibration report
+python -m unittest discover -s tests -v           # no key, no network, no survey
 python -m http.server 8000 --directory site
 ```
 
@@ -86,8 +91,10 @@ python -m http.server 8000 --directory site
 
 ## Working style
 
-Small, reviewable commits. One walk per pull request — the weekly Routine opens a PR titled
-`walk: <name>` and the diff should be one new JSON file plus a regenerated index.
+Small, reviewable commits. One walk per pull request — the weekly Actions job
+(`.github/workflows/new-walk.yml`, not a Claude Routine; the reasoning is in
+`docs/ARCHITECTURE.md` → *Scheduling*) opens a PR titled `walk: <slug>`, and the diff should
+be one new JSON file plus a regenerated index.
 
 When changing `prompts/` or `docs/VOICE.md`, regenerate at least two existing walks with the
 new prompt and put the before/after in the PR description. Prompt changes are model changes;
@@ -113,3 +120,7 @@ Prose in docs, not bullets, where the content is argument rather than enumeratio
   Proj4Leaflet; you'll lose the Explorer style entirely.
 - **`site/config.js` is gitignored.** If the map is blank locally, copy
   `site/config.example.js` across.
+- **The seed record fails validation on purpose.** It reports `SEED`, not `FAIL`, and does
+  not trip `--strict`. Publishing it is not the fix; surveying something is.
+- **The CSS fallback fence is a cascade layer.** `--ink: var(--ink, #4A3823)` looks like a
+  neat shim and is a self-reference: the property goes invalid and takes the palette with it.

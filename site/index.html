@@ -6,25 +6,39 @@
 <title>Waymark — walks from Stroud</title>
 <meta name="description" content="Curated walks around Stroud, surveyed from open data and written up by hand.">
 
-<!-- Styling is owned by cuddly-lamp. Confirm the actual file names and token prefix before
-     the first build; the paths below are the assumed contract, not a verified one. -->
-<link rel="stylesheet" href="https://USER.github.io/cuddly-lamp/tokens.css">
-<link rel="stylesheet" href="https://USER.github.io/cuddly-lamp/base.css">
+<!-- Styling is owned by cuddly-lamp. Verified against cuddly-lamp/assets/tokens.css: one
+     stylesheet, not two — there is no base.css — and the tokens are unprefixed: --paper,
+     --ink, --contour, --index, --incident, --amber, --route, --font-display/body/data,
+     --radius, --rule, --measure, --step--1 … --step-4. Linked from the CDN rather than
+     copied, per cuddly-lamp SKILL.md §6: one source of truth, and an update there reaches
+     this page without a commit here. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tokens.css">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="./styles.css">
 </head>
 
-<body>
+<body data-seed="waymark-stroud">
 <div id="app">
 
   <!-- ── rail ─────────────────────────────────────────────────────────────────────── -->
   <aside id="rail" aria-label="Filters">
     <div id="rail-grip" role="button" tabindex="0" aria-label="Expand filters"></div>
 
+    <!-- The per-page doodle. Its slot comes from TunnelFigure.placeDoodle against the rail,
+         never a fixed corner. It sits behind the rail's content and shows only in the gaps
+         between blocks — the map is opaque and full-bleed, so the rail is the only gutter
+         this page has. -->
+    <div class="doodle" id="doodle"></div>
+
     <header class="rail-head">
-      <h1>Waymark</h1>
-      <p class="rail-sub"><span id="count">0</span> of <span id="total">0</span> walks</p>
+      <span class="sig" id="sig"></span>
+      <div class="rail-title">
+        <h1>Waymark</h1>
+        <p class="rail-sub"><span id="count">0</span> of <span id="total">0</span> walks</p>
+      </div>
     </header>
 
     <!-- The dial. Every walk is a dot in polar coordinates about Stroud. Drag across it to
@@ -127,6 +141,21 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tunnel-figure.js"></script>
+<script>
+/* The house signature: the mark is the fixed logo and is identical on every page in the
+   family; the doodle is seeded from the page so it is stable across reloads and unlike any
+   other page's. Guarded, because the site has to stay usable when the CDN is unreachable. */
+(function () {
+  if (typeof TunnelFigure === "undefined") return;
+  document.getElementById("sig").innerHTML =
+    TunnelFigure.tunnelFigureSVG(null, { variant: "mark" });
+  var seed = document.body.dataset.seed || location.pathname || document.title;
+  var doodle = document.getElementById("doodle");
+  doodle.innerHTML = TunnelFigure.tunnelFigureSVG(seed, { variant: "doodle" });
+  TunnelFigure.placeDoodle(doodle, { seed: seed });
+})();
+</script>
 <script src="./config.js"></script>
 <script src="./app.js"></script>
 </body>
