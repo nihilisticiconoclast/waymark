@@ -1,0 +1,77 @@
+name: survey
+
+# Runs the survey stage and commits the payload.
+#
+# The survey is the only part of this system that needs the open internet — Overpass for the
+# ways and POIs, a DEM for the profile. A runner has that; a locked-down authoring session
+# does not. So the geometry is produced here, committed, and everything downstream works from
+# the file. This is also what keeps invariant 1 true in practice: coordinates enter the repo
+# from OpenStreetMap through this job and by no other route.
+#
+# The Overpass cache stays out of the repo (see .gitignore) — the raw responses for a 2.5 km
+# bbox are megabytes of JSON and the payload is the part worth versioning. A re-run pays the
+# endpoint again, which is why the band and radius are inputs: get it right in one pass.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Slug from data/queue.yml (blank = highest-priority unsurveyed)"
+        required: false
+      band:
+        description: "Override distance_band_km as lo:hi, e.g. 6:14"
+        required: false
+      radius_km:
+        description: "Override the search radius in km"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: survey
+  cancel-in-progress: false
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r scripts/requirements.txt
+
+      - name: Survey
+        env:
+          TARGET: ${{ inputs.target }}
+          BAND: ${{ inputs.band }}
+          RADIUS: ${{ inputs.radius_km }}
+        run: |
+          args=()
+          if [ -n "$TARGET" ]; then args+=(--target "$TARGET"); else args+=(--next); fi
+          if [ -n "$BAND" ]; then args+=(--band "$BAND"); fi
+          if [ -n "$RADIUS" ]; then args+=(--radius-km "$RADIUS"); fi
+          python scripts/survey.py "${args[@]}"
+
+      - name: Summarise what was found
+        run: |
+          for f in data/surveys/*.json; do
+            python - "$f" <<'PY'
+          import json, sys
+          s = json.load(open(sys.argv[1]))
+          f = s["facts"]
+          print(f"{s['slug']}: {f['distance_km']} km, {f['ascent_m']} m ascent, "
+                f"{f['access']['by_right_pct']}% by right, "
+                f"{len(f['named_features'])} named features, {len(f['hazards'])} hazards")
+          print("  named:", ", ".join(f["named_features"][:25]) or "(none)")
+          PY
+          done
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "survey: ${{ inputs.target || 'next' }}"
+          file_pattern: data/surveys

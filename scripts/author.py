@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 """
-Stage 2: AUTHOR. The model writes prose and a calibrated confidence, and nothing else.
+Stage 2: AUTHOR. Claude writes prose and a calibrated confidence, and nothing else.
 
+Two ways in, and the first is the normal one:
+
+    # 1. Claude is already here — in a Claude Code session or a Routine — and has written the
+    #    editorial block against the survey. No key, no API call, no billing.
+    python scripts/author.py --survey data/surveys/haresfield-beacon.json \
+                             --editorial data/editorial/haresfield-beacon.json
+
+    # 2. Unattended, for the scheduled job, where no session exists to write it.
     ANTHROPIC_API_KEY=... python scripts/author.py --survey data/surveys/haresfield-beacon.json
 
-The model sees the survey payload, the voice specification, and the permitted proper nouns.
-It does not see the internet, previous walks, or anything that would let it fill a gap with
-something plausible. If the write-up is thin, the survey was thin, and that is the correct
-signal — widen the Overpass query rather than loosening this stage.
+Mode 1 exists because reaching for the API to do this is silly when the model reading the
+survey and writing the record is the one running the command. The constraints are identical
+either way — they live in prompts/author-system.md, docs/VOICE.md, and the validator — and the
+validator is what actually enforces them. It does not care which mode produced the words.
+
+Either way the model sees the survey payload and the permitted proper nouns and nothing else.
+If the write-up is thin, the survey was thin, and that is the correct signal — widen the
+Overpass query rather than loosening this stage.
 """
 
 from __future__ import annotations
@@ -20,11 +32,9 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from anthropic import Anthropic
-from jinja2 import Template
-
 ROOT = Path(__file__).resolve().parent.parent
 WALKS = ROOT / "data" / "walks"
+EDITORIAL = ROOT / "data" / "editorial"
 SCHEMA = json.loads((ROOT / "schema" / "walk.schema.json").read_text())
 
 MODEL = os.environ.get("WAYMARK_MODEL", "claude-sonnet-5")
@@ -45,6 +55,8 @@ def next_id() -> int:
 
 
 def build_messages(survey: dict) -> tuple[str, str, str]:
+    from jinja2 import Template
+
     system = (ROOT / "prompts" / "author-system.md").read_text()
     template = Template((ROOT / "prompts" / "author-user.md.j2").read_text())
 
@@ -65,6 +77,8 @@ def build_messages(survey: dict) -> tuple[str, str, str]:
 
 
 def call_model(system: str, user: str) -> dict:
+    from anthropic import Anthropic
+
     client = Anthropic()
     resp = client.messages.create(
         model=MODEL,
@@ -82,15 +96,52 @@ def call_model(system: str, user: str) -> dict:
         )
 
 
+def read_editorial(path: Path) -> tuple[dict, str]:
+    """
+    An editorial block written in-session rather than fetched over the API.
+
+    It must carry exactly the three branches the model is allowed to write. Anything else in
+    the file is rejected rather than ignored, because a `facts` key here would be a person or
+    a model quietly hand-editing surveyed values, which is the one thing the split exists to
+    prevent.
+    """
+    written = json.loads(path.read_text())
+    allowed = {"editorial", "ratings", "confidence", "$comment"}
+    extra = set(written) - allowed
+    if extra:
+        raise SystemExit(
+            f"{path}: may only contain editorial, ratings and confidence — found {sorted(extra)}. "
+            "Surveyed values come from the survey payload and are never written by hand."
+        )
+    for required in ("editorial", "confidence"):
+        if required not in written:
+            raise SystemExit(f"{path}: missing '{required}'")
+    return written, hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--survey", required=True, type=Path)
+    ap.add_argument("--editorial", type=Path,
+                    help="a written editorial block (no API call). Defaults to "
+                         "data/editorial/<slug>.json when that file exists.")
+    ap.add_argument("--api", action="store_true",
+                    help="force the API path even if an editorial file is present")
     ap.add_argument("--out", type=Path, help="override output path")
     args = ap.parse_args()
 
     survey = json.loads(args.survey.read_text())
-    system, user, prompt_sha = build_messages(survey)
-    written = call_model(system, user)
+
+    editorial_path = args.editorial or (EDITORIAL / f"{survey['slug']}.json")
+    if not args.api and editorial_path.exists():
+        written, source_sha = read_editorial(editorial_path)
+        model, prompt_sha = "claude-in-session", source_sha
+        print(f"authored from {editorial_path} — no API call")
+    else:
+        system, user, prompt_sha = build_messages(survey)
+        written = call_model(system, user)
+        model = MODEL
+        print(f"authored by {MODEL} over the API")
 
     # Merge. The model's output is confined to three branches; everything else is survey
     # provenance. If the model wrote into facts or geometry, it is discarded silently here
@@ -109,7 +160,7 @@ def main() -> None:
         "provenance": {
             **survey["provenance"],
             "authored_at": datetime.now(timezone.utc).isoformat(),
-            "model": MODEL,
+            "model": model,
             "prompt_sha": prompt_sha,
             "validation": {"passed": False, "checks": {}},
         },

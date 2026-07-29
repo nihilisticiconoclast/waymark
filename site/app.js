@@ -143,6 +143,23 @@ function paintSelection() {
   });
 }
 
+/* Every visible walk draws its route, always — the route is the walk, and a map of start
+   pins tells you nothing about where a walk actually goes. Selecting one thickens it and
+   opens the panel; it does not conjure the line out of nowhere. */
+function drawRoutes() {
+  state.routeLayer.clearLayers();
+  state.walks.forEach(w => {
+    if (!w.line || !passes(w)) return;
+    const latlngs = w.line;
+    const selected = w.slug === state.selected;
+    L.polyline(latlngs, { className: "route-casing", interactive: false })
+      .addTo(state.routeLayer);
+    L.polyline(latlngs, {
+      className: selected ? "route-core is-selected" : "route-core",
+    }).addTo(state.routeLayer).on("click", () => select(w.slug));
+  });
+}
+
 /* Queued areas are drawn hollow and never share the walk pin's shape. A queued entry is a
    search anchor from data/queue.yml — not a route, not a start, and not checked against
    anything on the ground. The visual distinction is doing real work: the whole repo is
@@ -211,6 +228,7 @@ function apply() {
   document.getElementById("count").textContent = shown;
   const qc = document.getElementById("queue-count");
   if (qc) qc.textContent = queued;
+  drawRoutes();
   drawDots();
 }
 
@@ -375,10 +393,13 @@ async function select(slug) {
   if (!res.ok) return;
   const w = await res.json();
 
-  state.routeLayer.clearLayers();
+  // The line is already on the map — apply() drew it. Selecting reframes and highlights it,
+  // and swaps the index's simplified geometry for the full-resolution one.
   const latlngs = w.geometry.route.coordinates.map(([lon, lat]) => [lat, lon]);
-  L.polyline(latlngs, { className: "route-casing" }).addTo(state.routeLayer);
-  L.polyline(latlngs, { className: "route-core" }).addTo(state.routeLayer);
+  const indexed = state.walks.find(x => x.slug === slug);
+  if (indexed) indexed.line = latlngs;
+  state.selected = slug;
+  drawRoutes();
   map.fitBounds(L.latLngBounds(latlngs).pad(0.15));
 
   const f = w.facts, e = w.editorial, c = w.confidence;
@@ -417,7 +438,6 @@ async function select(slug) {
     <p><small>${esc(w.provenance.attribution.join(" · "))}</small></p>
   `;
   document.getElementById("detail").hidden = false;
-  state.selected = slug;
   paintSelection();
 }
 
@@ -428,8 +448,8 @@ function showQueued(slug) {
   const t = state.queue.find(q => q.slug === slug);
   if (!t) return;
 
-  state.routeLayer.clearLayers();
   state.selected = null;
+  drawRoutes();
   paintSelection();
 
   document.getElementById("detail-body").innerHTML = `
@@ -500,8 +520,8 @@ function initControls() {
 
   document.getElementById("detail-close").addEventListener("click", () => {
     document.getElementById("detail").hidden = true;
-    state.routeLayer.clearLayers();
     state.selected = null;
+    drawRoutes();
     paintSelection();
   });
 

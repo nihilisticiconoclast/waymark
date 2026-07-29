@@ -53,8 +53,9 @@ body { overscroll-behavior: none; }
    it holds up over both the pale wash of the Explorer sheet and a darker topographic
    basemap without needing a per-profile colour. The core is this view's single --route
    element — the one red line on the page, and it is literally a route. */
-.route-casing { stroke: var(--paper); stroke-width: 9; stroke-opacity: .8; fill: none; }
-.route-core   { stroke: var(--route); stroke-width: 3; fill: none; }
+.route-casing { stroke: var(--paper); stroke-width: 8; stroke-opacity: .8; fill: none; }
+.route-core   { stroke: var(--route); stroke-width: 2.5; fill: none; cursor: pointer; }
+.route-core.is-selected { stroke-width: 4; }
 
 .walk-pin {
   width: 14px; height: 14px;

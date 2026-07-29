@@ -38,6 +38,52 @@ def haversine_km(a, b):
     return 2 * R * math.asin(math.sqrt(h))
 
 
+def simplify(coords: list[list[float]], tolerance_m: float = 12.0) -> list[list[float]]:
+    """
+    Ramer–Douglas–Peucker, so the index can carry every route's line rather than only its
+    start. A survey emits a vertex every few metres; at map scale most of them are invisible,
+    and the whole point of the index is that it loads on a hill with one bar.
+
+    Tolerance is in metres of perpendicular deviation. 12 m is below what a route line's own
+    stroke width covers at the zooms this map uses, so the simplified line is not visibly
+    different from the full one — which is on the detail payload and replaces this on
+    selection.
+    """
+    if len(coords) < 3:
+        return coords
+
+    # Local equirectangular metres: fine over a walk-sized extent and far cheaper than
+    # projecting properly for what is only a vertex-thinning decision.
+    lat0 = math.radians(coords[0][1])
+    mx = 111_320 * math.cos(lat0)
+    pt = [(c[0] * mx, c[1] * 110_540) for c in coords]
+
+    keep = [False] * len(coords)
+    keep[0] = keep[-1] = True
+    stack = [(0, len(coords) - 1)]
+    while stack:
+        lo, hi = stack.pop()
+        ax, ay = pt[lo]
+        bx, by = pt[hi]
+        dx, dy = bx - ax, by - ay
+        seg = math.hypot(dx, dy)
+        worst, worst_i = -1.0, None
+        for i in range(lo + 1, hi):
+            px, py = pt[i]
+            if seg == 0:
+                d = math.hypot(px - ax, py - ay)
+            else:
+                d = abs(dy * px - dx * py + bx * ay - by * ax) / seg
+            if d > worst:
+                worst, worst_i = d, i
+        if worst_i is not None and worst > tolerance_m:
+            keep[worst_i] = True
+            stack.append((lo, worst_i))
+            stack.append((worst_i, hi))
+
+    return [c for c, k in zip(coords, keep) if k]
+
+
 def bearing(a, b):
     p1, p2 = math.radians(a[0]), math.radians(b[0])
     dl = math.radians(b[1] - a[1])
@@ -118,6 +164,9 @@ def main() -> None:
             "summary": r["editorial"]["summary"],
             "confidence": r["confidence"]["navigable"],
             "resolved": (r["confidence"].get("resolved") or {}).get("outcome"),
+            # [lat, lon] for Leaflet, simplified. The route is the walk; a map that shows
+            # only where a walk starts has withheld the thing you came to see.
+            "line": [[c[1], c[0]] for c in simplify(r["geometry"]["route"]["coordinates"])],
         })
 
         (OUT / "walks" / f"{r['slug']}.json").write_text(json.dumps({

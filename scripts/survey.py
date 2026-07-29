@@ -290,8 +290,17 @@ def sample_elevation(coords: list[tuple[float, float]], cache_key: str) -> list[
     for i in range(0, len(pts), 100):
         chunk = pts[i:i + 100]
         locs = "|".join(f"{lat},{lon}" for lat, lon in chunk)
-        r = requests.get(ELEVATION, params={"locations": locs}, timeout=60)
-        r.raise_for_status()
+        try:
+            r = requests.get(ELEVATION, params={"locations": locs}, timeout=60)
+            r.raise_for_status()
+        except requests.RequestException as e:
+            # The elevation service is a shared public instance with a daily cap, and it is
+            # the least important thing in the payload. Losing a whole survey — the route,
+            # the designations, the amenities, all of it — because a DEM lookup was rate
+            # limited is the wrong trade. The record reports no ascent rather than a guess,
+            # which the write-up then has to be honest about.
+            print(f"  elevation unavailable ({e}); continuing without a profile")
+            return []
         for j, res in enumerate(r.json().get("results", [])):
             idx = i + j
             if idx > 0:
@@ -497,6 +506,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", help="slug from data/queue.yml")
     ap.add_argument("--next", action="store_true", help="highest-priority unsurveyed target")
+    ap.add_argument("--band", help="override distance_band_km, e.g. 6:14 — for retrying a "
+                                   "target the assembler couldn't fit without editing the queue")
+    ap.add_argument("--radius-km", type=float, help="override the search radius")
     args = ap.parse_args()
 
     q = yaml.safe_load(QUEUE.read_text())
@@ -513,6 +525,12 @@ def main() -> None:
         target = next(t for t in q["targets"] if t["slug"] == args.target)
     else:
         ap.error("pass --target <slug> or --next")
+
+    if args.band:
+        lo, hi = args.band.split(":")
+        target = {**target, "distance_band_km": [float(lo), float(hi)]}
+    if args.radius_km:
+        target = {**target, "radius_km": args.radius_km}
 
     survey(target, origin)
 
