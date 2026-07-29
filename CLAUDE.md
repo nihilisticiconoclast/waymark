@@ -61,9 +61,10 @@ docs/ARCHITECTURE.md   the design, the data flow, the styling contract
 docs/VOICE.md          editorial specification — the highest-leverage file in the repo
 docs/DATA.md           sources, licences, attribution, tag vocabulary
 prompts/               system + user prompts for the authoring pass
+data/editorial/        written editorial blocks — the API-free authoring path
 schema/walk.schema.json  the contract between authoring and the site
 scripts/survey.py      Overpass + DEM → data/surveys/{id}.json   (no LLM)
-scripts/author.py      survey → data/walks/{id}.json             (LLM, constrained)
+scripts/author.py      survey + editorial → data/walks/{id}.json  (no API by default)
 scripts/validate.py    the gate
 scripts/build_index.py data/walks/*.json → site/data/walks.json + queue.json
 scripts/brier.py       ledger → calibration statistics
@@ -79,7 +80,7 @@ data/ledger.json       Beating the Bounds resolutions
 
 ```bash
 python scripts/survey.py --target <slug>          # or --next to pull from data/queue.yml
-python scripts/author.py --survey data/surveys/<slug>.json
+python scripts/author.py --survey data/surveys/<slug>.json   # uses data/editorial/<slug>.json
 python scripts/validate.py data/walks/*.json      # --strict in CI
 python scripts/build_index.py
 python scripts/brier.py                           # calibration report
@@ -120,8 +121,10 @@ Prose in docs, not bullets, where the content is argument rather than enumeratio
   Proj4Leaflet; you'll lose the Explorer style entirely.
 - **`site/config.js` is gitignored.** If the map is blank locally, copy
   `site/config.example.js` across.
-- **The seed record fails validation on purpose.** It reports `SEED`, not `FAIL`, and does
-  not trip `--strict`. Publishing it is not the fix; surveying something is.
+- **Authoring does not need the API.** Claude is already the thing reading the survey; write
+  `data/editorial/<slug>.json` and `author.py` merges it. `--api` is for the unattended job.
+- **An Overpass extract is mostly fragments.** The loop search starts from the largest
+  connected component; the node nearest the anchor is often an orphaned driveway stub.
 - **Queued areas on the map are not walks.** They come from `data/queue.yml` via
   `site/data/queue.json`, carry no surveyed facts, and answer to the dial only. Giving one a
   distance or a confidence to make the map look fuller breaks the line the repo is built on.

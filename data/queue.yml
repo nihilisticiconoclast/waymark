@@ -23,10 +23,11 @@ targets:
   - slug: haresfield-beacon
     name: Haresfield Beacon
     centre: [51.7845, -2.2870]
-    radius_km: 2.5
+    radius_km: 4.0          # 2.5 was too tight: the assembler could not reach a turning
+                            # point at half the target without a wider extract.
     distance_band_km: [7, 12]
     priority: 1
-    notes: NT escarpment, topograph, trig. Expect good PRoW density and mapped parking.
+    notes: NT escarpment, topograph, trig. Surveyed — 9.52 km, 252 m, 36% by right.
 
   - slug: standish-wood
     name: Standish Wood

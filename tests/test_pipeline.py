@@ -278,11 +278,19 @@ class TestStatusGate(unittest.TestCase):
     def test_draft_records_are_publishable(self):
         self.assertEqual(validate.check_status(a_record(status="draft")), [])
 
-    def test_shipped_seed_record_is_refused(self):
-        """The record actually in the repo must not be publishable."""
-        seed = json.loads((ROOT / "data" / "walks" / "0001-haresfield-beacon.json").read_text())
-        self.assertEqual(seed["status"], "seed")
-        self.assertTrue(validate.check_status(seed))
+    def test_every_shipped_record_passes_the_gate(self):
+        """
+        Not a fixture — the records actually on the site. A published record that would
+        fail the gate today means the gate changed and the corpus did not.
+        """
+        shipped = sorted((ROOT / "data" / "walks").glob("*.json"))
+        self.assertTrue(shipped, "no walk records in the repo")
+        for path in shipped:
+            with self.subTest(record=path.name):
+                rec = json.loads(path.read_text())
+                failures = {k: v for k, v in run_checks(rec).items() if v}
+                self.assertEqual(failures, {}, f"{path.name} would not pass today: {failures}")
+                self.assertEqual(rec["status"], "published")
 
     def test_strict_mode_tolerates_a_seed_but_not_a_bad_draft(self):
         """

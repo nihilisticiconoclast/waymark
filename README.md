@@ -13,42 +13,49 @@ probability is scored against reality when you walk it.
 
 ## Status
 
-Wired up and deploying; **no walks published**. The site is live and the pipeline, the gate
-and the calibration all run. What is missing is data, and only one thing produces it.
+Live, with **one walk on it**: Haresfield Beacon, a 9.52 km loop with 252 m of ascent,
+surveyed from OpenStreetMap and written up under the constraints below. Its route is drawn on
+the map — the line, not a pin on the start.
 
-The map therefore shows the **survey queue** — the twenty areas in `data/queue.yml`, drawn as
-hollow markers, filterable by the dial and by nothing else, because a queued area has no
-distance, no ascent and no surface for the other filters to read. They are search anchors, not
-routes. Each becomes a walk the first time it is surveyed, written up and passed by the
-validator, and it leaves the queue layer at that point.
+The other nineteen entries in `data/queue.yml` show as hollow markers: areas awaiting survey,
+answering to the dial and to none of the other filters, because a queued area has no distance,
+ascent or surface for them to read. Each becomes a walk the first time it is surveyed, written
+up and passed by the validator, and leaves the queue layer at that point.
 
-`data/walks/0001-haresfield-beacon.json` is a **seed** record that demonstrates the schema.
-Its geometry is seven hand-placed points that follow nothing on the ground, and the validator
-refuses to publish it — it reports `SEED` rather than `FAIL`, so it does not redden every
-pull request while it sits there.
+### How that walk was made, and how the next one is
+
+```bash
+# 1. Survey. Overpass + a DEM, no key, no model. Runs on Actions because that is where
+#    the open internet is: .github/workflows/survey.yml, dispatch with a target slug.
+python scripts/survey.py --target haresfield-beacon --radius-km 4
+
+# 2. Write. Claude reads data/surveys/<slug>.json and writes
+#    data/editorial/<slug>.json, then this merges it with the surveyed facts.
+python scripts/author.py --survey data/surveys/haresfield-beacon.json
+
+# 3. Gate, build, and it is on the map.
+python scripts/validate.py data/walks/*.json && python scripts/build_index.py
+```
+
+Step 2 is Claude in a session or a Routine. **No API key and no billing** — the constraints
+live in the prompt, `docs/VOICE.md` and the validator, and the validator cannot tell which
+mode produced the words. `author.py --api` exists only for the unattended weekly job.
 
 ### Next
 
-1. **Survey the first area.** `python scripts/survey.py --next` takes Haresfield Beacon, the
-   highest-priority entry. It needs no key. It does need `overpass-api.de`, and it is the
-   only step in the whole system that cannot run from a locked-down environment. Expect to
-   spend the first attempt or two widening `distance_band_km` — the loop assembler is the
-   part most likely to come back empty, and the honest failure is a `SystemExit` telling you
-   so rather than a forced bad loop.
-2. **Write it up.** `ANTHROPIC_API_KEY=… python scripts/author.py --survey
-   data/surveys/haresfield-beacon.json`.
-3. **Read the write-up against the survey payload**, not on its own. The prose is designed to
-   be plausible; that is exactly what makes it worth checking. Then
-   `python scripts/validate.py data/walks/*.json`.
-4. **Turn the weekly job on.** `.github/workflows/new-walk.yml` needs `ANTHROPIC_API_KEY` in
-   repository secrets; until then it will fail every Sunday at 06:00 UTC. Nothing else is
-   required — `ci.yml` and `pages.yml` are already running.
-5. **Walk one, then resolve it.** The calibration panel stays empty until the ledger has
-   entries, and the Brier decomposition means nothing below about n=10. This is the slow
-   part of the system and it is supposed to be: the rate limit is how fast you can walk.
-
-Optional, and only when you want the real 1:25 000 Explorer sheet rather than OpenTopoMap:
-set `OS_API_KEY` in secrets and `WAYMARK_BASEMAP` in repository variables. See *Basemap*.
+1. **The second walk.** Standish Wood is next in the queue. Dispatch the `survey` workflow,
+   then write it up. Expect to set `radius_km` — 2.5 km was too tight an extract for
+   Haresfield Beacon, and the assembler now says what it found when it cannot fit a band.
+2. **Walk it, then resolve it**, so `confidence.navigable` starts being scored. 0.55 on
+   Haresfield Beacon is a real forecast: a third of the route carries a designation, half of
+   it has no surface tag, and there is a ford of unknown depth.
+3. **The real Explorer sheet**, if you want it: an OS Data Hub key in `OS_API_KEY` and
+   `WAYMARK_BASEMAP` set to `os-leisure`. Until then the basemap is OpenTopoMap, tinted onto
+   cuddly-lamp's paper so it reads as a sheet rather than a generic web map. This is the one
+   thing on the site that genuinely needs something from you — OS will not issue a key to
+   anyone but the account holder.
+4. **`ANTHROPIC_API_KEY`**, only if you want the unattended Sunday job. Everything above
+   works without it.
 
 ---
 

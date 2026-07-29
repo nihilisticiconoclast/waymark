@@ -1,22 +1,7 @@
 {
- "count": 20,
+ "count": 19,
  "surveyed": 0,
  "targets": [
-  {
-   "slug": "haresfield-beacon",
-   "name": "Haresfield Beacon",
-   "lat": 51.7845,
-   "lon": -2.287,
-   "crow_km": 6.6,
-   "bearing": 312,
-   "band_km": [
-    7,
-    12
-   ],
-   "priority": 1,
-   "surveyed": false,
-   "notes": "NT escarpment, topograph, trig. Expect good PRoW density and mapped parking."
-  },
   {
    "slug": "standish-wood",
    "name": "Standish Wood",

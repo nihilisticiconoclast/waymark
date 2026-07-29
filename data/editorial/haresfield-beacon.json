@@ -1,0 +1,33 @@
+{
+  "$comment": "Written by Claude in session against data/surveys/haresfield-beacon.json. Proper nouns limited to facts.named_features plus data/gazetteer.txt; every number agrees with the surveyed geometry. No API call — see scripts/author.py.",
+
+  "editorial": {
+    "summary": "A loop from the escarpment edge at Haresfield Beacon down into the Severn Vale and back, north-west of Stroud.",
+
+    "character": "The walk is built around one substantial descent and one substantial climb, and the survey puts the steepest sustained pitch at better than one in five — short, but not somewhere to be casual with a wet boot. Between them the route spends a long middle stretch on lanes and undesignated tracks in the vale, which is flat, quick, and much the least interesting part of the day. It earns its place on the edge itself and the ground falling away west; on a day with the top in cloud there would be little reason to make the drive.",
+
+    "grain": "The edge is Inferior Oolite standing on Lias clay, which is why the top stays dry and firm while the slope below it slumps and holds water.",
+
+    "conditions": "Winter and early spring are the honest recommendation. The vale section drains badly and the descent runs greasy under leaf litter, but the edge faces west and the last hour of light off the Severn is the reason to be up there rather than anywhere else. Half the route carries no surface tag at all, so what is underfoot below the edge is genuinely unknown rather than merely unrecorded.",
+
+    "practical": "A free car park is recorded near Haresfield Beacon, but the survey places it some 2,800 m from where this loop begins, so arriving there and walking this route are not the same thing. The Beacon & Railway Hotel sits within twenty metres of the route; OpenStreetMap records nothing about vegan provision, which makes that unknown rather than absent, and worth a phone call before relying on it. No toilets were found within reach, and the land along the top is National Trust.",
+
+    "caveats": "Only about a third of the length carries a public footpath designation. The rest is mapped but undesignated or permissive, so access there is unrecorded rather than assured, and a permissive stretch can be withdrawn without anything on the map changing. The survey also flags a ford on or beside the route and says nothing about its depth or whether a footbridge stands alongside it — after rain that is the thing most likely to turn this into an out-and-back. Field furniture is invisible to a survey of this kind: stiles and gates that have rotted or been replaced will not appear until they are underfoot.",
+
+    "best_months": [10, 11, 12, 1, 2, 3],
+    "runnable": "in_parts"
+  },
+
+  "ratings": {
+    "difficulty": 3,
+    "technicality": 2,
+    "exposure": 3,
+    "solitude": 2
+  },
+
+  "confidence": {
+    "navigable": 0.55,
+    "basis": "Only a third of the length carries a designation and half of it has no surface tag, so access and going are both largely unrecorded. A ford is flagged with no depth or footbridge information. The loop is machine-assembled from OSM ways and nobody has walked it.",
+    "resolved": null
+  }
+}
