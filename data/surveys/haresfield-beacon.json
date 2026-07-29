@@ -4505,143 +4505,23 @@
     "hazards": [
       {
         "kind": "major_road_crossing",
-        "detail": "Route meets a motorway road with no mapped footway or crossing.",
+        "detail": "Route meets M5, a motorway road, with no mapped footway or crossing.",
         "osm_id": "way/3397761"
       },
       {
         "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
+        "detail": "Route meets Cross Keys Roundabout, a trunk road, with no mapped footway or crossing. Met at 5 points along the route.",
         "osm_id": "way/3994328"
       },
       {
         "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
+        "detail": "Route meets A38, a trunk road, with no mapped footway or crossing. Met at 7 points along the route.",
         "osm_id": "way/3994333"
       },
       {
         "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/3994334"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
+        "detail": "Route meets A430, a trunk road, with no mapped footway or crossing. Met at 15 points along the route.",
         "osm_id": "way/4235364"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/4235366"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/8136127"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/8136128"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/9584471"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/9631694"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a primary road with no mapped footway or crossing.",
-        "osm_id": "way/106295538"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a primary road with no mapped footway or crossing.",
-        "osm_id": "way/106295544"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/667040194"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/691903051"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a primary road with no mapped footway or crossing.",
-        "osm_id": "way/698323599"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a primary road with no mapped footway or crossing.",
-        "osm_id": "way/698323600"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/698330699"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/902612814"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/902612815"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1090879519"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1090879520"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1090879521"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1091331345"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1124272899"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1124272900"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1266572414"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1266838821"
-      },
-      {
-        "kind": "major_road_crossing",
-        "detail": "Route meets a trunk road with no mapped footway or crossing.",
-        "osm_id": "way/1338104131"
       }
     ],
     "named_features": [
@@ -4660,7 +4540,7 @@
   },
   "provenance": {
     "method": "survey+author",
-    "surveyed_at": "2026-07-29T16:07:35.753437+00:00",
+    "surveyed_at": "2026-07-29T16:16:16.649826+00:00",
     "overpass_query_sha": "18172aafae6d",
     "attribution": [
       "Route and feature data \u00a9 OpenStreetMap contributors, ODbL",
