@@ -32,7 +32,18 @@ QUEUE = ROOT / "data" / "queue.yml"
 OUT_DIR = ROOT / "data" / "surveys"
 CACHE_DIR = OUT_DIR / ".cache"
 
-OVERPASS = "https://overpass-api.de/api/interpreter"
+# Overpass etiquette asks callers to identify themselves, and the main instance enforces it:
+# a default `python-requests/2.x` User-Agent is answered with 406 Not Acceptable, which reads
+# like a malformed query and is not. Anything descriptive with a contact URL is accepted.
+USER_AGENT = "waymark/0.1 (+https://github.com/nihilisticiconoclast/waymark)"
+
+# Mirrors, tried in order. The main instance is the busiest and the first to refuse a runner
+# on a shared IP; the others run the same software over the same planet file.
+OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
 ELEVATION = "https://api.opentopodata.org/v1/eudem25m"
 
 # Designations that confer a public right of way in England and Wales. See docs/DATA.md.
@@ -128,18 +139,34 @@ def overpass(query: str, cache_key: str) -> dict:
     if cached.exists():
         return json.loads(cached.read_text())
 
-    for attempt in range(4):
-        r = requests.post(OVERPASS, data={"data": query}, timeout=180)
-        if r.status_code == 200:
-            cached.write_text(r.text)
-            return r.json()
-        if r.status_code in (429, 504):
-            wait = 15 * (attempt + 1)
-            print(f"  overpass {r.status_code}, backing off {wait}s")
-            time.sleep(wait)
-            continue
-        r.raise_for_status()
-    raise RuntimeError("Overpass refused after 4 attempts. Try again later, or self-host.")
+    headers = {"User-Agent": USER_AGENT}
+    problems = []
+    for endpoint in OVERPASS_ENDPOINTS:
+        for attempt in range(3):
+            try:
+                r = requests.post(endpoint, data={"data": query},
+                                  headers=headers, timeout=180)
+            except requests.RequestException as e:
+                problems.append(f"{endpoint}: {e}")
+                break
+            if r.status_code == 200:
+                cached.write_text(r.text)
+                return r.json()
+            if r.status_code in (429, 504):
+                wait = 15 * (attempt + 1)
+                print(f"  {endpoint} {r.status_code}, backing off {wait}s")
+                time.sleep(wait)
+                continue
+            problems.append(f"{endpoint}: {r.status_code} {r.reason}")
+            break                       # not a rate limit — a different mirror may do better
+        else:
+            problems.append(f"{endpoint}: rate limited after 3 attempts")
+        print(f"  {endpoint} did not answer; trying the next mirror")
+
+    raise RuntimeError(
+        "Every Overpass mirror refused:\n  " + "\n  ".join(problems) +
+        "\nThis is usually load rather than a bad query. Try again later, or self-host."
+    )
 
 
 # --------------------------------------------------------------------------- assembly
@@ -291,7 +318,8 @@ def sample_elevation(coords: list[tuple[float, float]], cache_key: str) -> list[
         chunk = pts[i:i + 100]
         locs = "|".join(f"{lat},{lon}" for lat, lon in chunk)
         try:
-            r = requests.get(ELEVATION, params={"locations": locs}, timeout=60)
+            r = requests.get(ELEVATION, params={"locations": locs},
+                             headers={"User-Agent": USER_AGENT}, timeout=60)
             r.raise_for_status()
         except requests.RequestException as e:
             # The elevation service is a shared public instance with a daily cap, and it is

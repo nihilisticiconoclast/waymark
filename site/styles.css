@@ -49,6 +49,19 @@ body { overscroll-behavior: none; }
   background: var(--paper);
 }
 
+/* Raster tiles cannot be restyled, but they can be tinted, and the difference between a
+   generic web map and a sheet matters here — cuddly-lamp's whole conceit is cartographic.
+   The tile pane multiplies onto the paper ground, so the white of the tile becomes --paper
+   and everything printed on it keeps its density: contours, woodland wash and footpath
+   dashes all survive, the sheet warms to the palette, and the red route still reads as the
+   one thing drawn on top rather than one more coloured line among many.
+   Switched off for the OS profiles, which are already the right colour and are somebody
+   else's cartography to leave alone. */
+#map[data-tint="true"] .leaflet-tile-pane {
+  mix-blend-mode: multiply;
+  filter: saturate(.72) contrast(.94);
+}
+
 /* Route geometry is drawn twice: a wide low-opacity casing under a narrow solid core, so
    it holds up over both the pale wash of the Explorer sheet and a darker topographic
    basemap without needing a per-profile colour. The core is this view's single --route

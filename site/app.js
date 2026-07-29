@@ -112,6 +112,10 @@ function initMap() {
    })
    .addTo(map);
 
+  // Only the keyless topographic basemap is tinted onto the paper; the OS sheets already
+  // look the way they are meant to look.
+  document.getElementById("map").dataset.tint = String(CFG.basemap === "opentopo");
+
   state.routeLayer.addTo(map);
   document.getElementById("attribution").textContent =
     p.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
