@@ -51,16 +51,26 @@ body { overscroll-behavior: none; }
 
 /* Raster tiles cannot be restyled, but they can be tinted, and the difference between a
    generic web map and a sheet matters here — cuddly-lamp's whole conceit is cartographic.
-   The tile pane multiplies onto the paper ground, so the white of the tile becomes --paper
-   and everything printed on it keeps its density: contours, woodland wash and footpath
-   dashes all survive, the sheet warms to the palette, and the red route still reads as the
-   one thing drawn on top rather than one more coloured line among many.
-   Switched off for the OS profiles, which are already the right colour and are somebody
-   else's cartography to leave alone. */
-#map[data-tint="true"] .leaflet-tile-pane {
+   A paper-coloured pane multiplies over the tiles: white paper-of-the-tile becomes --paper,
+   and everything printed on it keeps its density, so contours, woodland wash and footpath
+   dashes all survive. It sits at z-index 300 — above Leaflet's tile pane at 200, below the
+   overlay pane at 400 — so the route and the markers stay untinted and the red still reads
+   as the one thing drawn on top rather than another coloured line among many.
+
+   The tile pane itself is desaturated slightly first, because OpenTopoMap's woodland green
+   is louder than anything in the Tunnel palette.
+
+   (Blending the tile pane straight onto #map does not work: .leaflet-map-pane is
+   transformed, so it forms a stacking context and the tile pane has no backdrop to
+   multiply with. The tint has to be a sibling inside that context.) */
+#map[data-tint="true"] .leaflet-tile-pane { filter: saturate(.6) contrast(.92); }
+#map[data-tint="true"] .leaflet-tint-pane {
+  background: var(--paper);
   mix-blend-mode: multiply;
-  filter: saturate(.72) contrast(.94);
+  pointer-events: none;
 }
+.leaflet-tint-pane { display: none; }
+#map[data-tint="true"] .leaflet-tint-pane { display: block; }
 
 /* Route geometry is drawn twice: a wide low-opacity casing under a narrow solid core, so
    it holds up over both the pale wash of the Explorer sheet and a darker topographic

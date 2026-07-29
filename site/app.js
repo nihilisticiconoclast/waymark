@@ -113,7 +113,19 @@ function initMap() {
    .addTo(map);
 
   // Only the keyless topographic basemap is tinted onto the paper; the OS sheets already
-  // look the way they are meant to look.
+  // look the way they are meant to look, and are somebody else's cartography to leave alone.
+  // The pane is full-bleed and fixed to the viewport rather than the map's coordinate space,
+  // so it does not slide about under a pan.
+  map.createPane("tint");
+  const tintPane = map.getPane("tint");
+  tintPane.classList.add("leaflet-tint-pane");
+  // Leaflet's map pane is a 0x0 transformed div, so a percentage size collapses to nothing.
+  // A flat fill can simply be enormous: no edge is reachable by panning, and because it is
+  // one colour there is nothing to see moving underneath.
+  Object.assign(tintPane.style, {
+    zIndex: 300, position: "absolute",
+    left: "-20000px", top: "-20000px", width: "40000px", height: "40000px",
+  });
   document.getElementById("map").dataset.tint = String(CFG.basemap === "opentopo");
 
   state.routeLayer.addTo(map);

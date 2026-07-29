@@ -386,6 +386,23 @@ class TestLoopAssembly(unittest.TestCase):
     def test_out_of_band_request_finds_nothing_rather_than_forcing_it(self):
         self.assertIsNone(survey.find_loop(self.graph, self.CENTRE, (20.0, 30.0)))
 
+    def test_the_band_is_reachable_at_every_scale(self):
+        """
+        Regression. The turning point used to be sought at 0.20–0.35 of the target, which
+        caps an assembled loop at roughly 0.4–0.7 of the band — so a correctly specified
+        target returned "no loop found" and the response was to widen the queue entry until
+        the numbers happened to line up. The turning point belongs near half the target:
+        on a loop of circumference L the far side is L/2 away by the shorter arc.
+        """
+        for side_km, band in [(1.0, (3.5, 4.5)), (1.5, (5.0, 7.0)), (2.0, (7.0, 9.0))]:
+            with self.subTest(side_km=side_km, band=band):
+                graph = survey.build_graph(square_ways(self.CENTRE, side_km=side_km))
+                loop = survey.find_loop(graph, self.CENTRE, band)
+                self.assertIsNotNone(loop, f"no loop in {band} km on a {side_km * 4} km circuit")
+                total = sum(graph[u][v]["length"] for u, v in zip(loop, loop[1:])) / 1000
+                self.assertGreaterEqual(total, band[0])
+                self.assertLessEqual(total, band[1])
+
 
 class TestRouteRollUp(unittest.TestCase):
     def test_designation_and_surface_are_apportioned_by_length(self):

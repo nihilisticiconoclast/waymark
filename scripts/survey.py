@@ -195,10 +195,17 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     Loop assembly heuristic.
 
     Naive shortest-path returns out-and-backs, which are not walks. This instead: pick a
-    start node near the anchor, walk outward to a set of candidate "far" nodes at roughly
-    a quarter of the target distance, then find a return path that shares as few edges as
-    possible with the outward leg. Score candidates on total length within band and on edge
-    disjointness, and take the best.
+    start node near the anchor, walk outward to a candidate "far" node, then find a return
+    path that shares as few edges as possible with the outward leg. Score candidates on
+    total length within band and on edge disjointness, and take the best.
+
+    The turning point is chosen at roughly HALF the target distance, measured as
+    shortest-path length from the start. That is the geometry of the thing: on a loop of
+    circumference L the far side is L/2 away by the shorter arc, so out and back are each
+    about half. An earlier version looked between 0.20 and 0.35 of target, which caps the
+    loops it can build at roughly 0.4–0.7 of the band and made "no loop found" the normal
+    answer for a correctly-specified target. Widened either side of 0.5 because the return
+    leg is deliberately not the shortest path and so runs long.
 
     This is the weakest part of the pipeline and the right place to spend effort. Improve
     it here rather than filtering bad loops downstream.
@@ -210,13 +217,22 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         return None
     start = min(G.nodes, key=lambda n: haversine_m(n, anchor))
 
-    lengths = nx.single_source_dijkstra_path_length(G, start, cutoff=target * 0.6, weight="length")
-    far = [n for n, d in lengths.items() if target * 0.20 < d < target * 0.35]
+    lengths = nx.single_source_dijkstra_path_length(G, start, cutoff=target * 0.8, weight="length")
+    far = [n for n, d in lengths.items() if target * 0.32 < d < target * 0.62]
     if not far:
+        reach = max(lengths.values(), default=0.0)
+        print(f"  no turning point between {target * 0.32 / 1000:.1f} and "
+              f"{target * 0.62 / 1000:.1f} km of the start; the network reaches "
+              f"{reach / 1000:.1f} km")
         return None
 
+    # Try the most promising first: a turning point near half the target is the one most
+    # likely to close into a loop of about the target length.
+    far.sort(key=lambda n: abs(lengths[n] - target / 2))
+
+    attempts = []
     best, best_score = None, -1.0
-    for mid in far[:200]:
+    for mid in far[:300]:
         try:
             out = nx.shortest_path(G, start, mid, weight="length")
         except nx.NetworkXNoPath:
@@ -234,6 +250,7 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
 
         loop = out + back[1:]
         total = sum(G[u][v]["length"] for u, v in zip(loop, loop[1:]) if G.has_edge(u, v))
+        attempts.append(total)
         if not (lo_m <= total <= hi_m):
             continue
 
@@ -243,6 +260,14 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         if score > best_score:
             best, best_score = loop, score
 
+    if best is None and attempts:
+        # Say what was actually reachable. "No loop found" on its own leaves the operator
+        # guessing at a band, and guessing costs another Overpass call every time.
+        attempts.sort()
+        near = min(attempts, key=lambda t: abs(t - target))
+        print(f"  {len(attempts)} loops assembled, none in band: "
+              f"{attempts[0] / 1000:.1f}–{attempts[-1] / 1000:.1f} km, "
+              f"closest to target {near / 1000:.1f} km")
     return best
 
 
