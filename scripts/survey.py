@@ -384,6 +384,20 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
         print(f"  nearest node on the main network is "
               f"{haversine_m(start, anchor) / 1000:.1f} km from the anchor")
 
+    # The must-visit radius has to be reachable from where the walk begins. The trailhead is
+    # the nearest car park, the nearest network node to it can be a few hundred metres further
+    # again, and a fixed 500 m rule then rejects every loop including ones that start at the
+    # target — 230 of them, on the run that found this. Relative to the start, not absolute.
+    # Capped, though. Relaxing without a ceiling would mean a start three kilometres away
+    # simply widens the rule until any loop qualifies, which is how a constraint quietly
+    # stops constraining. Past a kilometre the honest answer is that the trailhead is not
+    # near the feature and the queue entry is wrong.
+    slack = min(max(must_pass_m, haversine_m(start, anchor) + 150), 1000.0)
+    if slack > must_pass_m:
+        print(f"  the start is {haversine_m(start, anchor):.0f} m from the target; "
+              f"requiring the loop within {slack:.0f} m of it")
+        must_pass_m = slack
+
     G = reachable
     lengths = nx.single_source_dijkstra_path_length(G, start, cutoff=target * 0.8, weight="length")
     costs = nx.single_source_dijkstra_path_length(G, start, weight="cost")
@@ -473,7 +487,8 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     if best is None and missed_target:
         print(f"  {missed_target} loops were in band but none came within "
               f"{must_pass_m:.0f} m of the target")
-    if best is None and attempts:
+    in_band = [a for a in attempts if lo_m <= a <= hi_m]
+    if best is None and attempts and not in_band:
         # Say what was actually reachable. "No loop found" on its own leaves the operator
         # guessing at a band, and guessing costs another Overpass call every time.
         attempts.sort()
