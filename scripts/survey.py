@@ -333,9 +333,50 @@ def build_graph(ways: list[dict], access=None) -> nx.Graph:
     return G
 
 
+ROAD_CLASSES = ("residential", "unclassified", "service", "other")
+
+
 def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float],
               start_at: tuple[float, float] | None = None,
               must_pass_m: float = 500.0, max_road_pct: float = 25.0):
+    """
+    Two passes, and the order is the whole point.
+
+    First the road classes are removed from the graph entirely and a loop is looked for on
+    what is left — rights of way, open-access land, paths and tracks. A loop found in that
+    pass is 0% road by construction rather than by scoring, which is the only way to be sure
+    of it. This is a footpath app; a lane is a last resort, not a cheap edge.
+
+    Only if that finds nothing are the roads added back, heavily priced and capped. Some
+    walks genuinely need a hundred metres of lane to link two path networks, and refusing
+    outright would return nothing for them.
+
+    Weighting alone was not enough, and the reason is worth keeping: with roads in the graph
+    the shortest path is free to use them, and a lane that saves two kilometres wins on every
+    term except the road penalty. Removing them removes the temptation instead of arguing
+    with it.
+    """
+    for road_free in (True, False):
+        if road_free:
+            keep = [(u, v) for u, v, d in G.edges(data=True) if d["kind"] not in ROAD_CLASSES]
+            if not keep:
+                continue
+            graph = nx.Graph(G.edge_subgraph(keep))
+            print(f"  pass 1: {graph.number_of_edges()} of {G.number_of_edges()} edges are "
+                  "walkable ways; searching those alone")
+        else:
+            graph = G
+            print("  pass 2: no loop on paths alone — allowing lanes, capped at "
+                  f"{max_road_pct:.0f}%")
+        loop = _search_loop(graph, anchor, band_km, start_at, must_pass_m, max_road_pct)
+        if loop is not None:
+            return loop
+    return None
+
+
+def _search_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, float],
+                 start_at: tuple[float, float] | None,
+                 must_pass_m: float, max_road_pct: float):
     """
     Loop assembly heuristic.
 
@@ -413,7 +454,6 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     # likely to close into a loop of about the target length.
     far.sort(key=lambda n: abs(lengths[n] - target / 2))
 
-    ROAD_CLASSES = ("residential", "unclassified", "service", "other")
     attempts = []
     missed_target = 0
     too_much_road = 0

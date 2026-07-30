@@ -13,6 +13,11 @@ name: survey
 # endpoint again, which is why the band and radius are inputs: get it right in one pass.
 
 on:
+  # Committing a slug to data/survey-request.txt runs that survey. The Actions UI is not
+  # always to hand — a session without the GitHub API, a phone — and "change a line, push"
+  # is a trigger anyone can reach, with the request itself left in the history.
+  push:
+    paths: ["data/survey-request.txt"]
   workflow_dispatch:
     inputs:
       target:
@@ -55,6 +60,11 @@ jobs:
           BAND: ${{ inputs.band }}
           RADIUS: ${{ inputs.radius_km }}
         run: |
+          # A dispatch input wins; otherwise the committed request; otherwise the queue.
+          if [ -z "$TARGET" ] && [ -f data/survey-request.txt ]; then
+            TARGET=$(grep -v '^#' data/survey-request.txt | tr -d '[:space:]' | head -1)
+            echo "request file asks for: ${TARGET:-<nothing>}"
+          fi
           args=()
           if [ -n "$TARGET" ]; then args+=(--target "$TARGET"); else args+=(--next); fi
           if [ -n "$BAND" ]; then args+=(--band "$BAND"); fi
@@ -67,7 +77,7 @@ jobs:
       # cache is normally gitignored; this force-adds it, guarded on size, and it gets
       # removed again once the heuristic settles.
       - name: Publish the extract for local iteration
-        if: inputs.commit_cache == 'true'
+        if: inputs.commit_cache == 'true' || github.event_name == 'push'
         run: |
           size=$(du -sm data/surveys/.cache | cut -f1)
           echo "extract is ${size} MB"

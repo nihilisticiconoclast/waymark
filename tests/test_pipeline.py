@@ -559,18 +559,44 @@ class TestRoutePreference(unittest.TestCase):
         self.assertTrue(area.contains(Point(-2.287, 51.785)), "inside the estate")
         self.assertFalse(area.contains(Point(-2.250, 51.785)), "outside the estate")
 
-    def test_a_loop_more_than_a_quarter_road_is_rejected_outright(self):
+    def test_a_road_only_circuit_is_refused_however_convenient(self):
         """
         A ceiling, not a preference. Pricing roads expensively biases the search but can be
         outvoted by the length and by-right terms, and a quarter of a walk spent on tarmac is
-        not a good walk that scored slightly low — it is the wrong answer.
+        not a good walk that scored slightly low — it is the wrong answer. Here the only
+        circuit available is entirely lane, so the honest result is nothing.
         """
-        import inspect
-        src = inspect.getsource(survey.find_loop)
-        self.assertIn("max_road_pct", src)
-        self.assertIn("too_much_road", src)
-        self.assertEqual(
-            inspect.signature(survey.find_loop).parameters["max_road_pct"].default, 25.0)
+        centre = (51.7845, -2.2870)
+        lanes = [dict(w, tags={"highway": "unclassified"})
+                 for w in square_ways(centre, side_km=1.0)]
+        graph = survey.build_graph(lanes)
+        self.assertIsNone(survey.find_loop(graph, centre, (3.5, 4.5)),
+                          "a circuit made entirely of lanes was accepted")
+
+    def test_the_first_pass_uses_paths_only_so_a_walk_is_road_free_by_construction(self):
+        """
+        The order matters. With roads in the graph the shortest path is free to use them, and
+        a lane that saves two kilometres wins on every term except the road penalty. The
+        first pass removes them instead of arguing with them.
+
+        Here a path circuit and a lane shortcut both exist. The lane must not appear.
+        """
+        centre = (51.7845, -2.2870)
+        ways = square_ways(centre, side_km=1.0)          # 3 sides PRoW, 1 undesignated path
+        lat, lon = centre
+        d = 1.0 / 111.0
+        ways.append({                                     # a lane cutting straight across
+            "type": "way", "id": 5000, "tags": {"highway": "unclassified"},
+            "geometry": [{"lat": lat, "lon": lon},
+                         {"lat": lat + d / 2, "lon": lon + d / 2},
+                         {"lat": lat + d, "lon": lon + d}],
+        })
+        graph = survey.build_graph(ways)
+        loop = survey.find_loop(graph, centre, (3.5, 4.5))
+        self.assertIsNotNone(loop)
+        kinds = {graph[u][v]["kind"] for u, v in zip(loop, loop[1:]) if graph.has_edge(u, v)}
+        self.assertFalse(kinds & set(survey.ROAD_CLASSES),
+                         f"the walk used a road class: {kinds}")
 
     def test_access_polygons_ignore_unclosed_ways(self):
         """A boundary fragment is not an area, and must not be guessed into one."""
