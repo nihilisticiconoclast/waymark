@@ -356,6 +356,16 @@ def find_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float, fl
     term except the road penalty. Removing them removes the temptation instead of arguing
     with it.
     """
+    # Try for an actual circuit first, on paths alone. This is the simple, direct question —
+    # "is there a loop here" — and when it answers, the answer is a real circular walk rather
+    # than a there-and-back-by-another-route that happens to close.
+    walkable = [(u, v) for u, v, d in G.edges(data=True) if d["kind"] not in ROAD_CLASSES]
+    if walkable:
+        circuit = find_circuit(nx.Graph(G.edge_subgraph(walkable)), anchor, band_km,
+                               start_at=start_at, must_pass_m=max(must_pass_m, 700.0))
+        if circuit is not None:
+            return circuit
+
     for road_free in (True, False):
         if road_free:
             keep = [(u, v) for u, v, d in G.edges(data=True) if d["kind"] not in ROAD_CLASSES]
@@ -537,6 +547,156 @@ def _search_loop(G: nx.Graph, anchor: tuple[float, float], band_km: tuple[float,
               f"{attempts[0] / 1000:.1f}–{attempts[-1] / 1000:.1f} km, "
               f"closest to target {near / 1000:.1f} km")
     return best
+
+
+# --------------------------------------------------------------- circuits (the simple way)
+
+def junction_graph(G: nx.Graph) -> nx.MultiGraph:
+    """
+    Collapse every degree-2 chain into a single edge.
+
+    A path network has thousands of shape points and only a few hundred places where a
+    decision is possible. Those junctions are the walk; the rest is drawing. Contracting
+    them turns "search a graph of 5,000 nodes" into "search a graph of 300", which is what
+    makes honest cycle-finding cheap enough to just do.
+
+    A MultiGraph, because two different chains routinely run between the same pair of
+    junctions and they are the two halves of a loop. Collapsing them to one edge — which is
+    what a plain Graph does — deletes exactly the circuits this is looking for.
+
+    A component that is one clean ring has no junctions at all, every node being degree 2.
+    Two nodes on it are promoted so the ring becomes two chains and stays findable.
+    """
+    junctions = {n for n in G.nodes if G.degree(n) != 2}
+    for component in nx.connected_components(G):
+        if len(component & junctions) < 2 and len(component) >= 3:
+            ring = sorted(component)
+            junctions.update({ring[0], ring[len(ring) // 2]})
+
+    J = nx.MultiGraph()
+    J.add_nodes_from(junctions)
+    walked = set()
+    for j in junctions:
+        for first in G.neighbors(j):
+            if (j, first) in walked:
+                continue
+            path, length, kinds = [j, first], G[j][first]["length"], [G[j][first]["kind"]]
+            prev, cur = j, first
+            while cur not in junctions:
+                onward = [x for x in G.neighbors(cur) if x != prev]
+                if len(onward) != 1:
+                    break
+                nxt = onward[0]
+                length += G[cur][nxt]["length"]
+                kinds.append(G[cur][nxt]["kind"])
+                path.append(nxt)
+                prev, cur = cur, nxt
+            end = path[-1]
+            walked.add((j, first))
+            walked.add((end, path[-2]))
+            if end == j:
+                continue                      # a lollipop back to itself; not a link
+            J.add_edge(j, end, length=length, path=path, kinds=kinds)
+    return J
+
+
+def find_circuit(G: nx.Graph, feature: tuple[float, float], band_km: tuple[float, float],
+                 start_at: tuple[float, float] | None = None,
+                 must_pass_m: float = 700.0, budget: int = 300_000):
+    """
+    Find a real circular walk: a cycle in the path network that starts at the trailhead,
+    passes the feature, and comes out the right length.
+
+    This replaces an out-and-back-by-another-route heuristic that never reliably produced a
+    circuit — it walked to a turning point and looked for a different way home, which is a
+    different thing from a loop and behaved like one. Asking for cycles directly is both
+    simpler to describe and simpler to be right about: depth-first from the trailhead,
+    pruning any branch already longer than the band allows, keeping every closed walk that
+    lands inside it.
+
+    An edge may be used once. Nodes may repeat, so a figure-of-eight counts — that is a
+    perfectly good walk and forbidding it would only be an artefact of the search.
+
+    Scored on how much of the length is walkable by right, then on closeness to the middle
+    of the band, which breaks the frequent ties on the first.
+    """
+    lo_m, hi_m = band_km[0] * 1000, band_km[1] * 1000
+    target = (lo_m + hi_m) / 2
+
+    J = junction_graph(G)
+    if J.number_of_edges() == 0:
+        return None
+    print(f"  {G.number_of_nodes()} shape points contract to {J.number_of_nodes()} junctions, "
+          f"{J.number_of_edges()} links")
+
+    origin = start_at or feature
+    start = min(J.nodes, key=lambda n: haversine_m(n, origin))
+    print(f"  circuit search starts {haversine_m(start, origin):.0f} m from the trailhead")
+
+    best, best_score, found, steps = None, None, 0, 0
+    stack = [(start, (), 0.0)]
+    while stack and steps < budget:
+        steps += 1
+        node, used, length = stack.pop()
+        for _, nbr, key, data in J.edges(node, keys=True, data=True):
+            eid = (min(node, nbr), max(node, nbr), key)
+            if eid in used:
+                continue
+            run = length + data["length"]
+            if run > hi_m:
+                continue                                  # no branch of this gets shorter
+            trail = used + (eid,)
+            if nbr == start:
+                if run < lo_m:
+                    continue
+                ring = _expand(J, start, trail)
+                if ring is None:
+                    continue
+                if min(haversine_m(n, feature) for n in ring) > must_pass_m:
+                    continue
+                found += 1
+                score = (round(_by_right_share(J, trail), 2), -abs(run - target))
+                if best_score is None or score > best_score:
+                    best, best_score = ring, score
+            else:
+                stack.append((nbr, trail, run))
+
+    if best is None:
+        print(f"  no circuit in {band_km[0]}–{band_km[1]} km through the feature "
+              f"({steps} branches explored)")
+        return None
+    print(f"  {found} circuits found; best is {best_score[0] * 100:.0f}% by right")
+    return best
+
+
+def _by_right_share(J: nx.MultiGraph, trail) -> float:
+    """Share of the circuit's length on ways a walker is entitled to be on."""
+    total = by_right = 0.0
+    for a, b, key in trail:
+        e = J[a][b][key]
+        per = e["length"] / max(len(e["kinds"]), 1)
+        total += e["length"]
+        by_right += sum(per for k in e["kinds"] if k in BY_RIGHT_CLASSES)
+    return by_right / total if total else 0.0
+
+
+def _expand(J: nx.MultiGraph, start, trail):
+    """
+    Edge trail back to full shape points, each chain oriented to join the one before it.
+    Returns None if the chains do not actually join end to end, which would mean the trail
+    was not a walk.
+    """
+    out = [start]
+    cur = start
+    for a, b, key in trail:
+        path = J[a][b][key]["path"]
+        if path[0] != cur:
+            path = list(reversed(path))
+        if path[0] != cur:
+            return None
+        out.extend(path[1:])
+        cur = path[-1]
+    return out if cur == start else None
 
 
 # --------------------------------------------------------------------------- attributes

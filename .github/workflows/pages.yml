@@ -65,6 +65,23 @@ jobs:
           print("window.WAYMARK_CONFIG = %s;" % json.dumps(
               {"basemap": basemap, "osApiKey": key}))
           PY
+      # Stamp the commit onto every local asset URL. A browser that has cached a previous
+      # app.js will otherwise keep running it against fresh HTML for as long as its cache
+      # says so — and when the cached copy is a broken one, the site stays broken for the
+      # person who most needs it fixed, with no way to tell from the outside.
+      - name: Cache-bust the local assets
+        run: |
+          python - <<'PY'
+          import pathlib, re, os
+          sha = os.environ["GITHUB_SHA"][:8]
+          p = pathlib.Path("site/index.html")
+          html = p.read_text()
+          html = re.sub(r'(\./(?:app|config|styles|vendor/[\w.]+)\.(?:js|css))"',
+                        lambda m: f'{m.group(1)}?v={sha}"', html)
+          p.write_text(html)
+          print("stamped assets with", sha)
+          PY
+
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
 

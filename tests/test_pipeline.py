@@ -749,3 +749,48 @@ class TestQueuePayload(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCircuitSearch(unittest.TestCase):
+    """
+    The simple question, asked directly: is there a loop here. The heuristic this replaced
+    walked out to a turning point and looked for a different way home, which is not the same
+    thing as a circuit and did not behave like one.
+    """
+
+    CENTRE = (51.7845, -2.2870)
+
+    def test_a_ring_contracts_to_two_links_not_one(self):
+        """
+        Two chains between the same pair of junctions are the two halves of a loop. A plain
+        Graph keeps only one of them, which deletes exactly the circuit being looked for —
+        hence a MultiGraph. And a clean ring has no junctions at all, every node being
+        degree 2, so two get promoted.
+        """
+        graph = survey.build_graph(square_ways(self.CENTRE, side_km=1.0))
+        J = survey.junction_graph(graph)
+        self.assertGreaterEqual(J.number_of_nodes(), 2)
+        self.assertGreaterEqual(J.number_of_edges(), 2,
+                                "the ring collapsed to a single link and the loop was lost")
+
+    def test_it_finds_a_closed_circuit_at_every_scale(self):
+        for side_km, band in [(1.0, (3.5, 4.5)), (1.5, (5.0, 7.0)), (2.0, (7.0, 9.0))]:
+            with self.subTest(side_km=side_km):
+                graph = survey.build_graph(square_ways(self.CENTRE, side_km=side_km))
+                loop = survey.find_circuit(graph, self.CENTRE, band)
+                self.assertIsNotNone(loop, f"no circuit on a {side_km * 4} km ring")
+                total = sum(graph[u][v]["length"] for u, v in zip(loop, loop[1:])
+                            if graph.has_edge(u, v)) / 1000
+                self.assertGreaterEqual(total, band[0])
+                self.assertLessEqual(total, band[1])
+                self.assertLess(survey.haversine_m(loop[0], loop[-1]), 50,
+                                "the circuit does not close")
+
+    def test_a_circuit_that_misses_the_feature_is_refused(self):
+        lat, lon = self.CENTRE
+        away = survey.build_graph(square_ways((lat + 0.03, lon), side_km=1.0))
+        self.assertIsNone(survey.find_circuit(away, self.CENTRE, (3.5, 4.5)))
+
+    def test_out_of_band_returns_nothing_rather_than_the_nearest_thing(self):
+        graph = survey.build_graph(square_ways(self.CENTRE, side_km=1.0))
+        self.assertIsNone(survey.find_circuit(graph, self.CENTRE, (20.0, 30.0)))

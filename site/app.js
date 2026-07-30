@@ -86,10 +86,19 @@ let map;
    are vendored now so that should not happen, but the ordering dependency was the actual
    bug and it is worth not reintroducing. */
 
+/* Report a failure where it can be seen. If the map is already up, the message goes in the
+   rail — replacing a working map with an error panel would be a second bug on top of the
+   first. Only a map that never initialised gets overwritten. */
 function fatal(message) {
-  const el = document.getElementById("map");
-  if (el) el.innerHTML = `<p class="map-error" role="alert">${message}</p>`;
   console.error(message);
+  const banner = `<p class="map-error" role="alert">${message}</p>`;
+  if (map) {
+    const note = document.getElementById("state-note");
+    if (note) { note.hidden = false; note.innerHTML = banner; }
+    return;
+  }
+  const el = document.getElementById("map");
+  if (el) el.innerHTML = banner;
 }
 
 /* ── geodesy ───────────────────────────────────────────────────────────────── */
