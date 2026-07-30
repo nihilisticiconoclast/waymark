@@ -16,7 +16,11 @@
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tokens.css">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet and Proj4 are vendored, not linked. They are load-bearing: without them there
+     is no map at all, and a static site should not have three third-party origins standing
+     between a walker and the thing they came for. cuddly-lamp stays on its CDN because that
+     is the style guide's own rule and because styles.css carries a fallback if it 404s. -->
+<link rel="stylesheet" href="./vendor/leaflet.css">
 <link rel="stylesheet" href="./styles.css">
 </head>
 
@@ -151,9 +155,9 @@
 
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script>
+<script src="./vendor/leaflet.js"></script>
+<script src="./vendor/proj4.js"></script>
+<script src="./vendor/proj4leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tunnel-figure.js"></script>
 <script>
 /* The house signature: the mark is the fixed logo and is identical on every page in the

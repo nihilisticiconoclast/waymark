@@ -386,3 +386,14 @@ body { overscroll-behavior: none; }
   .doodle { position: absolute; pointer-events: none; width: clamp(150px, 22vw, 280px); opacity: .6; }
   .doodle svg, .sig svg { width: 100%; height: auto; display: block; }
 }
+
+/* Shown in place of the map when the map cannot be drawn. A blank rectangle and a clean
+   console in someone else's browser is the hardest kind of failure to be told about. */
+.map-error {
+  margin: 0; max-width: 34rem;
+  padding: var(--wm-space-5);
+  font-size: var(--step--1); line-height: 1.6; color: var(--ink);
+  border-left: 2px solid var(--route);
+  background: color-mix(in srgb, var(--contour) 8%, transparent);
+}
+#map:has(.map-error) { display: grid; place-items: center; }

@@ -28,16 +28,19 @@ const BNG = () => new L.Proj.CRS(
   }
 );
 
+/* Every `crs` is a function, including the two plain 3857 ones that do not need to be.
+   Anything evaluated here runs the moment this file is parsed, before the guard in main()
+   can report a missing library — so nothing at module scope may reach into L. */
 const BASEMAP_PROFILES = {
   opentopo: {
-    crs: L.CRS.EPSG3857,
+    crs: () => L.CRS.EPSG3857,
     url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     options: { maxZoom: 17, subdomains: "abc" },
     zoom: 11, minZoom: 8, maxZoom: 17,
     attribution: "Map data © OpenStreetMap contributors, SRTM · Tiles © OpenTopoMap (CC-BY-SA)"
   },
   "os-outdoor": {
-    crs: L.CRS.EPSG3857,
+    crs: () => L.CRS.EPSG3857,
     url: "https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key={key}",
     options: { maxZoom: 20 },
     zoom: 12, minZoom: 8, maxZoom: 20,
@@ -65,7 +68,7 @@ const state = {
   queue: [],                         // areas awaiting survey — never walks
   queueMarkers: new Map(),
   showQueue: true,
-  routeLayer: L.layerGroup(),
+  routeLayer: null,          // created in initMap; see the note on module scope below
   selected: null,
   sector: null,                      // { b0, b1, r0, r1 } — set by the dial
   filters: {
@@ -75,6 +78,19 @@ const state = {
 };
 
 let map;
+
+/* Nothing at module scope may touch Leaflet. `routeLayer: L.layerGroup()` used to sit in the
+   state object above, which meant that if Leaflet had not loaded — a blocked CDN, an offline
+   phone, an ad blocker taking out unpkg — this file threw a ReferenceError on line one and
+   the whole page died: no map, no filters, no counts, just the static shell. The libraries
+   are vendored now so that should not happen, but the ordering dependency was the actual
+   bug and it is worth not reintroducing. */
+
+function fatal(message) {
+  const el = document.getElementById("map");
+  if (el) el.innerHTML = `<p class="map-error" role="alert">${message}</p>`;
+  console.error(message);
+}
 
 /* ── geodesy ───────────────────────────────────────────────────────────────── */
 
@@ -95,6 +111,7 @@ const compass = deg => COMPASS[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16
 /* ── map ───────────────────────────────────────────────────────────────────── */
 
 function initMap() {
+  state.routeLayer = L.layerGroup();
   const p = BASEMAP_PROFILES[CFG.basemap] || BASEMAP_PROFILES.opentopo;
   const crs = typeof p.crs === "function" ? p.crs() : p.crs;
 
@@ -645,6 +662,11 @@ async function loadQueue() {
 }
 
 async function main() {
+  if (typeof L === "undefined") {
+    fatal("The map library did not load, so there is no map on this page. " +
+          "Reload, and if it persists the deployment is missing site/vendor/leaflet.js.");
+    return;
+  }
   initMap();
   const data = await (await fetch("./data/walks.json")).json();
   state.walks = data.walks;
@@ -659,4 +681,8 @@ async function main() {
   loadCalibration();
 }
 
-main();
+/* Any failure past this point should say so on the page. A blank map with a clean console
+   in someone else's browser is the hardest kind of bug to be told about. */
+main().catch(err => {
+  fatal("Something went wrong loading the walks: " + err.message);
+});
