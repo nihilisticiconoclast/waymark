@@ -37,8 +37,9 @@ data/queue.yml
 │              cafe, NT land, trig, viewpoint) │
 │           ─→ hazards (A-roads, level         │
 │              crossings, fords, tidal)        │
-│  Loop assembly ─→ closed polyline in the     │
-│                   requested distance band    │
+│  Circuit search ─→ roads deleted, network    │
+│                    contracted to junctions,  │
+│                    cycles found in band      │
 │  DEM sampling ─→ elevation profile,          │
 │                  total ascent, max gradient  │
 │  Surface roll-up ─→ % sealed / firm / soft   │
@@ -175,6 +176,21 @@ BASEMAP_PROFILES = {
 
 BNG resolutions and origin follow the OS Data Hub reference values; they're in `app.js` with
 a comment saying so. Don't tune them.
+
+**Runtime dependencies.** Leaflet and Proj4 are vendored in `site/vendor/`, not linked. They
+are load-bearing — without them there is no map — and a static site should not put third-party
+origins between a walker and the thing they came for. Nothing in `app.js` may touch `L` at
+module scope for the same reason: a config table containing `L.CRS.EPSG3857` evaluates on
+parse, so a Leaflet that failed to arrive takes the whole page down with one ReferenceError,
+rail included. The site is tested with every external origin blocked.
+
+**Deployment.** Pages has two sources and they are not interchangeable. Under *GitHub Actions*
+the workflow's artifact is the site. Under *Deploy from a branch* Jekyll renders `README.md`
+as the index and the artifact is deployed to nowhere anybody looks — a green workflow means
+the upload succeeded, not that anyone can see it. The tell is a `pages build and deployment`
+run with event `dynamic` beside your own. `.nojekyll` and a root `index.html` redirect make
+the site work under branch deployment; the setting is still the fix, because `site/config.js`
+is written during the workflow and never committed, so no API key reaches a branch build.
 
 **Layout.** Map is the page. A left rail holds filters on desktop; below 900 px it becomes a
 bottom sheet with three detents (peek / half / full) so the map stays usable one-handed.

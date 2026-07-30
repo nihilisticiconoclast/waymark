@@ -62,6 +62,7 @@ docs/VOICE.md          editorial specification — the highest-leverage file in 
 docs/DATA.md           sources, licences, attribution, tag vocabulary
 prompts/               system + user prompts for the authoring pass
 data/editorial/        written editorial blocks — the API-free authoring path
+data/survey-request.txt  commit a slug here and push; the survey workflow runs it
 schema/walk.schema.json  the contract between authoring and the site
 scripts/survey.py      Overpass + DEM → data/surveys/{id}.json   (no LLM)
 scripts/author.py      survey + editorial → data/walks/{id}.json  (no API by default)
@@ -70,6 +71,8 @@ scripts/build_index.py data/walks/*.json → site/data/walks.json + queue.json
 scripts/brier.py       ledger → calibration statistics
 tests/test_pipeline.py the invariants above, as executable checks
 site/                  the map
+site/vendor/           Leaflet + proj4, vendored on purpose — see pitfalls
+index.html, .nojekyll  Pages workaround while the source is a branch — see pitfalls
 data/queue.yml         target areas awaiting survey
 data/ledger.json       Beating the Bounds resolutions
 ```
@@ -114,9 +117,19 @@ Prose in docs, not bullets, where the content is argument rather than enumeratio
 - **Overpass rate limits.** The public endpoint will refuse you. Back off, cache to
   `data/surveys/.cache/`, and never call it from the site at runtime.
 - **`highway=path` is not a right of way.** See invariant 5.
-- **Loop-finding is the hard part of `survey.py`.** A naive shortest-path returns
-  out-and-backs. The current heuristic is documented inline; improve it there rather than
-  post-hoc filtering.
+- **Route-finding asks for cycles, not for a way home.** `find_circuit` contracts the path
+  network to its junctions and searches for actual closed walks. The heuristic it replaced
+  walked out to a turning point and looked for a different way back, which is not a circuit
+  and never behaved like one — four rounds of re-weighting bought a flat vale loop with a
+  Costa on it. If it needs improving, improve the cycle search; don't reintroduce the other.
+- **Roads are removed from the graph, not made expensive.** With a lane in the graph the
+  shortest path is free to use it, and a lane that saves two kilometres beats a footpath on
+  every term except the penalty. The first pass deletes road classes outright, so a walk is
+  road-free by construction. Lanes come back only if nothing else exists, capped at 25%.
+- **Open-access land is a multipolygon.** An estate boundary's member ways are open segments
+  that close only when stitched. Skipping unclosed rings discarded every National Trust
+  boundary in the extract, and paths walkable by right because of the land they cross got
+  priced as "status unknown". `access_polygons` merges and polygonises.
 - **The Leisure basemap is EPSG:27700 only.** Don't "simplify" the CRS handling by dropping
   Proj4Leaflet; you'll lose the Explorer style entirely.
 - **`site/config.js` is gitignored.** If the map is blank locally, copy
@@ -130,3 +143,14 @@ Prose in docs, not bullets, where the content is argument rather than enumeratio
   distance or a confidence to make the map look fuller breaks the line the repo is built on.
 - **The CSS fallback fence is a cascade layer.** `--ink: var(--ink, #4A3823)` looks like a
   neat shim and is a self-reference: the property goes invalid and takes the palette with it.
+- **Nothing in `site/app.js` may touch `L` at module scope.** `routeLayer: L.layerGroup()` in
+  a state object, or `L.CRS.EPSG3857` in a config table, runs the moment the file is parsed —
+  so a Leaflet that hasn't loaded takes the entire page down, rail and all, with one
+  ReferenceError. Leaflet and proj4 are vendored in `site/vendor/` for the same reason: they
+  are load-bearing, and a static site should not put third-party origins between a walker and
+  the map. Test the site with **every external origin blocked** before believing it works.
+- **Check what is *served*, not what is *deployed*.** A green `pages` run means the artifact
+  uploaded. It does not mean anyone can see it: with Pages source set to "Deploy from a
+  branch", Jekyll renders `README.md` as the site and the artifact goes nowhere. The tell is
+  a `pages build and deployment` run with event `dynamic` sitting beside your own — that is
+  the legacy builder, and it only exists under branch deployment.

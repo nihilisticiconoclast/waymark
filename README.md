@@ -27,21 +27,29 @@ deliberately not committed, so under branch deployment no OS API key reaches the
 
 ## Status
 
-Live, with **one walk on it**: Haresfield Beacon, a 5.22 km circuit with 261 m of ascent and
-**not one metre of sealed surface** — seven tenths designated public footpath, the rest
-National Trust open-access land. It reaches 219 m on a 215 m escarpment, so it goes over the
-top rather than round the foot. Its route is drawn on the map as a line, not a pin on a start.
+Live, with **two walks on it**, both closed circuits on National Trust escarpment:
 
-The other nineteen entries in `data/queue.yml` show as hollow markers: areas awaiting survey,
-answering to the dial and to none of the other filters, because a queued area has no distance,
-ascent or surface for them to read. Each becomes a walk the first time it is surveyed, written
-up and passed by the validator, and leaves the queue layer at that point.
+| | distance | ascent | sealed | by right |
+|---|---|---|---|---|
+| Haresfield Beacon | 5.22 km | 261 m | **0.0%** | 70.2% |
+| Standish Wood | 8.01 km | 324 m | **0.6%** | 62.7% |
 
-### How that walk was made, and how the next one is
+Routes are drawn on the map as lines, not pins on a start. The remaining eighteen entries in
+`data/queue.yml` show as hollow markers: areas awaiting survey, answering to the dial and to
+none of the other filters, because a queued area has no distance, ascent or surface for them
+to read. Each becomes a walk the first time it is surveyed, written up and passed by the
+validator, and leaves the queue layer then.
+
+Standish Wood is the one that matters. The first route took a long argument with a routing
+heuristic; the second came out of the same code, on a different target, with nothing
+adjusted.
+
+### How those walks were made, and how the next one is
 
 ```bash
 # 1. Survey. Overpass + a DEM, no key, no model. Runs on Actions because that is where
-#    the open internet is: .github/workflows/survey.yml, dispatch with a target slug.
+#    the open internet is — dispatch .github/workflows/survey.yml, or put the slug in
+#    data/survey-request.txt and push, which triggers the same job.
 python scripts/survey.py --target haresfield-beacon
 
 # 2. Write. Claude reads data/surveys/<slug>.json and writes
@@ -120,6 +128,33 @@ calibration panel. Over time this tells you the one thing you actually want to k
 to trust a Waymark write-up you haven't verified.
 
 It reuses the scoring conventions from Dead Reckoning. Same idea, different question class.
+
+---
+
+## How a route is found
+
+The survey pulls every walkable way in a radius from OpenStreetMap, then looks for a circuit.
+
+Road classes are **deleted from the graph** for the first pass rather than made expensive. A
+lane left in the graph is a lane the shortest path is free to take, and one that saves two
+kilometres beats a footpath on every term a scoring function can offer; removing them means a
+walk is road-free by construction rather than by hoping. Lanes are added back only if nothing
+is found without them, capped at a quarter of the length, because a few hundred metres of lane
+is sometimes the only link between two path networks.
+
+What is left is contracted to its **junctions** — thousands of shape points become a few
+hundred places where a decision is possible — and then the question is asked directly: what
+cycles are there. Depth-first from the trailhead, pruning any branch already longer than the
+band allows, keeping every closed walk that lands inside it and scoring on how much of it is
+walkable by right. The trailhead is the nearest car park, not the queue's search centre; the
+circuit must pass the feature the target is named after, taken from a surveyed peak or trig
+point where OSM has one.
+
+Paths inside CRoW or National Trust land count as walkable by right even when the way itself
+carries no `designation`, because the right comes from the land rather than the line. Those
+boundaries are multipolygons whose member ways only close when stitched together — miss that
+and an entire estate becomes invisible, which is exactly how an escarpment common ends up
+reported as 36% by right and routed onto lanes.
 
 ---
 
