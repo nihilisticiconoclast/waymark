@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Waymark — walks from Stroud</title>
+<meta http-equiv="refresh" content="0; url=./site/">
+<link rel="canonical" href="./site/">
+
+<!--
+  This file exists because of how GitHub Pages is configured, and it should eventually be
+  deleted.
+
+  Pages has two sources. With "GitHub Actions", the pages workflow uploads the contents of
+  site/ and that becomes the site root — this file is not even in the artifact. With "Deploy
+  from a branch", GitHub runs Jekyll over the repository instead, and Jekyll turns README.md
+  into the site's index page. That is why the published site was the README: the workflow was
+  building and deploying a perfectly good artifact that nothing was serving.
+
+  So: .nojekyll stops the README becoming the index, and this redirect sends the site root to
+  the app, which lives in site/ and whose relative paths all resolve from there.
+
+  It works, but it is a workaround for a setting. The right fix is one dropdown —
+  Settings → Pages → Build and deployment → Source: GitHub Actions — and it matters beyond
+  tidiness: site/config.js is generated during the workflow and is deliberately not in the
+  repository, so under branch deployment there is no config file and no OS API key reaches
+  the page. The map still loads, on OpenTopoMap, without it.
+-->
+
+<p style="font:1rem/1.6 system-ui,sans-serif;margin:3rem">
+  Redirecting to <a href="./site/">the map</a>.
+</p>

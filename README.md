@@ -11,11 +11,26 @@ probability is scored against reality when you walk it.
 
 ---
 
+## Where the site is
+
+<https://nihilisticiconoclast.github.io/waymark/>
+
+**If that shows this README rather than a map, Pages is set to "Deploy from a branch".**
+Under that setting GitHub runs Jekyll over the repository and renders `README.md` as the
+index, while the `pages` workflow builds and deploys an artifact nothing is serving. The root
+`index.html` and `.nojekyll` in this repository work around it by redirecting to `site/`, but
+the fix is one dropdown — *Settings → Pages → Build and deployment → Source: **GitHub
+Actions***. It matters beyond tidiness: `site/config.js` is written during the workflow and is
+deliberately not committed, so under branch deployment no OS API key reaches the page.
+
+---
+
 ## Status
 
-Live, with **one walk on it**: Haresfield Beacon, a 9.52 km loop with 252 m of ascent,
-surveyed from OpenStreetMap and written up under the constraints below. Its route is drawn on
-the map — the line, not a pin on the start.
+Live, with **one walk on it**: Haresfield Beacon, a 5.22 km circuit with 261 m of ascent and
+**not one metre of sealed surface** — seven tenths designated public footpath, the rest
+National Trust open-access land. It reaches 219 m on a 215 m escarpment, so it goes over the
+top rather than round the foot. Its route is drawn on the map as a line, not a pin on a start.
 
 The other nineteen entries in `data/queue.yml` show as hollow markers: areas awaiting survey,
 answering to the dial and to none of the other filters, because a queued area has no distance,
@@ -27,7 +42,7 @@ up and passed by the validator, and leaves the queue layer at that point.
 ```bash
 # 1. Survey. Overpass + a DEM, no key, no model. Runs on Actions because that is where
 #    the open internet is: .github/workflows/survey.yml, dispatch with a target slug.
-python scripts/survey.py --target haresfield-beacon --radius-km 4
+python scripts/survey.py --target haresfield-beacon
 
 # 2. Write. Claude reads data/surveys/<slug>.json and writes
 #    data/editorial/<slug>.json, then this merges it with the surveyed facts.
@@ -43,18 +58,18 @@ mode produced the words. `author.py --api` exists only for the unattended weekly
 
 ### Next
 
-1. **The second walk.** Standish Wood is next in the queue. Dispatch the `survey` workflow,
-   then write it up. Expect to set `radius_km` — 2.5 km was too tight an extract for
-   Haresfield Beacon, and the assembler now says what it found when it cannot fit a band.
-2. **Walk it, then resolve it**, so `confidence.navigable` starts being scored. 0.55 on
-   Haresfield Beacon is a real forecast: a third of the route carries a designation, half of
-   it has no surface tag, and there is a ford of unknown depth.
-3. **The real Explorer sheet**, if you want it: an OS Data Hub key in `OS_API_KEY` and
-   `WAYMARK_BASEMAP` set to `os-leisure`. Until then the basemap is OpenTopoMap, tinted onto
+1. **Point Pages at the workflow** (see above), if it is still on branch deployment.
+2. **The second walk.** Standish Wood is next in the queue. Put its slug in
+   `data/survey-request.txt` and push, or dispatch the `survey` workflow.
+3. **Walk it, then resolve it**, so `confidence.navigable` starts being scored. 0.72 on
+   Haresfield Beacon is a real forecast: the access is well recorded, but half the route has
+   no surface tag and there is a ford of unknown depth.
+4. **The real Explorer sheet**, if you want it: an OS Data Hub key in `OS_API_KEY`, and
+   `WAYMARK_BASEMAP` set to `os-leisure` only if you have the Premium plan. Until then the basemap is OpenTopoMap, tinted onto
    cuddly-lamp's paper so it reads as a sheet rather than a generic web map. This is the one
    thing on the site that genuinely needs something from you — OS will not issue a key to
    anyone but the account holder.
-4. **`ANTHROPIC_API_KEY`**, only if you want the unattended Sunday job. Everything above
+5. **`ANTHROPIC_API_KEY`**, only if you want the unattended Sunday job. Everything above
    works without it.
 
 ---
