@@ -1,22 +1,7 @@
 {
- "count": 19,
+ "count": 18,
  "surveyed": 0,
  "targets": [
-  {
-   "slug": "standish-wood",
-   "name": "Standish Wood",
-   "lat": 51.779,
-   "lon": -2.274,
-   "crow_km": 5.5,
-   "bearing": 314,
-   "band_km": [
-    6,
-    10
-   ],
-   "priority": 2,
-   "surveyed": false,
-   "notes": null
-  },
   {
    "slug": "rodborough-common",
    "name": "Rodborough Common",

@@ -1,0 +1,33 @@
+{
+  "$comment": "Written by Claude in session against data/surveys/standish-wood.json. Proper nouns limited to facts.named_features plus data/gazetteer.txt; every number agrees with the surveyed geometry. No API call — see scripts/author.py.",
+
+  "editorial": {
+    "summary": "A circuit through Standish Wood and out along the escarpment edge, north-west of Stroud.",
+
+    "character": "Eight kilometres carrying 320 m of ascent, and the climbing arrives in two distinct doses rather than one long pull, with a steepest sustained pitch of better than one in five. Most of the route is inside the wood, which makes it a walk with the view rationed — long enclosed stretches, then the edge opens twice and the Severn Vale is suddenly a long way below. A trig point sits on the route. Beech on a limestone bench gives bare, open ground under the canopy and a floor that is loose in dry weather and slick in wet; the two named tracks, Beacon Lane and Robbers Road, are the older lines through it and are firmer than the paths that link them.",
+
+    "grain": "The wood sits on the Inferior Oolite bench above Lias clay, which is why the beech does well on the dry top while the slope below it slips and springs break out along the junction.",
+
+    "conditions": "Winter and early spring are when this is at its best: the beeches are bare, the edge is legible, and the wood is doing the thing beech woods do rather than being a green tunnel. The floor holds water badly after a wet week and the steeper linking paths will be greasy. Both viewpoints face west, so the light is an evening proposition.",
+
+    "practical": "An unnamed car park sits within 30 m of where the circuit begins, and the Haresfield Beacon and Standish Wood Car Park is about a kilometre away and does carry a fee. No toilets and no refreshment were found within reach of the route, so there is nothing to say about vegan provision either way. The land is National Trust.",
+
+    "caveats": "Just under two thirds of the length carries a public footpath or bridleway designation. A further stretch is permissive, which is a courtesy rather than a right and can be withdrawn without anything on the map changing, and the remainder is mapped but undesignated. A ford is flagged on or beside the route with nothing recorded about its depth or whether a footbridge stands alongside it. Field furniture is invisible to a survey of this kind: stiles and gates that have rotted or been replaced will not appear until they are underfoot.",
+
+    "best_months": [10, 11, 12, 1, 2, 3, 4],
+    "runnable": "mostly"
+  },
+
+  "ratings": {
+    "difficulty": 3,
+    "technicality": 2,
+    "exposure": 2,
+    "solitude": 3
+  },
+
+  "confidence": {
+    "navigable": 0.68,
+    "basis": "Nearly two thirds designated public footpath or bridleway, on National Trust land, with two named tracks carrying most of the distance. Against that: a fifth of the length is permissive and could be withdrawn, a ford is flagged with no depth information, and the circuit is machine-assembled from OSM ways and has not been walked.",
+    "resolved": null
+  }
+}
