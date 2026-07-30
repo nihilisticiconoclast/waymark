@@ -87,8 +87,11 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/surveys/.cache
-          git commit -m "cache: overpass extract for local iteration" || exit 0
+          # Everything under data/surveys, not just the cache: the payload is sitting there
+          # unstaged and `git pull --rebase` refuses to run with a dirty tree, which failed
+          # the job after the survey had already succeeded.
+          git add -f data/surveys
+          git commit -m "survey: haresfield-beacon (with extract)" || exit 0
           git pull --rebase origin main && git push
 
       - name: Summarise what was found
