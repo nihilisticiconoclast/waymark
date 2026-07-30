@@ -70,7 +70,7 @@ scripts/validate.py    the gate
 scripts/build_index.py data/walks/*.json → site/data/walks.json + queue.json
 scripts/brier.py       ledger → calibration statistics
 tests/test_pipeline.py the invariants above, as executable checks
-.claude/skills/         verify-what-ships — portable, not waymark-specific; copy it out
+.claude/skills/         installed from cuddly-lamp — see below
 site/                  the map
 site/vendor/           Leaflet + proj4, vendored on purpose — see pitfalls
 index.html, .nojekyll  Pages workaround while the source is a branch — see pitfalls
@@ -110,6 +110,30 @@ Loosening the gate requires a note in the PR explaining what class of error is n
 and why that's acceptable.
 
 Prose in docs, not bullets, where the content is argument rather than enumeration.
+
+---
+
+## Skills this repo expects
+
+Two live in cuddly-lamp, because neither is about walks and a session has no memory of the
+build that paid for them:
+
+- **`verify-what-ships`** — a green deploy is not a live site; nothing at module scope may
+  touch a CDN-loaded library; test with every external origin blocked. Both failures below
+  are from this repository.
+- **`changing-course`** — how to notice an approach is failing rather than underfit, and
+  switch. The route finder cost six slow CI rounds before being replaced by something simpler
+  that worked immediately.
+
+```bash
+for s in verify-what-ships changing-course; do
+  mkdir -p .claude/skills/$s
+  curl -fsSL https://raw.githubusercontent.com/nihilisticiconoclast/cuddly-lamp/main/.claude/skills/$s/SKILL.md \
+    -o .claude/skills/$s/SKILL.md
+done
+```
+
+Committed copies are what a cloud session sees; `~/.claude` is invisible to one.
 
 ---
 
