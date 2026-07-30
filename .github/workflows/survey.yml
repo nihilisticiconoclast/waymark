@@ -24,6 +24,10 @@ on:
       radius_km:
         description: "Override the search radius in km"
         required: false
+      commit_cache:
+        description: "Commit the raw Overpass extract so the assembler can be worked on locally"
+        required: false
+        default: "false"
 
 permissions:
   contents: write
@@ -56,6 +60,26 @@ jobs:
           if [ -n "$BAND" ]; then args+=(--band "$BAND"); fi
           if [ -n "$RADIUS" ]; then args+=(--radius-km "$RADIUS"); fi
           python scripts/survey.py "${args[@]}"
+
+      # The extract itself, so the loop assembler can be worked on without going back to
+      # Overpass for every attempt. Tuning a routing heuristic through six-minute CI runs
+      # against a rate-limited public endpoint is not debugging, it is guessing slowly. The
+      # cache is normally gitignored; this force-adds it, guarded on size, and it gets
+      # removed again once the heuristic settles.
+      - name: Publish the extract for local iteration
+        if: inputs.commit_cache == 'true'
+        run: |
+          size=$(du -sm data/surveys/.cache | cut -f1)
+          echo "extract is ${size} MB"
+          if [ "$size" -gt 60 ]; then
+            echo "::warning::extract is ${size} MB — too large to commit, skipping"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/surveys/.cache
+          git commit -m "cache: overpass extract for local iteration" || exit 0
+          git pull --rebase origin main && git push
 
       - name: Summarise what was found
         run: |
