@@ -677,8 +677,24 @@ def survey(target: dict, origin: dict) -> dict:
         print(f"  no car park within {PARK_MAX_M} m of the target; "
               "anchoring the loop to the queue centre")
 
+    # What the walk is actually about, when OSM knows. `centre` in the queue is hand-typed and
+    # only has to be close enough to search from; a peak or a trig point is a surveyed position
+    # for the feature itself. Anchoring the must-visit rule to the summit rather than to an
+    # approximate centre is the difference between a loop near a hill and a loop over it —
+    # Haresfield Beacon kept returning circuits at 21–80 m on a 215 m escarpment.
+    feature = (lat, lon)
+    for p in pois:
+        tg = p.get("tags", {})
+        if tg.get("natural") == "peak" or tg.get("man_made") == "survey_point":
+            pt = poi_point(p)
+            if pt and haversine_m(pt, (lat, lon)) <= 2000:
+                feature = pt
+                print(f"  anchoring to a surveyed {tg.get('natural') or 'trig point'}, "
+                      f"{haversine_m(pt, (lat, lon)):.0f} m from the queue centre")
+                break
+
     G = build_graph(ways, access=access)
-    loop = find_loop(G, (lat, lon), tuple(target["distance_band_km"]), start_at=start_at)
+    loop = find_loop(G, feature, tuple(target["distance_band_km"]), start_at=start_at)
     if loop is None:
         raise SystemExit(
             f"No loop found for {slug} in {target['distance_band_km']} km. "
