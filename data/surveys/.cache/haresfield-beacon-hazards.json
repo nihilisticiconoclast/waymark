@@ -1,0 +1,1875 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-07-30T19:53:36Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 12376311823,
+  "lat": 51.7693933,
+  "lon": -2.2663711,
+  "tags": {
+    "ford": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 3397761,
+  "bounds": {
+    "minlat": 51.7171487,
+    "minlon": -2.3696257,
+    "maxlat": 51.8304889,
+    "maxlon": -2.2071325
+  },
+  "geometry": [
+    { "lat": 51.8304889, "lon": -2.2071325 },
+    { "lat": 51.8297570, "lon": -2.2079660 },
+    { "lat": 51.8288397, "lon": -2.2091062 },
+    { "lat": 51.8281533, "lon": -2.2100703 },
+    { "lat": 51.8266253, "lon": -2.2123496 },
+    { "lat": 51.8249245, "lon": -2.2154717 },
+    { "lat": 51.8222095, "lon": -2.2206424 },
+    { "lat": 51.8219036, "lon": -2.2211832 },
+    { "lat": 51.8208618, "lon": -2.2231337 },
+    { "lat": 51.8200152, "lon": -2.2247498 },
+    { "lat": 51.8182987, "lon": -2.2279763 },
+    { "lat": 51.8166315, "lon": -2.2310875 },
+    { "lat": 51.8155569, "lon": -2.2331419 },
+    { "lat": 51.8137984, "lon": -2.2364077 },
+    { "lat": 51.8122353, "lon": -2.2392522 },
+    { "lat": 51.8109981, "lon": -2.2418859 },
+    { "lat": 51.8099559, "lon": -2.2442036 },
+    { "lat": 51.8091092, "lon": -2.2462579 },
+    { "lat": 51.8081635, "lon": -2.2487521 },
+    { "lat": 51.8074951, "lon": -2.2506918 },
+    { "lat": 51.8068741, "lon": -2.2527039 },
+    { "lat": 51.8062023, "lon": -2.2551513 },
+    { "lat": 51.8055578, "lon": -2.2578249 },
+    { "lat": 51.8051018, "lon": -2.2600297 },
+    { "lat": 51.8045494, "lon": -2.2629558 },
+    { "lat": 51.8040473, "lon": -2.2658530 },
+    { "lat": 51.8035673, "lon": -2.2685920 },
+    { "lat": 51.8029539, "lon": -2.2720837 },
+    { "lat": 51.8023392, "lon": -2.2756273 },
+    { "lat": 51.8018686, "lon": -2.2783015 },
+    { "lat": 51.8015622, "lon": -2.2798260 },
+    { "lat": 51.8012210, "lon": -2.2811561 },
+    { "lat": 51.8007323, "lon": -2.2827638 },
+    { "lat": 51.8002931, "lon": -2.2840853 },
+    { "lat": 51.7998681, "lon": -2.2851930 },
+    { "lat": 51.7993069, "lon": -2.2864488 },
+    { "lat": 51.7988996, "lon": -2.2872675 },
+    { "lat": 51.7984967, "lon": -2.2880191 },
+    { "lat": 51.7981131, "lon": -2.2886853 },
+    { "lat": 51.7976087, "lon": -2.2894676 },
+    { "lat": 51.7968247, "lon": -2.2905806 },
+    { "lat": 51.7959851, "lon": -2.2916427 },
+    { "lat": 51.7951929, "lon": -2.2924756 },
+    { "lat": 51.7931999, "lon": -2.2944328 },
+    { "lat": 51.7916226, "lon": -2.2959697 },
+    { "lat": 51.7903799, "lon": -2.2971418 },
+    { "lat": 51.7888244, "lon": -2.2986951 },
+    { "lat": 51.7870885, "lon": -2.3003747 },
+    { "lat": 51.7840181, "lon": -2.3033480 },
+    { "lat": 51.7822373, "lon": -2.3051310 },
+    { "lat": 51.7808261, "lon": -2.3064211 },
+    { "lat": 51.7802112, "lon": -2.3069313 },
+    { "lat": 51.7794525, "lon": -2.3075088 },
+    { "lat": 51.7785061, "lon": -2.3081648 },
+    { "lat": 51.7766309, "lon": -2.3092612 },
+    { "lat": 51.7743205, "lon": -2.3103166 },
+    { "lat": 51.7711847, "lon": -2.3116274 },
+    { "lat": 51.7695210, "lon": -2.3124547 },
+    { "lat": 51.7685757, "lon": -2.3130341 },
+    { "lat": 51.7676355, "lon": -2.3136817 },
+    { "lat": 51.7666902, "lon": -2.3143665 },
+    { "lat": 51.7655492, "lon": -2.3154200 },
+    { "lat": 51.7644734, "lon": -2.3165788 },
+    { "lat": 51.7636079, "lon": -2.3175585 },
+    { "lat": 51.7628108, "lon": -2.3185805 },
+    { "lat": 51.7605006, "lon": -2.3215270 },
+    { "lat": 51.7595755, "lon": -2.3227166 },
+    { "lat": 51.7579136, "lon": -2.3248238 },
+    { "lat": 51.7574572, "lon": -2.3254164 },
+    { "lat": 51.7564957, "lon": -2.3266356 },
+    { "lat": 51.7559981, "lon": -2.3273012 },
+    { "lat": 51.7552626, "lon": -2.3282310 },
+    { "lat": 51.7542858, "lon": -2.3294315 },
+    { "lat": 51.7533886, "lon": -2.3305377 },
+    { "lat": 51.7524316, "lon": -2.3316253 },
+    { "lat": 51.7509436, "lon": -2.3331544 },
+    { "lat": 51.7495311, "lon": -2.3343724 },
+    { "lat": 51.7478122, "lon": -2.3357525 },
+    { "lat": 51.7465403, "lon": -2.3365953 },
+    { "lat": 51.7429112, "lon": -2.3390231 },
+    { "lat": 51.7401514, "lon": -2.3408725 },
+    { "lat": 51.7387784, "lon": -2.3418101 },
+    { "lat": 51.7353410, "lon": -2.3441067 },
+    { "lat": 51.7323633, "lon": -2.3461504 },
+    { "lat": 51.7302950, "lon": -2.3475516 },
+    { "lat": 51.7288505, "lon": -2.3484731 },
+    { "lat": 51.7275484, "lon": -2.3494407 },
+    { "lat": 51.7264486, "lon": -2.3504487 },
+    { "lat": 51.7247966, "lon": -2.3523831 },
+    { "lat": 51.7242144, "lon": -2.3532017 },
+    { "lat": 51.7233489, "lon": -2.3545574 },
+    { "lat": 51.7225674, "lon": -2.3560508 },
+    { "lat": 51.7219019, "lon": -2.3574558 },
+    { "lat": 51.7211408, "lon": -2.3593767 },
+    { "lat": 51.7203521, "lon": -2.3617341 },
+    { "lat": 51.7201773, "lon": -2.3622666 },
+    { "lat": 51.7191433, "lon": -2.3653712 },
+    { "lat": 51.7185532, "lon": -2.3668833 },
+    { "lat": 51.7177959, "lon": -2.3684848 },
+    { "lat": 51.7171487, "lon": -2.3696257 }
+  ],
+  "tags": {
+    "active_traffic_management": "no",
+    "carriageway_ref": "A",
+    "highway": "motorway",
+    "lanes": "3",
+    "lit": "no",
+    "maxheight": "default",
+    "maxheight:signed": "no",
+    "maxspeed": "70 mph",
+    "maxspeed:type": "GB:motorway",
+    "maxspeed:variable": "no",
+    "national_highways:area": "2",
+    "oneway": "yes",
+    "operator": "National Highways",
+    "operator:wikidata": "Q5760006",
+    "ref": "M5",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 3397764,
+  "bounds": {
+    "minlat": 51.7559296,
+    "minlon": -2.3276575,
+    "maxlat": 51.8305795,
+    "maxlon": -2.2073132
+  },
+  "geometry": [
+    { "lat": 51.7559296, "lon": -2.3276575 },
+    { "lat": 51.7575596, "lon": -2.3256110 },
+    { "lat": 51.7580360, "lon": -2.3249976 },
+    { "lat": 51.7596584, "lon": -2.3228979 },
+    { "lat": 51.7605058, "lon": -2.3218268 },
+    { "lat": 51.7608521, "lon": -2.3213815 },
+    { "lat": 51.7620561, "lon": -2.3198428 },
+    { "lat": 51.7629412, "lon": -2.3187385 },
+    { "lat": 51.7636910, "lon": -2.3177903 },
+    { "lat": 51.7645386, "lon": -2.3167895 },
+    { "lat": 51.7656144, "lon": -2.3156307 },
+    { "lat": 51.7667435, "lon": -2.3145979 },
+    { "lat": 51.7676614, "lon": -2.3139234 },
+    { "lat": 51.7686134, "lon": -2.3132603 },
+    { "lat": 51.7695417, "lon": -2.3127016 },
+    { "lat": 51.7712571, "lon": -2.3118433 },
+    { "lat": 51.7744116, "lon": -2.3105212 },
+    { "lat": 51.7767256, "lon": -2.3094677 },
+    { "lat": 51.7785698, "lon": -2.3083874 },
+    { "lat": 51.7795341, "lon": -2.3076877 },
+    { "lat": 51.7803225, "lon": -2.3070928 },
+    { "lat": 51.7809313, "lon": -2.3065837 },
+    { "lat": 51.7822621, "lon": -2.3053859 },
+    { "lat": 51.7841247, "lon": -2.3035494 },
+    { "lat": 51.7872194, "lon": -2.3005130 },
+    { "lat": 51.7885577, "lon": -2.2992280 },
+    { "lat": 51.7890233, "lon": -2.2987809 },
+    { "lat": 51.7904621, "lon": -2.2973751 },
+    { "lat": 51.7917809, "lon": -2.2961410 },
+    { "lat": 51.7933773, "lon": -2.2945607 },
+    { "lat": 51.7952498, "lon": -2.2927129 },
+    { "lat": 51.7960524, "lon": -2.2918501 },
+    { "lat": 51.7969295, "lon": -2.2907546 },
+    { "lat": 51.7976993, "lon": -2.2896482 },
+    { "lat": 51.7982267, "lon": -2.2888075 },
+    { "lat": 51.7985987, "lon": -2.2881706 },
+    { "lat": 51.7990105, "lon": -2.2874078 },
+    { "lat": 51.7994159, "lon": -2.2865997 },
+    { "lat": 51.7999819, "lon": -2.2853195 },
+    { "lat": 51.8004006, "lon": -2.2842641 },
+    { "lat": 51.8009026, "lon": -2.2828944 },
+    { "lat": 51.8013821, "lon": -2.2812185 },
+    { "lat": 51.8017299, "lon": -2.2798863 },
+    { "lat": 51.8020563, "lon": -2.2782991 },
+    { "lat": 51.8024954, "lon": -2.2757580 },
+    { "lat": 51.8031180, "lon": -2.2722266 },
+    { "lat": 51.8037148, "lon": -2.2686474 },
+    { "lat": 51.8042116, "lon": -2.2658530 },
+    { "lat": 51.8047205, "lon": -2.2629535 },
+    { "lat": 51.8052796, "lon": -2.2599644 },
+    { "lat": 51.8057280, "lon": -2.2578346 },
+    { "lat": 51.8063720, "lon": -2.2552433 },
+    { "lat": 51.8070370, "lon": -2.2528203 },
+    { "lat": 51.8076436, "lon": -2.2508406 },
+    { "lat": 51.8082950, "lon": -2.2488916 },
+    { "lat": 51.8092069, "lon": -2.2464159 },
+    { "lat": 51.8100624, "lon": -2.2443516 },
+    { "lat": 51.8111284, "lon": -2.2420439 },
+    { "lat": 51.8123656, "lon": -2.2395155 },
+    { "lat": 51.8139287, "lon": -2.2365657 },
+    { "lat": 51.8156871, "lon": -2.2332999 },
+    { "lat": 51.8165574, "lon": -2.2316440 },
+    { "lat": 51.8183909, "lon": -2.2281518 },
+    { "lat": 51.8199946, "lon": -2.2251611 },
+    { "lat": 51.8209865, "lon": -2.2232700 },
+    { "lat": 51.8214502, "lon": -2.2224007 },
+    { "lat": 51.8220150, "lon": -2.2213442 },
+    { "lat": 51.8222995, "lon": -2.2208176 },
+    { "lat": 51.8225900, "lon": -2.2202820 },
+    { "lat": 51.8250161, "lon": -2.2157162 },
+    { "lat": 51.8258736, "lon": -2.2141099 },
+    { "lat": 51.8267736, "lon": -2.2125232 },
+    { "lat": 51.8282436, "lon": -2.2102482 },
+    { "lat": 51.8289523, "lon": -2.2092974 },
+    { "lat": 51.8298378, "lon": -2.2081493 },
+    { "lat": 51.8305795, "lon": -2.2073132 }
+  ],
+  "tags": {
+    "active_traffic_management": "no",
+    "carriageway_ref": "B",
+    "highway": "motorway",
+    "lanes": "3",
+    "lit": "no",
+    "maxheight": "default",
+    "maxheight:signed": "no",
+    "maxspeed": "70 mph",
+    "maxspeed:type": "GB:motorway",
+    "maxspeed:variable": "no",
+    "national_highways:area": "2",
+    "oneway": "yes",
+    "operator": "National Highways",
+    "operator:wikidata": "Q5760006",
+    "ref": "M5",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 3994328,
+  "bounds": {
+    "minlat": 51.8058629,
+    "minlon": -2.2899600,
+    "maxlat": 51.8059374,
+    "maxlon": -2.2893508
+  },
+  "geometry": [
+    { "lat": 51.8058629, "lon": -2.2899600 },
+    { "lat": 51.8059067, "lon": -2.2898604 },
+    { "lat": 51.8059321, "lon": -2.2897454 },
+    { "lat": 51.8059374, "lon": -2.2896236 },
+    { "lat": 51.8059221, "lon": -2.2895040 },
+    { "lat": 51.8058874, "lon": -2.2893955 },
+    { "lat": 51.8058651, "lon": -2.2893508 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "2",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 3994333,
+  "bounds": {
+    "minlat": 51.8058874,
+    "minlon": -2.2894629,
+    "maxlat": 51.8146254,
+    "maxlon": -2.2796826
+  },
+  "geometry": [
+    { "lat": 51.8146254, "lon": -2.2796826 },
+    { "lat": 51.8145116, "lon": -2.2798294 },
+    { "lat": 51.8144304, "lon": -2.2799743 },
+    { "lat": 51.8142390, "lon": -2.2803248 },
+    { "lat": 51.8141070, "lon": -2.2805536 },
+    { "lat": 51.8139665, "lon": -2.2807477 },
+    { "lat": 51.8137987, "lon": -2.2809559 },
+    { "lat": 51.8129812, "lon": -2.2817593 },
+    { "lat": 51.8124239, "lon": -2.2823775 },
+    { "lat": 51.8118318, "lon": -2.2830624 },
+    { "lat": 51.8111387, "lon": -2.2840136 },
+    { "lat": 51.8104390, "lon": -2.2850240 },
+    { "lat": 51.8100177, "lon": -2.2856230 },
+    { "lat": 51.8099439, "lon": -2.2857197 },
+    { "lat": 51.8098652, "lon": -2.2858228 },
+    { "lat": 51.8097448, "lon": -2.2859806 },
+    { "lat": 51.8096164, "lon": -2.2861487 },
+    { "lat": 51.8093721, "lon": -2.2864459 },
+    { "lat": 51.8092418, "lon": -2.2866043 },
+    { "lat": 51.8092217, "lon": -2.2866288 },
+    { "lat": 51.8088122, "lon": -2.2870974 },
+    { "lat": 51.8082748, "lon": -2.2876319 },
+    { "lat": 51.8077358, "lon": -2.2881201 },
+    { "lat": 51.8075009, "lon": -2.2883249 },
+    { "lat": 51.8070391, "lon": -2.2887211 },
+    { "lat": 51.8062159, "lon": -2.2894187 },
+    { "lat": 51.8061449, "lon": -2.2894580 },
+    { "lat": 51.8060642, "lon": -2.2894629 },
+    { "lat": 51.8059862, "lon": -2.2894413 },
+    { "lat": 51.8058874, "lon": -2.2893955 }
+  ],
+  "tags": {
+    "dual_carriageway": "yes",
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 3994334,
+  "bounds": {
+    "minlat": 51.8064213,
+    "minlon": -2.2894390,
+    "maxlat": 51.8097807,
+    "maxlon": -2.2861885
+  },
+  "geometry": [
+    { "lat": 51.8064213, "lon": -2.2894390 },
+    { "lat": 51.8068308, "lon": -2.2890935 },
+    { "lat": 51.8073996, "lon": -2.2885962 },
+    { "lat": 51.8077675, "lon": -2.2882806 },
+    { "lat": 51.8081693, "lon": -2.2879545 },
+    { "lat": 51.8085785, "lon": -2.2875323 },
+    { "lat": 51.8089173, "lon": -2.2871763 },
+    { "lat": 51.8093197, "lon": -2.2867283 },
+    { "lat": 51.8096297, "lon": -2.2863753 },
+    { "lat": 51.8097807, "lon": -2.2861885 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 3994335,
+  "bounds": {
+    "minlat": 51.7774788,
+    "minlon": -2.3196271,
+    "maxlat": 51.7800326,
+    "maxlon": -2.3175969
+  },
+  "geometry": [
+    { "lat": 51.7774788, "lon": -2.3196271 },
+    { "lat": 51.7789268, "lon": -2.3186752 },
+    { "lat": 51.7800326, "lon": -2.3175969 }
+  ],
+  "tags": {
+    "cycleway:both": "lane",
+    "cycleway:lane": "advisory",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 4235364,
+  "bounds": {
+    "minlat": 51.7984324,
+    "minlon": -2.2890457,
+    "maxlat": 51.7988654,
+    "maxlon": -2.2888787
+  },
+  "geometry": [
+    { "lat": 51.7988654, "lon": -2.2890457 },
+    { "lat": 51.7988286, "lon": -2.2889968 },
+    { "lat": 51.7987992, "lon": -2.2889623 },
+    { "lat": 51.7987612, "lon": -2.2889201 },
+    { "lat": 51.7987272, "lon": -2.2888971 },
+    { "lat": 51.7986736, "lon": -2.2888846 },
+    { "lat": 51.7986189, "lon": -2.2888787 },
+    { "lat": 51.7985463, "lon": -2.2888787 },
+    { "lat": 51.7984324, "lon": -2.2888802 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 4235365,
+  "bounds": {
+    "minlat": 51.7987555,
+    "minlon": -2.2893537,
+    "maxlat": 51.7990411,
+    "maxlon": -2.2893375
+  },
+  "geometry": [
+    { "lat": 51.7987555, "lon": -2.2893489 },
+    { "lat": 51.7987961, "lon": -2.2893507 },
+    { "lat": 51.7988395, "lon": -2.2893468 },
+    { "lat": 51.7989021, "lon": -2.2893375 },
+    { "lat": 51.7989747, "lon": -2.2893375 },
+    { "lat": 51.7990411, "lon": -2.2893537 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "70 mph",
+    "maxspeed:type": "GB:nsl_dual",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 4235366,
+  "bounds": {
+    "minlat": 51.7988654,
+    "minlon": -2.2893798,
+    "maxlat": 51.8011394,
+    "maxlon": -2.2890457
+  },
+  "geometry": [
+    { "lat": 51.8011394, "lon": -2.2893798 },
+    { "lat": 51.8009846, "lon": -2.2893698 },
+    { "lat": 51.7999343, "lon": -2.2893139 },
+    { "lat": 51.7996126, "lon": -2.2892968 },
+    { "lat": 51.7992874, "lon": -2.2892560 },
+    { "lat": 51.7991805, "lon": -2.2892543 },
+    { "lat": 51.7991105, "lon": -2.2892472 },
+    { "lat": 51.7990724, "lon": -2.2892337 },
+    { "lat": 51.7990318, "lon": -2.2892151 },
+    { "lat": 51.7989923, "lon": -2.2891905 },
+    { "lat": 51.7989571, "lon": -2.2891588 },
+    { "lat": 51.7989255, "lon": -2.2891238 },
+    { "lat": 51.7988654, "lon": -2.2890457 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "70 mph",
+    "maxspeed:type": "GB:nsl_dual",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 8136127,
+  "bounds": {
+    "minlat": 51.7984324,
+    "minlon": -2.2893318,
+    "maxlat": 51.7987052,
+    "maxlon": -2.2888802
+  },
+  "geometry": [
+    { "lat": 51.7984324, "lon": -2.2888802 },
+    { "lat": 51.7984980, "lon": -2.2889732 },
+    { "lat": 51.7985438, "lon": -2.2890394 },
+    { "lat": 51.7985740, "lon": -2.2890848 },
+    { "lat": 51.7986345, "lon": -2.2892081 },
+    { "lat": 51.7986690, "lon": -2.2892813 },
+    { "lat": 51.7987052, "lon": -2.2893318 }
+  ],
+  "tags": {
+    "destination:lanes": "GLOS|North",
+    "destination:ref": "B4008|M5",
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 8136128,
+  "bounds": {
+    "minlat": 51.7974899,
+    "minlon": -2.2886104,
+    "maxlat": 51.7979262,
+    "maxlon": -2.2884922
+  },
+  "geometry": [
+    { "lat": 51.7974899, "lon": -2.2884922 },
+    { "lat": 51.7975208, "lon": -2.2885441 },
+    { "lat": 51.7975544, "lon": -2.2885791 },
+    { "lat": 51.7975902, "lon": -2.2886022 },
+    { "lat": 51.7976284, "lon": -2.2886104 },
+    { "lat": 51.7976775, "lon": -2.2886047 },
+    { "lat": 51.7977293, "lon": -2.2885896 },
+    { "lat": 51.7977809, "lon": -2.2885783 },
+    { "lat": 51.7978267, "lon": -2.2885696 },
+    { "lat": 51.7978651, "lon": -2.2885702 },
+    { "lat": 51.7978998, "lon": -2.2885796 },
+    { "lat": 51.7979262, "lon": -2.2885882 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 9584471,
+  "bounds": {
+    "minlat": 51.7975988,
+    "minlon": -2.2885110,
+    "maxlat": 51.7979503,
+    "maxlon": -2.2880474
+  },
+  "geometry": [
+    { "lat": 51.7979503, "lon": -2.2885110 },
+    { "lat": 51.7978668, "lon": -2.2884009 },
+    { "lat": 51.7978328, "lon": -2.2883423 },
+    { "lat": 51.7978076, "lon": -2.2882867 },
+    { "lat": 51.7977825, "lon": -2.2882219 },
+    { "lat": 51.7977480, "lon": -2.2881383 },
+    { "lat": 51.7977177, "lon": -2.2880911 },
+    { "lat": 51.7976785, "lon": -2.2880610 },
+    { "lat": 51.7976297, "lon": -2.2880474 },
+    { "lat": 51.7975988, "lon": -2.2880545 }
+  ],
+  "tags": {
+    "destination:lanes": "None|South|South",
+    "destination:ref": "B4008|M5|M5",
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 9631694,
+  "bounds": {
+    "minlat": 51.7980452,
+    "minlon": -2.2888643,
+    "maxlat": 51.7983992,
+    "maxlon": -2.2886346
+  },
+  "geometry": [
+    { "lat": 51.7983992, "lon": -2.2888643 },
+    { "lat": 51.7980452, "lon": -2.2886346 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "highway": "trunk",
+    "lanes": "3",
+    "layer": "1",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "no",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 13846373,
+  "bounds": {
+    "minlat": 51.7724035,
+    "minlon": -2.3231892,
+    "maxlat": 51.7746201,
+    "maxlon": -2.3217242
+  },
+  "geometry": [
+    { "lat": 51.7724035, "lon": -2.3231892 },
+    { "lat": 51.7729964, "lon": -2.3227566 },
+    { "lat": 51.7732127, "lon": -2.3226249 },
+    { "lat": 51.7736932, "lon": -2.3223323 },
+    { "lat": 51.7746201, "lon": -2.3217242 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 13846377,
+  "bounds": {
+    "minlat": 51.7751198,
+    "minlon": -2.3212304,
+    "maxlat": 51.7774788,
+    "maxlon": -2.3196271
+  },
+  "geometry": [
+    { "lat": 51.7774788, "lon": -2.3196271 },
+    { "lat": 51.7768703, "lon": -2.3199750 },
+    { "lat": 51.7768188, "lon": -2.3200045 },
+    { "lat": 51.7761442, "lon": -2.3204719 },
+    { "lat": 51.7758284, "lon": -2.3206908 },
+    { "lat": 51.7754642, "lon": -2.3209431 },
+    { "lat": 51.7751198, "lon": -2.3212304 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 13846380,
+  "bounds": {
+    "minlat": 51.7716063,
+    "minlon": -2.3237707,
+    "maxlat": 51.7724008,
+    "maxlon": -2.3230344
+  },
+  "geometry": [
+    { "lat": 51.7724008, "lon": -2.3230344 },
+    { "lat": 51.7720519, "lon": -2.3233371 },
+    { "lat": 51.7718137, "lon": -2.3235645 },
+    { "lat": 51.7716063, "lon": -2.3237707 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "lanes": "1",
+    "maxspeed": "40 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "sidewalk": "no",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 38966114,
+  "bounds": {
+    "minlat": 51.7840900,
+    "minlon": -2.3148473,
+    "maxlat": 51.7842226,
+    "maxlon": -2.3147448
+  },
+  "geometry": [
+    { "lat": 51.7840900, "lon": -2.3148473 },
+    { "lat": 51.7842226, "lon": -2.3147448 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "bridge:name": "Putloe Bridge",
+    "cycleway:both": "no",
+    "highway": "primary",
+    "layer": "1",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 38966115,
+  "bounds": {
+    "minlat": 51.7952693,
+    "minlon": -2.3050558,
+    "maxlat": 51.7958322,
+    "maxlon": -2.3043404
+  },
+  "geometry": [
+    { "lat": 51.7952693, "lon": -2.3050558 },
+    { "lat": 51.7957725, "lon": -2.3044155 },
+    { "lat": 51.7958322, "lon": -2.3043404 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 106295538,
+  "bounds": {
+    "minlat": 51.8055506,
+    "minlon": -2.2905331,
+    "maxlat": 51.8057535,
+    "maxlon": -2.2900637
+  },
+  "geometry": [
+    { "lat": 51.8055506, "lon": -2.2900637 },
+    { "lat": 51.8056274, "lon": -2.2902274 },
+    { "lat": 51.8056719, "lon": -2.2903115 },
+    { "lat": 51.8057535, "lon": -2.2905331 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "1",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 106295544,
+  "bounds": {
+    "minlat": 51.8057535,
+    "minlon": -2.2905331,
+    "maxlat": 51.8058060,
+    "maxlon": -2.2900349
+  },
+  "geometry": [
+    { "lat": 51.8057535, "lon": -2.2905331 },
+    { "lat": 51.8058060, "lon": -2.2900349 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 667040194,
+  "bounds": {
+    "minlat": 51.8050145,
+    "minlon": -2.2892206,
+    "maxlat": 51.8056154,
+    "maxlon": -2.2891863
+  },
+  "geometry": [
+    { "lat": 51.8056154, "lon": -2.2892121 },
+    { "lat": 51.8055043, "lon": -2.2891863 },
+    { "lat": 51.8052569, "lon": -2.2891924 },
+    { "lat": 51.8050145, "lon": -2.2892206 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 667040195,
+  "bounds": {
+    "minlat": 51.8036413,
+    "minlon": -2.2896132,
+    "maxlat": 51.8050278,
+    "maxlon": -2.2893955
+  },
+  "geometry": [
+    { "lat": 51.8036413, "lon": -2.2896132 },
+    { "lat": 51.8039346, "lon": -2.2895886 },
+    { "lat": 51.8042258, "lon": -2.2895427 },
+    { "lat": 51.8049488, "lon": -2.2894058 },
+    { "lat": 51.8050278, "lon": -2.2893955 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "3",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 691903050,
+  "bounds": {
+    "minlat": 51.7987555,
+    "minlon": -2.2893489,
+    "maxlat": 51.7988654,
+    "maxlon": -2.2890457
+  },
+  "geometry": [
+    { "lat": 51.7987555, "lon": -2.2893489 },
+    { "lat": 51.7987960, "lon": -2.2892990 },
+    { "lat": 51.7988228, "lon": -2.2892563 },
+    { "lat": 51.7988378, "lon": -2.2892222 },
+    { "lat": 51.7988528, "lon": -2.2891537 },
+    { "lat": 51.7988587, "lon": -2.2891139 },
+    { "lat": 51.7988654, "lon": -2.2890457 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 691903051,
+  "bounds": {
+    "minlat": 51.7974881,
+    "minlon": -2.2884922,
+    "maxlat": 51.7975988,
+    "maxlon": -2.2880545
+  },
+  "geometry": [
+    { "lat": 51.7975988, "lon": -2.2880545 },
+    { "lat": 51.7975534, "lon": -2.2881105 },
+    { "lat": 51.7975215, "lon": -2.2881701 },
+    { "lat": 51.7974945, "lon": -2.2882843 },
+    { "lat": 51.7974881, "lon": -2.2884843 },
+    { "lat": 51.7974899, "lon": -2.2884922 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 698323598,
+  "bounds": {
+    "minlat": 51.8052934,
+    "minlon": -2.2921144,
+    "maxlat": 51.8055433,
+    "maxlon": -2.2914273
+  },
+  "geometry": [
+    { "lat": 51.8052934, "lon": -2.2921144 },
+    { "lat": 51.8055433, "lon": -2.2914273 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 698323599,
+  "bounds": {
+    "minlat": 51.8055433,
+    "minlon": -2.2914273,
+    "maxlat": 51.8056797,
+    "maxlon": -2.2910251
+  },
+  "geometry": [
+    { "lat": 51.8055433, "lon": -2.2914273 },
+    { "lat": 51.8056002, "lon": -2.2912604 },
+    { "lat": 51.8056797, "lon": -2.2910251 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lanes:backward": "2",
+    "lanes:forward": "1",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "turn:lanes:backward": "through|right"
+  }
+},
+{
+  "type": "way",
+  "id": 698323600,
+  "bounds": {
+    "minlat": 51.8056797,
+    "minlon": -2.2910251,
+    "maxlat": 51.8057564,
+    "maxlon": -2.2905331
+  },
+  "geometry": [
+    { "lat": 51.8056797, "lon": -2.2910251 },
+    { "lat": 51.8057407, "lon": -2.2908077 },
+    { "lat": 51.8057564, "lon": -2.2906705 },
+    { "lat": 51.8057535, "lon": -2.2905331 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 698323602,
+  "bounds": {
+    "minlat": 51.8051342,
+    "minlon": -2.2925745,
+    "maxlat": 51.8052934,
+    "maxlon": -2.2921144
+  },
+  "geometry": [
+    { "lat": 51.8051342, "lon": -2.2925745 },
+    { "lat": 51.8052934, "lon": -2.2921144 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lanes:backward": "2",
+    "lanes:forward": "1",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "turn:lanes:backward": "through|right"
+  }
+},
+{
+  "type": "way",
+  "id": 698330699,
+  "bounds": {
+    "minlat": 51.8050278,
+    "minlon": -2.2897433,
+    "maxlat": 51.8053902,
+    "maxlon": -2.2893955
+  },
+  "geometry": [
+    { "lat": 51.8050278, "lon": -2.2893955 },
+    { "lat": 51.8050964, "lon": -2.2894059 },
+    { "lat": 51.8051498, "lon": -2.2894286 },
+    { "lat": 51.8052025, "lon": -2.2894571 },
+    { "lat": 51.8052753, "lon": -2.2895495 },
+    { "lat": 51.8053902, "lon": -2.2897433 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 700400415,
+  "bounds": {
+    "minlat": 51.7951410,
+    "minlon": -2.3052110,
+    "maxlat": 51.7952693,
+    "maxlon": -2.3050558
+  },
+  "geometry": [
+    { "lat": 51.7951410, "lon": -2.3052110 },
+    { "lat": 51.7952693, "lon": -2.3050558 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lanes:backward": "1",
+    "lanes:forward": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "turn:lanes:forward": "through|right"
+  }
+},
+{
+  "type": "way",
+  "id": 700400416,
+  "bounds": {
+    "minlat": 51.7914532,
+    "minlon": -2.3093436,
+    "maxlat": 51.7928571,
+    "maxlon": -2.3079489
+  },
+  "geometry": [
+    { "lat": 51.7914532, "lon": -2.3093436 },
+    { "lat": 51.7918757, "lon": -2.3089924 },
+    { "lat": 51.7923504, "lon": -2.3085193 },
+    { "lat": 51.7924511, "lon": -2.3084189 },
+    { "lat": 51.7928571, "lon": -2.3079489 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 700400417,
+  "bounds": {
+    "minlat": 51.7911899,
+    "minlon": -2.3095625,
+    "maxlat": 51.7914532,
+    "maxlon": -2.3093436
+  },
+  "geometry": [
+    { "lat": 51.7911899, "lon": -2.3095625 },
+    { "lat": 51.7912730, "lon": -2.3094934 },
+    { "lat": 51.7914532, "lon": -2.3093436 }
+  ],
+  "tags": {
+    "highway": "primary",
+    "lanes": "3",
+    "lanes:backward": "2",
+    "lanes:forward": "1",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "turn:lanes:backward": "through|right"
+  }
+},
+{
+  "type": "way",
+  "id": 700400418,
+  "bounds": {
+    "minlat": 51.7842226,
+    "minlon": -2.3147448,
+    "maxlat": 51.7847315,
+    "maxlon": -2.3143495
+  },
+  "geometry": [
+    { "lat": 51.7842226, "lon": -2.3147448 },
+    { "lat": 51.7847315, "lon": -2.3143495 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 902612814,
+  "bounds": {
+    "minlat": 51.8037662,
+    "minlon": -2.2894149,
+    "maxlat": 51.8050145,
+    "maxlon": -2.2892206
+  },
+  "geometry": [
+    { "lat": 51.8050145, "lon": -2.2892206 },
+    { "lat": 51.8040457, "lon": -2.2893885 },
+    { "lat": 51.8037662, "lon": -2.2894149 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 902612815,
+  "bounds": {
+    "minlat": 51.8026394,
+    "minlon": -2.2894625,
+    "maxlat": 51.8037662,
+    "maxlon": -2.2894149
+  },
+  "geometry": [
+    { "lat": 51.8037662, "lon": -2.2894149 },
+    { "lat": 51.8031816, "lon": -2.2894625 },
+    { "lat": 51.8026394, "lon": -2.2894453 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "3",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703223,
+  "bounds": {
+    "minlat": 51.7712691,
+    "minlon": -2.3243238,
+    "maxlat": 51.7724035,
+    "maxlon": -2.3231892
+  },
+  "geometry": [
+    { "lat": 51.7712691, "lon": -2.3243238 },
+    { "lat": 51.7717431, "lon": -2.3237873 },
+    { "lat": 51.7721083, "lon": -2.3234306 },
+    { "lat": 51.7724035, "lon": -2.3231892 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "lanes": "1",
+    "maxspeed": "40 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703224,
+  "bounds": {
+    "minlat": 51.7724008,
+    "minlon": -2.3230344,
+    "maxlat": 51.7729768,
+    "maxlon": -2.3226062
+  },
+  "geometry": [
+    { "lat": 51.7729768, "lon": -2.3226062 },
+    { "lat": 51.7724008, "lon": -2.3230344 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703442,
+  "bounds": {
+    "minlat": 51.7746201,
+    "minlon": -2.3217242,
+    "maxlat": 51.7774788,
+    "maxlon": -2.3196271
+  },
+  "geometry": [
+    { "lat": 51.7746201, "lon": -2.3217242 },
+    { "lat": 51.7755281, "lon": -2.3211387 },
+    { "lat": 51.7758842, "lon": -2.3208941 },
+    { "lat": 51.7761985, "lon": -2.3206781 },
+    { "lat": 51.7768841, "lon": -2.3202070 },
+    { "lat": 51.7774788, "lon": -2.3196271 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703443,
+  "bounds": {
+    "minlat": 51.7729768,
+    "minlon": -2.3226062,
+    "maxlat": 51.7751198,
+    "maxlon": -2.3212304
+  },
+  "geometry": [
+    { "lat": 51.7751198, "lon": -2.3212304 },
+    { "lat": 51.7741339, "lon": -2.3217922 },
+    { "lat": 51.7736446, "lon": -2.3220977 },
+    { "lat": 51.7734398, "lon": -2.3222283 },
+    { "lat": 51.7732447, "lon": -2.3223527 },
+    { "lat": 51.7729768, "lon": -2.3226062 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "oneway": "yes",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703444,
+  "bounds": {
+    "minlat": 51.7800326,
+    "minlon": -2.3175969,
+    "maxlat": 51.7840900,
+    "maxlon": -2.3148473
+  },
+  "geometry": [
+    { "lat": 51.7800326, "lon": -2.3175969 },
+    { "lat": 51.7806892, "lon": -2.3170345 },
+    { "lat": 51.7812060, "lon": -2.3165533 },
+    { "lat": 51.7813722, "lon": -2.3164659 },
+    { "lat": 51.7821620, "lon": -2.3160505 },
+    { "lat": 51.7824583, "lon": -2.3158833 },
+    { "lat": 51.7832353, "lon": -2.3154449 },
+    { "lat": 51.7837846, "lon": -2.3150868 },
+    { "lat": 51.7840900, "lon": -2.3148473 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703469,
+  "bounds": {
+    "minlat": 51.7896406,
+    "minlon": -2.3105116,
+    "maxlat": 51.7911899,
+    "maxlon": -2.3095625
+  },
+  "geometry": [
+    { "lat": 51.7896406, "lon": -2.3105116 },
+    { "lat": 51.7902402, "lon": -2.3101367 },
+    { "lat": 51.7908780, "lon": -2.3097564 },
+    { "lat": 51.7911899, "lon": -2.3095625 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703470,
+  "bounds": {
+    "minlat": 51.7847315,
+    "minlon": -2.3143495,
+    "maxlat": 51.7896406,
+    "maxlon": -2.3105116
+  },
+  "geometry": [
+    { "lat": 51.7847315, "lon": -2.3143495 },
+    { "lat": 51.7876882, "lon": -2.3119896 },
+    { "lat": 51.7886326, "lon": -2.3112499 },
+    { "lat": 51.7890732, "lon": -2.3108978 },
+    { "lat": 51.7896406, "lon": -2.3105116 }
+  ],
+  "tags": {
+    "cycleway:both": "lane",
+    "cycleway:lane": "advisory",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703528,
+  "bounds": {
+    "minlat": 51.7943306,
+    "minlon": -2.3061830,
+    "maxlat": 51.7951410,
+    "maxlon": -2.3052110
+  },
+  "geometry": [
+    { "lat": 51.7943306, "lon": -2.3061830 },
+    { "lat": 51.7951410, "lon": -2.3052110 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703529,
+  "bounds": {
+    "minlat": 51.7928571,
+    "minlon": -2.3079489,
+    "maxlat": 51.7943306,
+    "maxlon": -2.3061830
+  },
+  "geometry": [
+    { "lat": 51.7928571, "lon": -2.3079489 },
+    { "lat": 51.7930961, "lon": -2.3076850 },
+    { "lat": 51.7933486, "lon": -2.3073474 },
+    { "lat": 51.7939140, "lon": -2.3066862 },
+    { "lat": 51.7941450, "lon": -2.3064160 },
+    { "lat": 51.7943306, "lon": -2.3061830 }
+  ],
+  "tags": {
+    "cycleway:both": "lane",
+    "cycleway:lane": "advisory",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703638,
+  "bounds": {
+    "minlat": 51.8045053,
+    "minlon": -2.2941080,
+    "maxlat": 51.8051342,
+    "maxlon": -2.2925745
+  },
+  "geometry": [
+    { "lat": 51.8045053, "lon": -2.2941080 },
+    { "lat": 51.8051342, "lon": -2.2925745 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703639,
+  "bounds": {
+    "minlat": 51.7958322,
+    "minlon": -2.3043404,
+    "maxlat": 51.8043304,
+    "maxlon": -2.2944941
+  },
+  "geometry": [
+    { "lat": 51.7958322, "lon": -2.3043404 },
+    { "lat": 51.7959684, "lon": -2.3041718 },
+    { "lat": 51.7969465, "lon": -2.3030104 },
+    { "lat": 51.7976216, "lon": -2.3022701 },
+    { "lat": 51.7980375, "lon": -2.3018153 },
+    { "lat": 51.7986334, "lon": -2.3012429 },
+    { "lat": 51.7994290, "lon": -2.3005577 },
+    { "lat": 51.7996220, "lon": -2.3003999 },
+    { "lat": 51.8002022, "lon": -2.2999424 },
+    { "lat": 51.8009973, "lon": -2.2993823 },
+    { "lat": 51.8014764, "lon": -2.2990461 },
+    { "lat": 51.8017783, "lon": -2.2987913 },
+    { "lat": 51.8020821, "lon": -2.2984962 },
+    { "lat": 51.8023754, "lon": -2.2981556 },
+    { "lat": 51.8026176, "lon": -2.2978204 },
+    { "lat": 51.8031287, "lon": -2.2969789 },
+    { "lat": 51.8032594, "lon": -2.2967153 },
+    { "lat": 51.8036691, "lon": -2.2959133 },
+    { "lat": 51.8043304, "lon": -2.2944941 }
+  ],
+  "tags": {
+    "cycleway:both": "lane",
+    "cycleway:lane": "advisory",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1051703640,
+  "bounds": {
+    "minlat": 51.8043304,
+    "minlon": -2.2944941,
+    "maxlat": 51.8045053,
+    "maxlon": -2.2941080
+  },
+  "geometry": [
+    { "lat": 51.8043304, "lon": -2.2944941 },
+    { "lat": 51.8045053, "lon": -2.2941080 }
+  ],
+  "tags": {
+    "cycleway:lane": "advisory",
+    "cycleway:left": "lane",
+    "highway": "primary",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "name": "Bristol Road",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1070433260,
+  "bounds": {
+    "minlat": 51.7895173,
+    "minlon": -2.2600080,
+    "maxlat": 51.7895923,
+    "maxlon": -2.2598594
+  },
+  "geometry": [
+    { "lat": 51.7895173, "lon": -2.2600080 },
+    { "lat": 51.7895923, "lon": -2.2598594 }
+  ],
+  "tags": {
+    "designation": "public_footpath",
+    "foot": "designated",
+    "ford": "yes",
+    "highway": "footway"
+  }
+},
+{
+  "type": "way",
+  "id": 1090879519,
+  "bounds": {
+    "minlat": 51.7979503,
+    "minlon": -2.2886346,
+    "maxlat": 51.7980452,
+    "maxlon": -2.2885110
+  },
+  "geometry": [
+    { "lat": 51.7980452, "lon": -2.2886346 },
+    { "lat": 51.7979503, "lon": -2.2885110 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "2",
+    "layer": "1",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 1090879520,
+  "bounds": {
+    "minlat": 51.7979262,
+    "minlon": -2.2886346,
+    "maxlat": 51.7980452,
+    "maxlon": -2.2885882
+  },
+  "geometry": [
+    { "lat": 51.7979262, "lon": -2.2885882 },
+    { "lat": 51.7980452, "lon": -2.2886346 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "1",
+    "layer": "1",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 1090879521,
+  "bounds": {
+    "minlat": 51.7983992,
+    "minlon": -2.2888802,
+    "maxlat": 51.7984324,
+    "maxlon": -2.2888643
+  },
+  "geometry": [
+    { "lat": 51.7984324, "lon": -2.2888802 },
+    { "lat": 51.7983992, "lon": -2.2888643 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "no",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 1091331345,
+  "bounds": {
+    "minlat": 51.8058629,
+    "minlon": -2.2899600,
+    "maxlat": 51.8064213,
+    "maxlon": -2.2894390
+  },
+  "geometry": [
+    { "lat": 51.8058629, "lon": -2.2899600 },
+    { "lat": 51.8060782, "lon": -2.2897623 },
+    { "lat": 51.8062427, "lon": -2.2896005 },
+    { "lat": 51.8064213, "lon": -2.2894390 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "oneway": "yes",
+    "ref": "A38"
+  }
+},
+{
+  "type": "way",
+  "id": 1124272898,
+  "bounds": {
+    "minlat": 51.8056501,
+    "minlon": -2.2893508,
+    "maxlat": 51.8058651,
+    "maxlon": -2.2892063
+  },
+  "geometry": [
+    { "lat": 51.8058651, "lon": -2.2893508 },
+    { "lat": 51.8058032, "lon": -2.2892693 },
+    { "lat": 51.8057295, "lon": -2.2892197 },
+    { "lat": 51.8056501, "lon": -2.2892063 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1124272899,
+  "bounds": {
+    "minlat": 51.8053879,
+    "minlon": -2.2900637,
+    "maxlat": 51.8055506,
+    "maxlon": -2.2895846
+  },
+  "geometry": [
+    { "lat": 51.8053879, "lon": -2.2895846 },
+    { "lat": 51.8053902, "lon": -2.2897433 },
+    { "lat": 51.8053984, "lon": -2.2897934 },
+    { "lat": 51.8054283, "lon": -2.2898949 },
+    { "lat": 51.8054728, "lon": -2.2899812 },
+    { "lat": 51.8055292, "lon": -2.2900468 },
+    { "lat": 51.8055506, "lon": -2.2900637 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1124272900,
+  "bounds": {
+    "minlat": 51.8053879,
+    "minlon": -2.2895846,
+    "maxlat": 51.8056154,
+    "maxlon": -2.2892121
+  },
+  "geometry": [
+    { "lat": 51.8056154, "lon": -2.2892121 },
+    { "lat": 51.8055337, "lon": -2.2892563 },
+    { "lat": 51.8054644, "lon": -2.2893390 },
+    { "lat": 51.8054142, "lon": -2.2894520 },
+    { "lat": 51.8053879, "lon": -2.2895846 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "2",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1223318882,
+  "bounds": {
+    "minlat": 51.8011377,
+    "minlon": -2.2896388,
+    "maxlat": 51.8036413,
+    "maxlon": -2.2895274
+  },
+  "geometry": [
+    { "lat": 51.8011377, "lon": -2.2895274 },
+    { "lat": 51.8025028, "lon": -2.2896239 },
+    { "lat": 51.8032292, "lon": -2.2896388 },
+    { "lat": 51.8036413, "lon": -2.2896132 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1266572413,
+  "bounds": {
+    "minlat": 51.8056154,
+    "minlon": -2.2892121,
+    "maxlat": 51.8056501,
+    "maxlon": -2.2892063
+  },
+  "geometry": [
+    { "lat": 51.8056501, "lon": -2.2892063 },
+    { "lat": 51.8056154, "lon": -2.2892121 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1266572414,
+  "bounds": {
+    "minlat": 51.8055506,
+    "minlon": -2.2900992,
+    "maxlat": 51.8058060,
+    "maxlon": -2.2900349
+  },
+  "geometry": [
+    { "lat": 51.8055506, "lon": -2.2900637 },
+    { "lat": 51.8056362, "lon": -2.2900992 },
+    { "lat": 51.8057243, "lon": -2.2900893 },
+    { "lat": 51.8058060, "lon": -2.2900349 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1266838821,
+  "bounds": {
+    "minlat": 51.8058060,
+    "minlon": -2.2900349,
+    "maxlat": 51.8058629,
+    "maxlon": -2.2899600
+  },
+  "geometry": [
+    { "lat": 51.8058060, "lon": -2.2900349 },
+    { "lat": 51.8058629, "lon": -2.2899600 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "junction": "roundabout",
+    "lanes": "3",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "sign",
+    "name": "Cross Keys Roundabout",
+    "oneway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764551,
+  "bounds": {
+    "minlat": 51.7987052,
+    "minlon": -2.2893489,
+    "maxlat": 51.7987555,
+    "maxlon": -2.2893318
+  },
+  "geometry": [
+    { "lat": 51.7987052, "lon": -2.2893318 },
+    { "lat": 51.7987296, "lon": -2.2893447 },
+    { "lat": 51.7987555, "lon": -2.2893489 }
+  ],
+  "tags": {
+    "destination:lanes": "GLOS|North",
+    "destination:ref": "B4008|M5",
+    "highway": "trunk",
+    "junction": "teardrop",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60 mph",
+    "maxspeed:type": "GB:nsl_single",
+    "name": "Quedgeley Interchange",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764552,
+  "bounds": {
+    "minlat": 51.7990411,
+    "minlon": -2.2895274,
+    "maxlat": 51.8011377,
+    "maxlon": -2.2893537
+  },
+  "geometry": [
+    { "lat": 51.7990411, "lon": -2.2893537 },
+    { "lat": 51.7993338, "lon": -2.2894005 },
+    { "lat": 51.7995438, "lon": -2.2894288 },
+    { "lat": 51.8011377, "lon": -2.2895274 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "70 mph",
+    "maxspeed:type": "GB:nsl_dual",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1338104131,
+  "bounds": {
+    "minlat": 51.8011394,
+    "minlon": -2.2894453,
+    "maxlat": 51.8026394,
+    "maxlon": -2.2893798
+  },
+  "geometry": [
+    { "lat": 51.8026394, "lon": -2.2894453 },
+    { "lat": 51.8025055, "lon": -2.2894411 },
+    { "lat": 51.8019256, "lon": -2.2894306 },
+    { "lat": 51.8011394, "lon": -2.2893798 }
+  ],
+  "tags": {
+    "highway": "trunk",
+    "lanes": "2",
+    "maxspeed": "50 mph",
+    "maxspeed:type": "sign",
+    "name": "Bath Road",
+    "oneway": "yes",
+    "ref": "A430"
+  }
+}
+
+  ]
+}
