@@ -70,6 +70,7 @@ scripts/validate.py    the gate
 scripts/build_index.py data/walks/*.json → site/data/walks.json + queue.json
 scripts/brier.py       ledger → calibration statistics
 tests/test_pipeline.py the invariants above, as executable checks
+.claude/skills/         verify-what-ships — portable, not waymark-specific; copy it out
 site/                  the map
 site/vendor/           Leaflet + proj4, vendored on purpose — see pitfalls
 index.html, .nojekyll  Pages workaround while the source is a branch — see pitfalls
