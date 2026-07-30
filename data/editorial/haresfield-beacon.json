@@ -2,17 +2,17 @@
   "$comment": "Written by Claude in session against data/surveys/haresfield-beacon.json. Proper nouns limited to facts.named_features plus data/gazetteer.txt; every number agrees with the surveyed geometry. No API call — see scripts/author.py.",
 
   "editorial": {
-    "summary": "A loop from the escarpment edge at Haresfield Beacon down into the Severn Vale and back, north-west of Stroud.",
+    "summary": "A short circuit over the escarpment edge at Haresfield Beacon, north-west of Stroud.",
 
-    "character": "The walk is built around one substantial descent and one substantial climb, and the survey puts the steepest sustained pitch at better than one in five — short, but not somewhere to be casual with a wet boot. Between them the route spends a long middle stretch on lanes and undesignated tracks in the vale, which is flat, quick, and much the least interesting part of the day. It earns its place on the edge itself and the ground falling away west; on a day with the top in cloud there would be little reason to make the drive.",
+    "character": "Five kilometres and 260 m of climbing is a steep ratio, and the walk feels it: this is a short outing with a real hill in it rather than a stroll that happens to rise. The pull onto the edge touches one in six, which is brief enough not to matter and steep enough to notice, and the top then runs level along the break of slope with the ground falling away west. Nothing on the route is sealed — not a metre of it — which for a circuit this close to a main valley is unusual and is most of why it is worth the drive.",
 
-    "grain": "The edge is Inferior Oolite standing on Lias clay, which is why the top stays dry and firm while the slope below it slumps and holds water.",
+    "grain": "The bench the path follows is the Inferior Oolite standing on Lias clay, which is why the top is dry and firm and the slope below it slips.",
 
-    "conditions": "Winter and early spring are the honest recommendation. The vale section drains badly and the descent runs greasy under leaf litter, but the edge faces west and the last hour of light off the Severn is the reason to be up there rather than anywhere else. Half the route carries no surface tag at all, so what is underfoot below the edge is genuinely unknown rather than merely unrecorded.",
+    "conditions": "The edge faces west, so the last hour of light is the reason to be up there and the middle of a summer day is not. Half the route has no surface tag at all and the rest is soft going, so after a wet week the climb will be greasy and the descent more so. Winter is the honest recommendation, when the beeches are bare and the vale is legible from the top.",
 
-    "practical": "A free car park is recorded near Haresfield Beacon, but the survey places it some 2,800 m from where this loop begins, so arriving there and walking this route are not the same thing. The Beacon & Railway Hotel sits within twenty metres of the route; OpenStreetMap records nothing about vegan provision, which makes that unknown rather than absent, and worth a phone call before relying on it. No toilets were found within reach, and the land along the top is National Trust.",
+    "practical": "Three car parks sit within about 600 to 800 m of where the circuit begins, none of them named in the survey and none with a recorded fee, so the charge is unknown rather than absent. No toilets and no refreshment were found within reach of the route, which also means there is no vegan provision to report either way — this is a walk to bring a flask to.",
 
-    "caveats": "Only about a third of the length carries a public footpath designation. The rest is mapped but undesignated or permissive, so access there is unrecorded rather than assured, and a permissive stretch can be withdrawn without anything on the map changing. The survey also flags a ford on or beside the route and says nothing about its depth or whether a footbridge stands alongside it — after rain that is the thing most likely to turn this into an out-and-back. Field furniture is invisible to a survey of this kind: stiles and gates that have rotted or been replaced will not appear until they are underfoot.",
+    "caveats": "About seven tenths of the length carries a public footpath designation; the remainder is mapped but undesignated, so access there rests on the open-access status of the land rather than on anything recorded against the path. A ford is flagged on or beside the route, with nothing known about its depth or whether a footbridge stands alongside — after rain that is the thing most likely to turn this into an out-and-back. Field furniture is invisible to a survey of this kind: stiles and gates that have rotted or been replaced will not appear until they are underfoot.",
 
     "best_months": [10, 11, 12, 1, 2, 3],
     "runnable": "in_parts"
@@ -26,8 +26,8 @@
   },
 
   "confidence": {
-    "navigable": 0.55,
-    "basis": "Only a third of the length carries a designation and half of it has no surface tag, so access and going are both largely unrecorded. A ford is flagged with no depth or footbridge information. The loop is machine-assembled from OSM ways and nobody has walked it.",
+    "navigable": 0.72,
+    "basis": "Seven tenths of the length is designated public footpath and the rest is open-access land, so access is better recorded than most. Against that: half the route has no surface tag, a ford is flagged with no depth or footbridge information, and the circuit is machine-assembled from OSM ways and has not been walked.",
     "resolved": null
   }
 }
