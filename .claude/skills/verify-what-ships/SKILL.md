@@ -41,7 +41,47 @@ habit and it burns the user's trust when the cause is structural.
 
 ---
 
-## 2. Nothing at module scope may touch a library that might not load
+## 2. A generated config that fails to parse fails silently
+
+If the build writes a file the page then loads — a config, an injected key, a feature flag —
+nothing about a broken one announces itself. A `<script>` that fails to parse simply does not
+run: no network error, no missing file, no red anywhere in the deploy. The application falls
+back to its defaults, and defaults look deliberate.
+
+The case: a Pages workflow wrote `site/config.js` with
+
+```yaml
+run: python - <<'PY' > site/config.js
+```
+
+and the script printed *both* its log annotations and the payload. Every `print` went into the
+file:
+
+```js
+::notice::basemap=os-outdoor (OS key present)   // SyntaxError: Unexpected token ':'
+window.WAYMARK_CONFIG = { ... };                // never reached
+```
+
+The API key was configured correctly the whole time. The site served the keyless fallback
+basemap for a week and reported no error to anyone.
+
+- **Never redirect a generator's stdout into the artifact it generates.** Log lines and
+  payload are two channels sharing one pipe. Write the file; print to the log.
+- **Syntax-check generated code in the build.** `node --check out.js` is one line and would
+  have failed the run on the first push. Assert the *shape* too — that the file is the single
+  statement it is meant to be — which also catches a partial or doubled write.
+- **Distinguish "absent" from "broken" in the consuming code.** A config legitimately missing
+  in development and a corrupt one in production take the same silent path to the same
+  defaults. Say which happened, in the page.
+
+**A log line you added to prove a fact, then missing from the log, is itself the finding.**
+The `::notice::` above existed specifically to answer "did the runner see the key". When it
+wasn't in the log the first assumption was a too-short tail. It wasn't: its absence *was* the
+bug, sitting in full view.
+
+---
+
+## 3. Nothing at module scope may touch a library that might not load
 
 A page that links a library from a CDN and then uses it while the module is being parsed has
 no failure mode short of total. This kills the whole page, not the feature:
@@ -65,7 +105,7 @@ hardest failure to diagnose from a screenshot and the easiest to misread as "not
 
 ---
 
-## 3. Test with every external origin blocked
+## 4. Test with every external origin blocked
 
 The single highest-value test for a static site, and the one that would have caught the above
 immediately:
@@ -85,7 +125,7 @@ before/after on the same probe.
 
 ---
 
-## 4. Cache-bust local assets at build time
+## 5. Cache-bust local assets at build time
 
 A broken asset plus a browser cache is a site that stays broken specifically for the person
 who already visited — the person reporting it. Stamp the build's commit onto local asset URLs
@@ -97,7 +137,7 @@ so fresh HTML can never pair with a stale script:
 
 ---
 
-## 5. Do not tune a heuristic through a slow feedback loop
+## 6. Do not tune a heuristic through a slow feedback loop
 
 Iterating on an algorithm through six-minute CI runs against a rate-limited public API is not
 debugging. It is guessing slowly, and it produces confident theories that each cost a round
@@ -113,7 +153,7 @@ trip to disprove.
 
 ---
 
-## 6. Remove the option rather than penalising it
+## 7. Remove the option rather than penalising it
 
 When a search keeps choosing something it should not, weighting it more heavily is usually
 the wrong fix and always the slower one. A penalty can be outvoted by every other term in the
@@ -129,6 +169,7 @@ that is a property you can assert in a test.
 
 - [ ] Loaded the real deployed URL, or said plainly that you could not and why.
 - [ ] Confirmed which source the host is serving from, not just that the job passed.
+- [ ] Anything the build generates and the page loads was syntax-checked by the build.
 - [ ] Ran the page with all external origins blocked; zero page errors.
 - [ ] Local assets are cache-busted.
 - [ ] Quoted a before/after from the same probe, not a description of the change.

@@ -157,8 +157,13 @@ Committed copies are what a cloud session sees; `~/.claude` is invisible to one.
   priced as "status unknown". `access_polygons` merges and polygonises.
 - **The Leisure basemap is EPSG:27700 only.** Don't "simplify" the CRS handling by dropping
   Proj4Leaflet; you'll lose the Explorer style entirely.
-- **`site/config.js` is gitignored.** If the map is blank locally, copy
-  `site/config.example.js` across.
+- **`site/config.js` is gitignored and generated.** Locally, copy `site/config.example.js`
+  across. In CI the `pages` workflow writes it from `OS_API_KEY` — and it *writes* the file
+  rather than redirecting stdout into it, because a `>` there put the workflow's `::notice::`
+  annotations above the assignment and made the file a syntax error. A script that fails to
+  parse fails silently: `window.WAYMARK_CONFIG` never exists, `app.js` falls to its keyless
+  default, and a correct OS key looks exactly like an ignored one. The `node --check` step
+  after it is load-bearing; so is the footer telling absent config from broken config.
 - **Authoring does not need the API.** Claude is already the thing reading the survey; write
   `data/editorial/<slug>.json` and `author.py` merges it. `--api` is for the unattended job.
 - **An Overpass extract is mostly fragments.** The loop search starts from the largest
