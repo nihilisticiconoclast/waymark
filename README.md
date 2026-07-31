@@ -243,7 +243,27 @@ Nothing about this is automatable — OS issues keys to an account holder, and t
    | Field | Value |
    |---|---|
    | Name | `OS_API_KEY` |
-   | Secret | the key from the Data Hub |
+   | Secret | the **Project API Key** — the 32-character one |
+
+   **Take the key, not the secret.** The Data Hub project page shows two credentials, one
+   above the other:
+
+   | | Length | What it is for |
+   |---|---|---|
+   | Project API Key | 32 chars | the tile URL's `?key=` — this is the one |
+   | API Secret | 16 chars | an OAuth client secret, exchanged server-side for a token |
+
+   They are trivially transposed, and the failure is confusing rather than obvious: the tile
+   endpoint does not accept the secret, so every tile is refused, the map falls back to
+   OpenTopoMap, and it looks exactly like a key that was ignored. It is also the worse
+   mistake of the two — a published API key is the intended pattern, a published API secret
+   is not. The `pages` workflow now refuses to write a value that isn't 32 alphanumeric
+   characters, logs an error saying so, and deploys with OpenTopoMap instead; if a secret
+   ever does reach a deploy, regenerate it in the Data Hub.
+
+   Note the tab. `OS_API_KEY` is a **Secret**, on the Secrets tab. `WAYMARK_BASEMAP` below is
+   a **Variable**, on the Variables tab. A secret added as a variable is invisible to
+   `secrets.OS_API_KEY` and the site quietly runs keyless.
 
    That is the entire configuration. The basemap follows from whether the key exists — with
    it, the site uses `os-outdoor`; without it, OpenTopoMap. There is no second entry to add.

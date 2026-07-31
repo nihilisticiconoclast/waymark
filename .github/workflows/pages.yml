@@ -51,9 +51,24 @@ jobs:
           OS_API_KEY: ${{ secrets.OS_API_KEY }}
         run: |
           python - <<'PY'
-          import json, os, pathlib
+          import json, os, pathlib, re
           key = os.environ.get("OS_API_KEY", "").strip()
           basemap = os.environ.get("BASEMAP_OVERRIDE", "").strip()
+          # OS Data Hub issues two credentials per project, one above the other on the same
+          # page, and they are easy to transpose: a 32-character Project API Key, which is
+          # what goes in the tile URL, and a 16-character API Secret, which belongs in an
+          # OAuth token exchange. Publishing the secret is materially worse than publishing
+          # nothing — a key is public by design, a secret is not — and the tile endpoint
+          # rejects it anyway, so the map falls back and the mistake looks like a dead key.
+          # A value not shaped like a project key is therefore refused, loudly, rather than
+          # written onto a public page. Never print the value; the length is the diagnosis.
+          if key and not re.fullmatch(r"[A-Za-z0-9]{32}", key):
+              print("::error::OS_API_KEY is %d characters. An OS Data Hub project API key is "
+                    "32 alphanumeric characters; the 16-character value beside it on the same "
+                    "page is the API *secret* and must never be published. Refusing to write "
+                    "it to the site — using OpenTopoMap. If this credential has been deployed, "
+                    "regenerate it in the Data Hub." % len(key))
+              key = ""
           if not basemap:
               basemap = "os-outdoor" if key else "opentopo"
           if basemap.startswith("os-") and not key:
