@@ -50,8 +50,8 @@ jobs:
           BASEMAP_OVERRIDE: ${{ vars.WAYMARK_BASEMAP }}
           OS_API_KEY: ${{ secrets.OS_API_KEY }}
         run: |
-          python - <<'PY' > site/config.js
-          import json, os
+          python - <<'PY'
+          import json, os, pathlib
           key = os.environ.get("OS_API_KEY", "").strip()
           basemap = os.environ.get("BASEMAP_OVERRIDE", "").strip()
           if not basemap:
@@ -60,10 +60,30 @@ jobs:
               print("::warning::WAYMARK_BASEMAP asks for %s but OS_API_KEY is empty; "
                     "using OpenTopoMap." % basemap)
               basemap = "opentopo"
+          # The file is written, not printed. A `>` redirect on this step put every log
+          # annotation above the assignment inside config.js, which made the file a syntax
+          # error, and a syntax error in config.js is silent: the browser discards it,
+          # window.WAYMARK_CONFIG never exists, and app.js falls back to its keyless
+          # default. A correct OS key published an OpenTopoMap site for a week that way.
+          pathlib.Path("site/config.js").write_text(
+              "window.WAYMARK_CONFIG = %s;\n"
+              % json.dumps({"basemap": basemap, "osApiKey": key}))
           print("::notice::basemap=%s (OS key %s)"
                 % (basemap, "present" if key else "absent"))
-          print("window.WAYMARK_CONFIG = %s;" % json.dumps(
-              {"basemap": basemap, "osApiKey": key}))
+          PY
+      # Nothing in the repository proves the generated file is loadable, and the failure mode
+      # is invisible from the outside: a blank-looking config and a map that works, wrongly.
+      # So parse it here and assert it is the one statement it is supposed to be.
+      - name: Check config.js is loadable
+        run: |
+          node --check site/config.js
+          python - <<'PY'
+          import pathlib, re, sys
+          text = pathlib.Path("site/config.js").read_text().strip()
+          if not re.fullmatch(r"window\.WAYMARK_CONFIG = \{.*\};", text, re.S):
+              sys.exit("site/config.js is not a single WAYMARK_CONFIG assignment:\n"
+                       + text[:400])
+          print(re.sub(r'"osApiKey": "[^"]+"', '"osApiKey": "███"', text))
           PY
       # Stamp the commit onto every local asset URL. A browser that has cached a previous
       # app.js will otherwise keep running it against fresh HTML for as long as its cache

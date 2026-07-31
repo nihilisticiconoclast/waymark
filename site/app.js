@@ -3,10 +3,16 @@
    =========================================================================== */
 
 /* Styling comes from cuddly-lamp's CDN copy, linked in index.html — there is no base URL
-   to configure here. Config carries the basemap choice and the OS key, nothing else. */
+   to configure here. Config carries the basemap choice and the OS key, nothing else.
+
+   Whether config.js actually loaded is worth knowing separately from what it said. Absent
+   (running from a checkout, where it is gitignored) and present-but-broken produce exactly
+   the same silent fall to these defaults, and the second one looks from the outside like a
+   deploy that ignored your OS key. The footer says which happened. */
+const CFG_LOADED = window.WAYMARK_CONFIG != null && typeof window.WAYMARK_CONFIG === "object";
 const CFG = Object.assign(
   { basemap: "opentopo", osApiKey: "" },
-  window.WAYMARK_CONFIG || {}
+  CFG_LOADED ? window.WAYMARK_CONFIG : {}
 );
 
 const ORIGIN = { lat: 51.7447, lon: -2.2166, name: "Stroud" };   // keep in step with build_index.py
@@ -174,7 +180,13 @@ function initMap() {
 
   state.routeLayer.addTo(map);
   document.getElementById("attribution").textContent =
+    (CFG_LOADED ? "" : "config.js did not load — default basemap. ") +
     p.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
+  if (!CFG_LOADED) {
+    console.warn("config.js did not define window.WAYMARK_CONFIG — running defaults " +
+                 "(basemap opentopo, no OS key). Locally: copy site/config.example.js. " +
+                 "Deployed: the pages workflow writes it, so it failed to parse.");
+  }
 }
 
 function pinIcon(w, selected) {
