@@ -1,0 +1,1267 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-07-31T06:20:35Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 129742453,
+  "lat": 51.7999690,
+  "lon": -2.3000739,
+  "tags": {
+    "amenity": "parking",
+    "created_by": "JOSM"
+  }
+},
+{
+  "type": "node",
+  "id": 252654506,
+  "lat": 51.7876317,
+  "lon": -2.2729496,
+  "tags": {
+    "addr:city": "Gloucester",
+    "addr:postcode": "GL10 3DX",
+    "addr:street": "Haresfield",
+    "alt_name": "The Beacon Inn",
+    "amenity": "pub",
+    "name": "The Beacon & Railway Hotel",
+    "tourism": "hotel",
+    "url": "http://www.thebeaconinn.co.uk/",
+    "website": "https://thebeaconinn.co.uk"
+  }
+},
+{
+  "type": "node",
+  "id": 326346334,
+  "lat": 51.7782512,
+  "lon": -2.2617570,
+  "tags": {
+    "ele": "217",
+    "name": "Haresfield Beacon",
+    "natural": "peak",
+    "source": "survey",
+    "wikidata": "Q5656910",
+    "wikipedia": "en:Haresfield Beacon"
+  }
+},
+{
+  "type": "node",
+  "id": 339527468,
+  "lat": 51.7806789,
+  "lon": -2.2577023,
+  "tags": {
+    "amenity": "parking",
+    "created_by": "Potlatch 0.10f"
+  }
+},
+{
+  "type": "node",
+  "id": 424435964,
+  "lat": 51.7738388,
+  "lon": -2.2673587,
+  "tags": {
+    "name": "Vinegar Hill",
+    "natural": "peak",
+    "source": "NPE"
+  }
+},
+{
+  "type": "node",
+  "id": 452536997,
+  "lat": 51.7745324,
+  "lon": -2.2907445,
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "node",
+  "id": 502478028,
+  "lat": 51.7876811,
+  "lon": -2.2740128,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Railway Foot Crossing",
+    "naptan:AtcoCode": "1600GL2355",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Railway Foot Crossing",
+    "naptan:NaptanCode": "gloawgag",
+    "naptan:Street": "Haresfield Lane",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502478032,
+  "lat": 51.7877618,
+  "lon": -2.2741003,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Railway Foot Crossing",
+    "naptan:AtcoCode": "1600GL2356",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Railway Foot Crossing",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloawgad",
+    "naptan:Street": "Haresfield Lane",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502480036,
+  "lat": 51.7817490,
+  "lon": -2.3161317,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Standish Lane",
+    "naptan:AtcoCode": "1600GL3363",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Standish Ln",
+    "naptan:NaptanCode": "gloatgwt",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502480056,
+  "lat": 51.7821176,
+  "lon": -2.3161633,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Standish Lane",
+    "naptan:AtcoCode": "1600GL3364",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Standish Ln",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatgwm",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502483099,
+  "lat": 51.7743005,
+  "lon": -2.2896575,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "St Nicholas's Church",
+    "naptan:AtcoCode": "1600GL4393",
+    "naptan:Bearing": "SE",
+    "naptan:CommonName": "St Nicholas's Church",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatptp",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502483102,
+  "lat": 51.7741119,
+  "lon": -2.2895549,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "St Nicholas's Church",
+    "naptan:AtcoCode": "1600GL4394",
+    "naptan:Bearing": "NW",
+    "naptan:CommonName": "St Nicholas's Church",
+    "naptan:NaptanCode": "gloatpta",
+    "naptan:Street": "B4008",
+    "naptan:verified": "yes",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502489940,
+  "lat": 51.7958219,
+  "lon": -2.2564438,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Cross Farm",
+    "naptan:AtcoCode": "1600GLA36809",
+    "naptan:Bearing": "W",
+    "naptan:CommonName": "Cross Farm",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "glogmpmj",
+    "naptan:Street": "Brookthorpe Road",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502489945,
+  "lat": 51.7909994,
+  "lon": -2.2699297,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Haresfield School",
+    "naptan:AtcoCode": "1600GLA36811",
+    "naptan:Bearing": "W",
+    "naptan:CommonName": "Haresfield School",
+    "naptan:NaptanCode": "glogmpmp",
+    "naptan:Street": "Colethrop Ln",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502489952,
+  "lat": 51.7911071,
+  "lon": -2.2699883,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Haresfield School",
+    "naptan:AtcoCode": "1600GLA36812",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Haresfield School",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "glogmpmt",
+    "naptan:Street": "Colethrop Ln",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502493772,
+  "lat": 51.7934450,
+  "lon": -2.2878843,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Javelin Park",
+    "naptan:AtcoCode": "1600GLB459",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Javelin Park",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatwdj",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502493775,
+  "lat": 51.7943178,
+  "lon": -2.2883770,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Javelin Park",
+    "naptan:AtcoCode": "1600GLB460",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Javelin Park",
+    "naptan:NaptanCode": "gloatwad",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499024,
+  "lat": 51.7621885,
+  "lon": -2.3041858,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Green",
+    "naptan:AtcoCode": "1600GLS1056",
+    "naptan:Bearing": "NW",
+    "naptan:CommonName": "The Green",
+    "naptan:NaptanCode": "gloatjtw",
+    "naptan:Street": "Orchard Place",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499053,
+  "lat": 51.7959388,
+  "lon": -2.2564590,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Cross Farm",
+    "naptan:AtcoCode": "1600GLS1068",
+    "naptan:Bearing": "E",
+    "naptan:CommonName": "Cross Farm",
+    "naptan:NaptanCode": "gloawmaj",
+    "naptan:Street": "Brookthorpe Road",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499852,
+  "lat": 51.7806182,
+  "lon": -2.2872917,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Haresfield Turn",
+    "naptan:AtcoCode": "1600GLS341",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Haresfield Turn",
+    "naptan:NaptanCode": "gloatwjd",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499854,
+  "lat": 51.7811545,
+  "lon": -2.2886142,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Haresfield Turn",
+    "naptan:AtcoCode": "1600GLS342",
+    "naptan:Bearing": "NW",
+    "naptan:CommonName": "Haresfield Turn",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatwgt",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499857,
+  "lat": 51.7729710,
+  "lon": -2.2854749,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Shieling",
+    "naptan:AtcoCode": "1600GLS343",
+    "naptan:Bearing": "SE",
+    "naptan:CommonName": "The Shieling",
+    "naptan:NaptanCode": "gloatwpa",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499861,
+  "lat": 51.7725052,
+  "lon": -2.2847473,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Shieling",
+    "naptan:AtcoCode": "1600GLS344",
+    "naptan:Bearing": "NW",
+    "naptan:CommonName": "The Shieling",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatwpd",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499864,
+  "lat": 51.7684429,
+  "lon": -2.2802872,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Oxlynch Ln",
+    "naptan:AtcoCode": "1600GLS345",
+    "naptan:Bearing": "SE",
+    "naptan:CommonName": "Oxlynch Ln",
+    "naptan:NaptanCode": "gloawatj",
+    "naptan:PlusbusZoneRef": "STRUD",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499868,
+  "lat": 51.7684781,
+  "lon": -2.2805918,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Oxlynch Ln",
+    "naptan:AtcoCode": "1600GLS346",
+    "naptan:Bearing": "NW",
+    "naptan:CommonName": "Oxlynch Ln",
+    "naptan:NaptanCode": "gloawata",
+    "naptan:PlusbusZoneRef": "STRUD",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499891,
+  "lat": 51.7662885,
+  "lon": -2.2788248,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Old Barn",
+    "naptan:AtcoCode": "1600GLS347",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "The Old Barn",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloawdaj",
+    "naptan:PlusbusZoneRef": "STRUD",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502499895,
+  "lat": 51.7659013,
+  "lon": -2.2790398,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Old Barn",
+    "naptan:AtcoCode": "1600GLS348",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "The Old Barn",
+    "naptan:NaptanCode": "gloawdad",
+    "naptan:PlusbusZoneRef": "STRUD",
+    "naptan:Street": "B4008",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500081,
+  "lat": 51.8050460,
+  "lon": -2.2926487,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Pound Lane",
+    "naptan:AtcoCode": "1600GLS417",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Pound Ln",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatpdm",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500085,
+  "lat": 51.8053230,
+  "lon": -2.2922929,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Pound Lane",
+    "naptan:AtcoCode": "1600GLS418",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Pound Ln",
+    "naptan:NaptanCode": "gloatpdw",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500089,
+  "lat": 51.8029098,
+  "lon": -2.2972663,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Lodge",
+    "naptan:AtcoCode": "1600GLS419",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Hardwicke Court Lodge",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatmjd",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500092,
+  "lat": 51.8032887,
+  "lon": -2.2967902,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Lodge",
+    "naptan:AtcoCode": "1600GLS420",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Hardwicke Court Lodge",
+    "naptan:NaptanCode": "gloatmjg",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500095,
+  "lat": 51.7950492,
+  "lon": -2.3051609,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Hiltmead Lane",
+    "naptan:AtcoCode": "1600GLS421",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Hiltmead Ln",
+    "naptan:NaptanCode": "gloatjpm",
+    "naptan:Street": "A38 Parkend",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500099,
+  "lat": 51.7938759,
+  "lon": -2.3068785,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Parkend House",
+    "naptan:AtcoCode": "1600GLS422",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Parkend House",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatjpa",
+    "naptan:ShortCommonName": "Moreton Valence Motor Co",
+    "naptan:Street": "A38 Parkend",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500102,
+  "lat": 51.7911446,
+  "lon": -2.3095278,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Epney Turn",
+    "naptan:AtcoCode": "1600GLS423",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Epney Turn",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatjgt",
+    "naptan:Street": "A38 Putloe",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500107,
+  "lat": 51.7915225,
+  "lon": -2.3094144,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Epney Turn",
+    "naptan:AtcoCode": "1600GLS424",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "Epney Turn",
+    "naptan:NaptanCode": "gloatjma",
+    "naptan:Street": "A38 Putloe",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500113,
+  "lat": 51.7869372,
+  "lon": -2.3127175,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Putloe Cottage",
+    "naptan:AtcoCode": "1600GLS426",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Putloe Cottage",
+    "naptan:NaptanCode": "gloatjdm",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500117,
+  "lat": 51.7738206,
+  "lon": -2.3220622,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Attwoolls",
+    "naptan:AtcoCode": "1600GLS427",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Hyde Ln",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatgmd",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500120,
+  "lat": 51.7742070,
+  "lon": -2.3221519,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Attwoolls",
+    "naptan:AtcoCode": "1600GLS428",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Hyde Ln",
+    "naptan:NaptanCode": "gloatgma",
+    "naptan:Street": "A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500124,
+  "lat": 51.7768925,
+  "lon": -2.3199244,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Northfield Park",
+    "naptan:AtcoCode": "1600GLS429",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "Northfield Park",
+    "naptan:NaptanCode": "gloatgpg",
+    "naptan:Street": "Bristol Rd A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502500127,
+  "lat": 51.7771437,
+  "lon": -2.3201291,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Northfield Park",
+    "naptan:AtcoCode": "1600GLS430",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Northfield Park",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloatgpd",
+    "naptan:Street": "Bristol Rd A38",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502501773,
+  "lat": 51.7915935,
+  "lon": -2.2724897,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Round House",
+    "naptan:AtcoCode": "1600GLS971",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Round House",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloawgjg",
+    "naptan:Street": "Haresfield Ln",
+    "naptan:verified": "yes",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502501779,
+  "lat": 51.7916519,
+  "lon": -2.2725326,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Round House",
+    "naptan:AtcoCode": "1600GLS972",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Round House",
+    "naptan:NaptanCode": "gloawgdw",
+    "naptan:Street": "Haresfield Ln",
+    "naptan:verified": "yes",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502501785,
+  "lat": 51.7950338,
+  "lon": -2.2749709,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Mount",
+    "naptan:AtcoCode": "1600GLS973",
+    "naptan:Bearing": "NE",
+    "naptan:CommonName": "The Mount",
+    "naptan:Indicator": "Opp",
+    "naptan:NaptanCode": "gloawdtw",
+    "naptan:Street": "Mount Farm Ln",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 502501791,
+  "lat": 51.7948719,
+  "lon": -2.2749844,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "The Mount",
+    "naptan:AtcoCode": "1600GLS974",
+    "naptan:Bearing": "SW",
+    "naptan:CommonName": "The Mount",
+    "naptan:NaptanCode": "gloawdtp",
+    "naptan:Street": "Mount Farm Ln",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "source": "naptan_import"
+  }
+},
+{
+  "type": "node",
+  "id": 1270255182,
+  "lat": 51.7780349,
+  "lon": -2.2619639,
+  "tags": {
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 1913396767,
+  "lat": 51.7783016,
+  "lon": -2.2617486,
+  "tags": {
+    "description": "Flush Bracket benchmark 5150\nWaypoint TP3627",
+    "ele": "216.548",
+    "man_made": "survey_point",
+    "ref": "S5150",
+    "survey_point:structure": "pillar"
+  }
+},
+{
+  "type": "node",
+  "id": 8568740887,
+  "lat": 51.8055774,
+  "lon": -2.2740250,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Hunts Grove Primary Academy",
+    "naptan:AtcoCode": "1600G0791",
+    "naptan:Bearing": "N",
+    "naptan:CommonName": "Hunts Grove Primary Academy",
+    "naptan:Indicator": "o/s",
+    "naptan:NaptanCode": "glojajwd",
+    "naptan:verified": "no",
+    "public_transport": "platform",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10763895965,
+  "lat": 51.7794406,
+  "lon": -2.2560652,
+  "tags": {
+    "direction": "180",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 11765728978,
+  "lat": 51.7860633,
+  "lon": -2.3131526,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Putloe Cottage",
+    "naptan:AtcoCode": "1600GLS425",
+    "naptan:Bearing": "S",
+    "naptan:CommonName": "Putloe Cottage",
+    "naptan:Indicator": "opp",
+    "naptan:NaptanCode": "gloatjdg",
+    "naptan:verified": "no",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "way",
+  "id": 169336485,
+  "center": {
+    "lat": 51.7855990,
+    "lon": -2.2894034
+  },
+  "tags": {
+    "amenity": "parking",
+    "description": "Lay-by",
+    "fee": "no",
+    "parking": "surface",
+    "source": "Bing"
+  }
+},
+{
+  "type": "way",
+  "id": 251372076,
+  "center": {
+    "lat": 51.8014918,
+    "lon": -2.2921757
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "note": "Parking for horse boxes/trailers only.",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 251372077,
+  "center": {
+    "lat": 51.8019054,
+    "lon": -2.2905411
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "note": "Parking for passenger vehicles only.",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 251373980,
+  "center": {
+    "lat": 51.8050382,
+    "lon": -2.2900782
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "fee": "no",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 1083356913,
+  "center": {
+    "lat": 51.8057922,
+    "lon": -2.2736748
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1083356920,
+  "center": {
+    "lat": 51.8058690,
+    "lon": -2.2722771
+  },
+  "tags": {
+    "amenity": "parking",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 1124272904,
+  "center": {
+    "lat": 51.8064771,
+    "lon": -2.2889180
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 1124272905,
+  "center": {
+    "lat": 51.8062075,
+    "lon": -2.2890725
+  },
+  "tags": {
+    "addr:city": "Gloucester",
+    "addr:postcode": "GL2 2RG",
+    "addr:street": "Bath Road",
+    "addr:suburb": "Hardwicke",
+    "amenity": "cafe",
+    "brand": "Costa",
+    "brand:wikidata": "Q608845",
+    "building": "retail",
+    "cuisine": "coffee_shop",
+    "fhrs:id": "1210615",
+    "name": "Costa",
+    "outdoor_seating": "yes",
+    "takeaway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1180074433,
+  "center": {
+    "lat": 51.7707645,
+    "lon": -2.3236704
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "fee": "no",
+    "parking": "surface",
+    "surface": "compacted"
+  }
+},
+{
+  "type": "way",
+  "id": 1222760398,
+  "center": {
+    "lat": 51.7792077,
+    "lon": -2.2541959
+  },
+  "tags": {
+    "amenity": "parking",
+    "operator": "National Trust",
+    "operator:type": "charitable",
+    "operator:wikidata": "Q333515",
+    "parking": "street_side",
+    "source": "survey"
+  }
+},
+{
+  "type": "way",
+  "id": 1222760399,
+  "center": {
+    "lat": 51.7793139,
+    "lon": -2.2549686
+  },
+  "tags": {
+    "amenity": "parking",
+    "operator": "National Trust",
+    "operator:type": "charitable",
+    "operator:wikidata": "Q333515",
+    "parking": "street_side",
+    "source": "survey"
+  }
+},
+{
+  "type": "way",
+  "id": 1223318881,
+  "center": {
+    "lat": 51.8063979,
+    "lon": -2.2909856
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1266962077,
+  "center": {
+    "lat": 51.7735902,
+    "lon": -2.3227750
+  },
+  "tags": {
+    "access": "private",
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764495,
+  "center": {
+    "lat": 51.7974944,
+    "lon": -2.2860394
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764496,
+  "center": {
+    "lat": 51.7976925,
+    "lon": -2.2858616
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764497,
+  "center": {
+    "lat": 51.7982012,
+    "lon": -2.2852531
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764498,
+  "center": {
+    "lat": 51.7978909,
+    "lon": -2.2847701
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764499,
+  "center": {
+    "lat": 51.7975848,
+    "lon": -2.2829361
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764500,
+  "center": {
+    "lat": 51.7971796,
+    "lon": -2.2827518
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764501,
+  "center": {
+    "lat": 51.7984207,
+    "lon": -2.2837214
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764502,
+  "center": {
+    "lat": 51.7987610,
+    "lon": -2.2844510
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764503,
+  "center": {
+    "lat": 51.7994961,
+    "lon": -2.2823391
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1320764504,
+  "center": {
+    "lat": 51.7992261,
+    "lon": -2.2806608
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1362656580,
+  "center": {
+    "lat": 51.7947318,
+    "lon": -2.2892780
+  },
+  "tags": {
+    "access": "customers",
+    "amenity": "parking",
+    "fee": "no",
+    "name": "Gloucester Garden Centre",
+    "operator": "British Garden Centres",
+    "operator:wikidata": "Q114243480"
+  }
+},
+{
+  "type": "way",
+  "id": 1463876956,
+  "center": {
+    "lat": 51.7993203,
+    "lon": -2.2827947
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1463876957,
+  "center": {
+    "lat": 51.7975000,
+    "lon": -2.2850979
+  },
+  "tags": {
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1468895351,
+  "center": {
+    "lat": 51.8022086,
+    "lon": -2.2679164
+  },
+  "tags": {
+    "amenity": "parking",
+    "parking": "surface"
+  }
+},
+{
+  "type": "way",
+  "id": 1468900637,
+  "center": {
+    "lat": 51.8057984,
+    "lon": -2.2754704
+  },
+  "tags": {
+    "access": "private",
+    "amenity": "parking"
+  }
+},
+{
+  "type": "way",
+  "id": 1468900638,
+  "center": {
+    "lat": 51.8057491,
+    "lon": -2.2764016
+  },
+  "tags": {
+    "access": "private",
+    "amenity": "parking"
+  }
+}
+
+  ]
+}
