@@ -225,9 +225,17 @@ Nothing about this is automatable — OS issues keys to an account holder, and t
    whether it wants card details at <https://osdatahub.os.uk/plans> before wiring a public
    site to it.
 3. In the project settings, **lock the key to a referrer**:
-   `https://nihilisticiconoclast.github.io/*`. The key is delivered to the browser by design
-   — that is the intended pattern for this API — but referrer-locking is what stops it being
-   useful to anyone else. Don't reuse it across projects.
+   `https://nihilisticiconoclast.github.io/*`. Do this before you paste the key anywhere.
+
+   **The key is visible on the published page, and no arrangement of this repository can
+   change that.** Every tile the browser fetches is
+   `https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=…`, so the key is in
+   the network tab whether or not it is also in `config.js`. Hiding it would mean running a
+   server of your own to proxy tiles and attach the key there, which this site does not have
+   and does not want. OS treat it as a public, restricted, revocable credential: the referrer
+   lock is the control, not secrecy. Lock it, don't reuse it across projects, and regenerate
+   it the moment it appears anywhere it shouldn't — a chat log, a screenshot, a support
+   ticket. Regenerating takes one click in the Data Hub and invalidates the old key at once.
 4. In this repo, add **one secret and nothing else**:
 
    *Settings → Secrets and variables → Actions →* the **Secrets** tab *→ New repository secret*
@@ -252,9 +260,15 @@ Start with `os-outdoor`. It needs only the free plan, it is EPSG:3857 like the d
 it will tell you the key and referrer lock are right before the projection changes underneath
 you as well. **The `os-leisure` URL in `site/app.js` is unverified** — the WMTS layer name and
 parameter casing are written from the API specification and have never been run against a live
-key, and that is the single line most likely to need adjusting. If tiles fail, the site falls
-back to OpenTopoMap after a few errors and says so in the footer rather than showing a blank
-map, so a wrong key degrades instead of breaking.
+key, and that is the single line most likely to need adjusting. If the OS layer draws nothing
+at all, the site falls back to OpenTopoMap rather than showing a blank map, and prints the
+reason in the map's own attribution box — including whatever OS said when asked for a tile
+directly, which is where a truncated key, an unentitled plan or a referrer that doesn't match
+announces itself. A wrong key degrades instead of breaking, and says why.
+
+The fallback fires only when *no* tile has drawn. It used to fire after four failed tiles,
+which is a different and wrong test: OS returns 404 outside Great Britain, so a working
+basemap could spend four errors on the sea and get thrown away for the rest of the session.
 
 Two things to know before you reach for `os-leisure`:
 
