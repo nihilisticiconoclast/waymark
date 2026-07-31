@@ -75,6 +75,8 @@ const state = {
   queueMarkers: new Map(),
   showQueue: true,
   routeLayer: null,          // created in initMap; see the note on module scope below
+  basemapFellBack: false,
+  basemapNote: "",                   // why the basemap on screen isn't the one asked for
   selected: null,
   sector: null,                      // { b0, b1, r0, r1 } — set by the dial
   filters: {
@@ -142,23 +144,30 @@ function initMap() {
 
   /* An OS profile can fail for several dull reasons — no key, a key not entitled to that
      product, a referrer lock that doesn't match the Pages origin, or the Leisure WMTS
-     parameters being slightly off. None of them should leave a blank map, so after a few
-     failed tiles the basemap falls back to the keyless one and says so in the footer. A map
-     with the wrong tiles is still a map; a map with no tiles is a bug report. */
+     parameters being slightly off. None of them should leave a blank map, so a basemap that
+     never manages to draw anything falls back to the keyless one and says so in the footer.
+     A map with the wrong tiles is still a map; a map with no tiles is a bug report.
+
+     "Never manages to draw anything" is the whole condition, and it used to be four failed
+     tiles instead. That is not the same test: OS returns 404 for any tile outside Great
+     Britain, so a view with coast in it — which is most of them once you zoom out — spends
+     four errors on the sea and permanently downgrades a basemap that was working. One
+     successful tile settles it; nothing after that can trigger the fallback. */
   if (CFG.basemap !== "opentopo") {
-    let failures = 0;
+    let failures = 0, drew = false;
+    base.on("tileload", () => { drew = true; });
     base.on("tileerror", () => {
-      if (++failures < 4 || state.basemapFellBack) return;
+      if (drew || state.basemapFellBack || ++failures < 6) return;
       state.basemapFellBack = true;
-      console.warn(`Basemap "${CFG.basemap}" failed; falling back to OpenTopoMap. ` +
-                   "Check the OS key, its entitlement, and the referrer lock.");
+      state.basemapNote = `${CFG.basemap} served no tiles — showing OpenTopoMap. ` +
+                          "Check the key's OS Maps API entitlement and its referrer lock.";
+      console.warn(`Basemap "${CFG.basemap}" drew no tiles in ${failures} attempts; ` +
+                   "falling back to OpenTopoMap.");
       map.removeLayer(base);
       const fb = BASEMAP_PROFILES.opentopo;
       L.tileLayer(fb.url, Object.assign({ attribution: fb.attribution }, fb.options)).addTo(map);
       document.getElementById("map").dataset.tint = "true";
-      document.getElementById("attribution").textContent =
-        `${CFG.basemap} tiles did not load — showing OpenTopoMap. ` +
-        fb.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
+      paintFooter(fb);
     });
   }
 
@@ -179,14 +188,31 @@ function initMap() {
   document.getElementById("map").dataset.tint = String(CFG.basemap === "opentopo");
 
   state.routeLayer.addTo(map);
-  document.getElementById("attribution").textContent =
-    (CFG_LOADED ? "" : "config.js did not load — default basemap. ") +
-    p.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
+  paintFooter(p);
   if (!CFG_LOADED) {
     console.warn("config.js did not define window.WAYMARK_CONFIG — running defaults " +
                  "(basemap opentopo, no OS key). Locally: copy site/config.example.js. " +
                  "Deployed: the pages workflow writes it, so it failed to parse.");
   }
+}
+
+/* The footer states which basemap is actually on screen, which build drew it, and — when the
+   answer is not the one that was asked for — why. "It is still showing OpenTopoMap" has at
+   least four causes: a stale cached page, a config that did not load, a config that asked for
+   OpenTopoMap, and an OS layer that refused to serve. From the outside they are identical.
+   This line separates them without anyone needing to open a console or read a build log. */
+function paintFooter(profile) {
+  const build = document.querySelector('meta[name="waymark-build"]')?.content || "dev";
+  const asked = CFG.basemap;
+  const showing = state.basemapFellBack ? "opentopo" : asked;
+
+  let why = "";
+  if (!CFG_LOADED) why = "config.js did not load, so this is the default. ";
+  else if (state.basemapNote) why = state.basemapNote + " ";
+
+  document.getElementById("attribution").textContent =
+    `Basemap: ${showing}${showing === asked ? "" : ` (asked for ${asked})`} · build ${build}. ` +
+    why + profile.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
 }
 
 function pinIcon(w, selected) {

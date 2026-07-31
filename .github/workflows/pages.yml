@@ -98,8 +98,12 @@ jobs:
           html = p.read_text()
           html = re.sub(r'(\./(?:app|config|styles|vendor/[\w.]+)\.(?:js|css))"',
                         lambda m: f'{m.group(1)}?v={sha}"', html)
+          html, n = re.subn(r'(<meta name="waymark-build" content=")dev(")',
+                            lambda m: m.group(1) + sha + m.group(2), html)
+          if n != 1:
+              raise SystemExit("expected exactly one waymark-build meta tag, found %d" % n)
           p.write_text(html)
-          print("stamped assets with", sha)
+          print("stamped assets and build meta with", sha)
           PY
 
       - uses: actions/upload-pages-artifact@v3
