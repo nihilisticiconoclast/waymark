@@ -159,8 +159,7 @@ function initMap() {
     base.on("tileerror", () => {
       if (drew || state.basemapFellBack || ++failures < 6) return;
       state.basemapFellBack = true;
-      state.basemapNote = `${CFG.basemap} served no tiles — showing OpenTopoMap. ` +
-                          "Check the key's OS Maps API entitlement and its referrer lock.";
+      state.basemapNote = `${CFG.basemap} served no tiles`;
       console.warn(`Basemap "${CFG.basemap}" drew no tiles in ${failures} attempts; ` +
                    "falling back to OpenTopoMap.");
       map.removeLayer(base);
@@ -168,6 +167,17 @@ function initMap() {
       L.tileLayer(fb.url, Object.assign({ attribution: fb.attribution }, fb.options)).addTo(map);
       document.getElementById("map").dataset.tint = "true";
       paintFooter(fb);
+      /* A failed <img> says nothing about why it failed — the browser gives the tile layer an
+         error event and no status code. So ask for one tile the ordinary way and report what
+         the server actually said. OS Data Hub answers a bad request with a JSON body naming
+         the reason ("Missing or invalid API key", a referrer that isn't on the allow list, a
+         plan without OS Maps API on it), and that sentence is worth more than any amount of
+         guessing from the outside. */
+      askWhy(url).then(reason => {
+        state.basemapNote = `${CFG.basemap} served no tiles — ${reason}`;
+        console.warn(`OS said: ${reason}`);
+        paintFooter(fb);
+      });
     });
   }
 
@@ -208,11 +218,56 @@ function paintFooter(profile) {
 
   let why = "";
   if (!CFG_LOADED) why = "config.js did not load, so this is the default. ";
-  else if (state.basemapNote) why = state.basemapNote + " ";
+  else if (state.basemapNote) why = state.basemapNote + ". ";
+
+  const status =
+    `Basemap: ${showing}${showing === asked ? "" : ` (asked for ${asked})`} · build ${build}`;
 
   document.getElementById("attribution").textContent =
-    `Basemap: ${showing}${showing === asked ? "" : ` (asked for ${asked})`} · build ${build}. ` +
-    why + profile.attribution + " · Walk data © OpenStreetMap contributors (ODbL)";
+    status + ". " + why + profile.attribution +
+    " · Walk data © OpenStreetMap contributors (ODbL)";
+
+  /* The same line goes into Leaflet's own attribution box, in the corner of the map. That is
+     where somebody looks when the map is wrong — the rail's footer is three screens down a
+     scrolling sidebar, and a diagnosis nobody finds is not a diagnosis. */
+  setMapStatus(status + (why ? " — " + why.trim() : ""));
+}
+
+let statusAttribution = null;
+
+function setMapStatus(text) {
+  if (!map || !map.attributionControl) return;
+  if (statusAttribution) map.attributionControl.removeAttribution(statusAttribution);
+  statusAttribution = `<strong>${esc(text)}</strong>`;
+  map.attributionControl.addAttribution(statusAttribution);
+}
+
+/* Ask the tile server for one tile the ordinary way, and return whatever it says. A tile
+   loaded as an <img> reports failure with no status and no body, so this is the only route to
+   the server's own explanation. The URL carries the key, so the URL is never reported — only
+   the status line and the body, which is where OS puts the reason. */
+async function askWhy(urlTemplate) {
+  const z = 12;
+  const n = 2 ** z;
+  const x = Math.floor((ORIGIN.lon + 180) / 360 * n);
+  const y = Math.floor(
+    (1 - Math.log(Math.tan(rad(ORIGIN.lat)) + 1 / Math.cos(rad(ORIGIN.lat))) / Math.PI) / 2 * n);
+  const url = urlTemplate
+    .replace("{z}", z).replace("{x}", x).replace("{y}", y).replace("{s}", "a");
+
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    let body = "";
+    try {
+      body = (await r.text()).replace(/\s+/g, " ").trim().slice(0, 180);
+    } catch { /* a binary body has nothing to say */ }
+    if (r.ok) return `a direct request for one tile succeeded (HTTP ${r.status}), ` +
+                     "so the failure is intermittent rather than a rejected key";
+    return `the server answered HTTP ${r.status}${body ? ": " + body : ""}`;
+  } catch (e) {
+    return "the request could not be made at all " +
+           `(${e.name}: ${e.message}) — typically a blocked origin or no network`;
+  }
 }
 
 function pinIcon(w, selected) {
