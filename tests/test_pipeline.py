@@ -794,3 +794,67 @@ class TestCircuitSearch(unittest.TestCase):
     def test_out_of_band_returns_nothing_rather_than_the_nearest_thing(self):
         graph = survey.build_graph(square_ways(self.CENTRE, side_km=1.0))
         self.assertIsNone(survey.find_circuit(graph, self.CENTRE, (20.0, 30.0)))
+
+
+class TestTrailheadRotation(unittest.TestCase):
+    """
+    A circuit has no inherent beginning; a walk does, and it is where you leave the car. The
+    search must begin at a junction, and the nearest junction to a car park is routinely a few
+    hundred metres from it — Haresfield Beacon came back starting 575 m away.
+
+    Rotating afterwards is free, and the tests that matter are the ones proving it changes
+    nothing but the index.
+    """
+
+    CENTRE = (51.7845, -2.2870)
+
+    def setUp(self):
+        graph = survey.build_graph(square_ways(self.CENTRE, side_km=1.0))
+        self.graph = graph
+        self.loop = survey.find_circuit(graph, self.CENTRE, (3.5, 4.5))
+        self.assertIsNotNone(self.loop)
+
+    def _length(self, loop):
+        return sum(self.graph[u][v]["length"] for u, v in zip(loop, loop[1:])
+                   if self.graph.has_edge(u, v))
+
+    def test_rotation_starts_the_walk_at_the_car_park(self):
+        park = self.loop[len(self.loop) // 2]          # a point half way round
+        rotated, trailhead = survey.start_at_trailhead(self.loop, [park])
+        self.assertIsNotNone(trailhead)
+        self.assertLess(survey.haversine_m(rotated[0], park),
+                        survey.haversine_m(self.loop[0], park))
+        self.assertLess(trailhead[0], 1.0)
+
+    def test_rotation_changes_nothing_but_where_it_starts(self):
+        park = self.loop[len(self.loop) // 3]
+        rotated, _ = survey.start_at_trailhead(self.loop, [park])
+        self.assertAlmostEqual(self._length(rotated), self._length(self.loop), delta=1.0)
+        self.assertEqual(len(rotated), len(self.loop))
+        self.assertEqual(sorted(map(sorted, (frozenset(e) for e in zip(rotated, rotated[1:])))),
+                         sorted(map(sorted, (frozenset(e) for e in zip(self.loop, self.loop[1:])))),
+                         "rotation altered the set of edges walked")
+
+    def test_the_rotated_circuit_still_closes(self):
+        park = self.loop[len(self.loop) // 4]
+        rotated, _ = survey.start_at_trailhead(self.loop, [park])
+        self.assertEqual(rotated[0], rotated[-1])
+        self.assertLess(survey.haversine_m(rotated[0], rotated[-1]), 1.0)
+
+    def test_a_distant_car_park_is_not_a_trailhead(self):
+        far = (self.CENTRE[0] + 0.5, self.CENTRE[1])
+        rotated, trailhead = survey.start_at_trailhead(self.loop, [far])
+        self.assertIsNone(trailhead)
+        self.assertEqual(rotated, self.loop)
+
+    def test_an_open_path_is_left_alone(self):
+        """Rotating something that does not close would cut it in half."""
+        open_path = self.loop[:len(self.loop) // 2]
+        rotated, trailhead = survey.start_at_trailhead(open_path, [open_path[3]])
+        self.assertIsNone(trailhead)
+        self.assertEqual(rotated, open_path)
+
+    def test_no_car_parks_at_all_is_not_an_error(self):
+        rotated, trailhead = survey.start_at_trailhead(self.loop, [])
+        self.assertIsNone(trailhead)
+        self.assertEqual(rotated, self.loop)

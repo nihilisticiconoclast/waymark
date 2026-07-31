@@ -669,6 +669,36 @@ def find_circuit(G: nx.Graph, feature: tuple[float, float], band_km: tuple[float
     return best
 
 
+def start_at_trailhead(loop: list, parks: list, max_m: float = 1200.0):
+    """
+    Rotate a closed circuit so that it begins at the point nearest a car park.
+
+    A circuit has no inherent beginning — every point on it is as good a start as any other —
+    but a walk does, and it is where you leave the car. The search has to begin somewhere it
+    can, which on a contracted graph means a junction, and the nearest junction to a car park
+    is routinely a few hundred metres from it. Rotating afterwards costs nothing and changes
+    nothing: same edges, same length, same route, different index to start counting from.
+
+    Returns the loop unchanged if it is not closed, or if no car park is within `max_m` —
+    rotating an open path would cut it in half, and a distant car park is not a trailhead.
+    """
+    if len(loop) < 4 or haversine_m(loop[0], loop[-1]) > 150:
+        return loop, None
+    if not parks:
+        return loop, None
+
+    ring = loop[:-1]                       # drop the repeated closing node before rotating
+    best = min(((haversine_m(node, park), i, park)
+                for park in parks for i, node in enumerate(ring)),
+               key=lambda x: x[0])
+    distance, index, park = best
+    if distance > max_m:
+        return loop, None
+
+    rotated = ring[index:] + ring[:index]
+    return rotated + [rotated[0]], (distance, park)
+
+
 def _by_right_share(J: nx.MultiGraph, trail) -> float:
     """Share of the circuit's length on ways a walker is entitled to be on."""
     total = by_right = 0.0
@@ -868,6 +898,15 @@ def survey(target: dict, origin: dict) -> dict:
         bonus = min(int(cap), 100) if cap.isdigit() else 0
         parks.append((d - bonus, d, t.get("name"), pt))
 
+    # Every plausible trailhead, for rotating the finished circuit onto one. The list above
+    # is filtered to the queue centre because it seeds the search; this is not, because the
+    # circuit may well pass a better car park than the one it started looking from.
+    park_points = [poi_point(p) for p in pois
+                   if p.get("tags", {}).get("amenity") == "parking"
+                   and p["tags"].get("parking") != "park_and_ride"
+                   and p["tags"].get("access") not in ("private", "customers", "no", "permit")]
+    park_points = [pt for pt in park_points if pt]
+
     parks.sort(key=lambda x: x[0])
     start_at = parks[0][3] if parks else None
     if start_at:
@@ -901,6 +940,12 @@ def survey(target: dict, origin: dict) -> dict:
             "Widen distance_band_km or radius_km in data/queue.yml, or the path density here "
             "is genuinely too low and the target should be dropped."
         )
+
+    loop, trailhead = start_at_trailhead(loop, park_points)
+    if trailhead:
+        print(f"  circuit rotated to start {trailhead[0]:.0f} m from a car park")
+    else:
+        print("  no car park close enough to start from; leaving the circuit where it began")
 
     attrs = summarise_route(G, loop)
     profile = sample_elevation(loop, slug)
