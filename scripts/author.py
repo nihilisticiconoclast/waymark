@@ -49,9 +49,19 @@ def load_gazetteer() -> list[str]:
     ]
 
 
-def next_id() -> int:
+def id_and_path(slug: str) -> tuple[int, Path]:
+    """
+    A walk keeps its number. Re-authoring after a re-survey is routine — a better route, a
+    corrected write-up — and letting the id climb each time churns the record for no reason.
+    An existing record for this slug keeps its id and its filename; only a new slug takes the
+    next number.
+    """
+    existing = sorted(WALKS.glob(f"*-{slug}.json"))
+    if existing:
+        return int(existing[0].name.split("-")[0]), existing[0]
     ids = [int(p.name.split("-")[0]) for p in WALKS.glob("*.json") if p.name[:4].isdigit()]
-    return max(ids, default=0) + 1
+    wid = max(ids, default=0) + 1
+    return wid, WALKS / f"{wid:04d}-{slug}.json"
 
 
 def build_messages(survey: dict) -> tuple[str, str, str]:
@@ -146,7 +156,7 @@ def main() -> None:
     # Merge. The model's output is confined to three branches; everything else is survey
     # provenance. If the model wrote into facts or geometry, it is discarded silently here
     # and validate.py will not see it — which is the point.
-    wid = next_id()
+    wid, default_out = id_and_path(survey["slug"])
     record = {
         "id": wid,
         "slug": survey["slug"],
@@ -167,7 +177,7 @@ def main() -> None:
     }
 
     WALKS.mkdir(parents=True, exist_ok=True)
-    out = args.out or WALKS / f"{wid:04d}-{survey['slug']}.json"
+    out = args.out or default_out
     out.write_text(json.dumps(record, indent=2, ensure_ascii=False))
     print(f"→ {out}")
     print(f"  confidence.navigable = {record['confidence']['navigable']}")
